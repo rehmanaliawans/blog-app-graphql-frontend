@@ -3,3 +3,15 @@ mutation Login($loginUser: LoginUserInput!) {
     access_token
   }
 }
+mutation Signup($signUpUserInput: CreateUserInput!) {
+  signUp(signUpUserInput: $signUpUserInput) {
+    access_token
+    user {
+      email
+      lastName
+      id
+      firstName
+      fullName
+    }
+  }
+}

@@ -17,14 +17,8 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 // components
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useMutation } from "@apollo/client";
 import { saveToken } from "../../../utils";
-import {
-  useLoginMutation,
-  AccessUserPayload,
-  LoginMutationVariables,
-  LoginUserInput
-} from "../../../generated/graphql";
+import { useLoginMutation, LoginUserInput } from "../../../generated/graphql";
 
 // ----------------------------------------------------------------------
 
@@ -80,6 +74,7 @@ const LoginForm = () => {
           placeholder="Enter email address"
           {...register("email")}
           error={errors.email ? true : false}
+          helperText={errors.email && errors.email.message}
         />
 
         <TextField
@@ -88,6 +83,7 @@ const LoginForm = () => {
           type={showPassword ? "text" : "password"}
           error={errors.password ? true : false}
           {...register("password")}
+          helperText={errors.password && errors.password.message}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">

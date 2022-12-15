@@ -1,10 +1,8 @@
 import { Link as RouterLink } from "react-router-dom";
-
 import { styled } from "@mui/material/styles";
 import { Card, Link, Container, Typography } from "@mui/material";
-
 import Page from "../components/Page";
-import { LoginForm } from "../sections/auth/login";
+import { RegisterForm } from "../sections/auth/register";
 
 const RootStyle = styled("div")(({ theme }) => ({
   [theme.breakpoints.up("md")]: {
@@ -34,35 +32,33 @@ const ContentStyle = styled("div")(({ theme }) => ({
   padding: theme.spacing(12, 0)
 }));
 
-// ----------------------------------------------------------------------
-
-export default function Login() {
+export default function Register() {
   return (
-    <Page title="Login">
+    <Page title="Register">
       <RootStyle>
         <SectionStyle>
-          <Typography variant="h3" sx={{ px: 5, mt: 10, mb: 5 }}>
-            Hi, Welcome Back
+          <Typography variant="h3" sx={{ px: 6, mt: 10, mb: 5 }}>
+            Get started with register yourself!
           </Typography>
-          <img src="/images/login.png" alt="login" />
+          <img alt="register" src="/images/register.png" />
         </SectionStyle>
 
-        <Container maxWidth="sm">
+        <Container>
           <ContentStyle>
             <Typography variant="h4" gutterBottom>
-              Login
+              Register
             </Typography>
 
             <Typography sx={{ color: "text.secondary", mb: 5 }}>
               Enter your details below.
             </Typography>
 
-            <LoginForm />
+            <RegisterForm />
 
-            <Typography variant="body2" align="center" sx={{ mt: 3 }}>
-              Don’t have an account? {""}
-              <Link variant="subtitle2" component={RouterLink} to="/register">
-                Get started
+            <Typography variant="body2" sx={{ mt: 3, textAlign: "center" }}>
+              Already have an account?{" "}
+              <Link variant="subtitle2" to="/login" component={RouterLink}>
+                Login
               </Link>
             </Typography>
           </ContentStyle>

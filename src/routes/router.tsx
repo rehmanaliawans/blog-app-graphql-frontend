@@ -4,6 +4,8 @@ import PageLayout from "../components/layout";
 import HomePage from "../Pages/HomePage";
 import Login from "../Pages/Login";
 import Page404 from "../Pages/Page404";
+import Register from "../Pages/Register";
+import LoggedInProtection from "./LoggesInProtection";
 import LoggedOutProtection from "./LogggedOutProtection";
 
 export default function Router() {
@@ -17,8 +19,20 @@ export default function Router() {
       )
     },
     {
+      path: "/register",
+      element: (
+        <LoggedOutProtection redirectTo="/">
+          <Register />
+        </LoggedOutProtection>
+      )
+    },
+    {
       path: "/",
-      element: <PageLayout />,
+      element: (
+        <LoggedInProtection redirectTo="/login">
+          <PageLayout />
+        </LoggedInProtection>
+      ),
       children: [
         {
           path: "/",

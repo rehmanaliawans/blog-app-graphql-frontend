@@ -1,8 +1,8 @@
 import { Grid } from "@mui/material";
 import MuiCard from "../../components/Card";
-import { CardData } from "../../interface/Card.interface";
+import { FetchAllPostsQuery } from "../../generated/graphql";
 
-const ShowData = ({ data }: { data: CardData[] }) => {
+const ShowData = ({ data }: { data: FetchAllPostsQuery | undefined }) => {
   return (
     <Grid
       container
@@ -11,9 +11,11 @@ const ShowData = ({ data }: { data: CardData[] }) => {
         marginTop: "10px"
       }}
       spacing={2}
+      display="flex"
+      justifyContent="center"
     >
-      {data.map((card, index) => (
-        <Grid item lg={3} key={index}>
+      {data?.fetchAllPosts?.posts?.map((card, index) => (
+        <Grid item lg={6} sm={6} xs={12} key={index}>
           <MuiCard card={card} />
         </Grid>
       ))}

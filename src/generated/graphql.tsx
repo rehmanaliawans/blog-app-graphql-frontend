@@ -290,6 +290,20 @@ export type CreateUserPostMutationVariables = Exact<{
 
 export type CreateUserPostMutation = { __typename?: 'Mutation', createUserPost: { __typename?: 'ResponseMsgPayload', message: string, status: number } };
 
+export type FetchAllUserQueryVariables = Exact<{
+  paginateInput: PaginateInput;
+}>;
+
+
+export type FetchAllUserQuery = { __typename?: 'Query', fetchAllUser: { __typename?: 'AllUsersDto', count?: number | null, users?: Array<{ __typename?: 'User', firstName: string, lastName: string, email: string }> | null } };
+
+export type FetchAllPostsQueryVariables = Exact<{
+  paginateInput: PaginateInput;
+}>;
+
+
+export type FetchAllPostsQuery = { __typename?: 'Query', fetchAllPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string }> | null } };
+
 
 export const LoginDocument = gql`
     mutation Login($loginUser: LoginUserInput!) {
@@ -465,3 +479,83 @@ export function useCreateUserPostMutation(baseOptions?: Apollo.MutationHookOptio
 export type CreateUserPostMutationHookResult = ReturnType<typeof useCreateUserPostMutation>;
 export type CreateUserPostMutationResult = Apollo.MutationResult<CreateUserPostMutation>;
 export type CreateUserPostMutationOptions = Apollo.BaseMutationOptions<CreateUserPostMutation, CreateUserPostMutationVariables>;
+export const FetchAllUserDocument = gql`
+    query FetchAllUser($paginateInput: PaginateInput!) {
+  fetchAllUser(paginateInput: $paginateInput) {
+    users {
+      firstName
+      lastName
+      email
+    }
+    count
+  }
+}
+    `;
+
+/**
+ * __useFetchAllUserQuery__
+ *
+ * To run a query within a React component, call `useFetchAllUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchAllUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchAllUserQuery({
+ *   variables: {
+ *      paginateInput: // value for 'paginateInput'
+ *   },
+ * });
+ */
+export function useFetchAllUserQuery(baseOptions: Apollo.QueryHookOptions<FetchAllUserQuery, FetchAllUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FetchAllUserQuery, FetchAllUserQueryVariables>(FetchAllUserDocument, options);
+      }
+export function useFetchAllUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FetchAllUserQuery, FetchAllUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FetchAllUserQuery, FetchAllUserQueryVariables>(FetchAllUserDocument, options);
+        }
+export type FetchAllUserQueryHookResult = ReturnType<typeof useFetchAllUserQuery>;
+export type FetchAllUserLazyQueryHookResult = ReturnType<typeof useFetchAllUserLazyQuery>;
+export type FetchAllUserQueryResult = Apollo.QueryResult<FetchAllUserQuery, FetchAllUserQueryVariables>;
+export const FetchAllPostsDocument = gql`
+    query FetchAllPosts($paginateInput: PaginateInput!) {
+  fetchAllPosts(paginateInput: $paginateInput) {
+    posts {
+      id
+      title
+      description
+    }
+    count
+  }
+}
+    `;
+
+/**
+ * __useFetchAllPostsQuery__
+ *
+ * To run a query within a React component, call `useFetchAllPostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchAllPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchAllPostsQuery({
+ *   variables: {
+ *      paginateInput: // value for 'paginateInput'
+ *   },
+ * });
+ */
+export function useFetchAllPostsQuery(baseOptions: Apollo.QueryHookOptions<FetchAllPostsQuery, FetchAllPostsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FetchAllPostsQuery, FetchAllPostsQueryVariables>(FetchAllPostsDocument, options);
+      }
+export function useFetchAllPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FetchAllPostsQuery, FetchAllPostsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FetchAllPostsQuery, FetchAllPostsQueryVariables>(FetchAllPostsDocument, options);
+        }
+export type FetchAllPostsQueryHookResult = ReturnType<typeof useFetchAllPostsQuery>;
+export type FetchAllPostsLazyQueryHookResult = ReturnType<typeof useFetchAllPostsLazyQuery>;
+export type FetchAllPostsQueryResult = Apollo.QueryResult<FetchAllPostsQuery, FetchAllPostsQueryVariables>;

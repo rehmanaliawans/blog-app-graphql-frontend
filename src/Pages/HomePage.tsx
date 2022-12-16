@@ -1,81 +1,20 @@
-import { Box, Container, Grid, Pagination } from "@mui/material";
+/* eslint-disable react-hooks/rules-of-hooks */
+import {
+  Box,
+  Container,
+  Grid,
+  Pagination,
+  TablePagination
+} from "@mui/material";
 import Page from "../components/Page";
 import SearchBar from "../components/SerachBar";
 import { CardData } from "../interface/Card.interface";
 import ShowData from "../sections/homePage/ShowData";
 import { styled } from "@mui/material/styles";
-const data: CardData[] = [
-  {
-    id: 1,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  },
-  {
-    id: 2,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  },
-  {
-    id: 3,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  },
-  {
-    id: 4,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  },
-  {
-    id: 5,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  },
-  {
-    id: 5,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  },
-  {
-    id: 5,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  },
-  {
-    id: 5,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  },
-  {
-    id: 5,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  },
-  {
-    id: 5,
-    link: "/assets/images.jpeg",
-    title: "Brunch this weekend?",
-    description:
-      "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica"
-  }
-];
+import { useFetchAllPostsLazyQuery } from "../generated/graphql";
+import { ChangeEvent, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+
 const ContainerStyle = styled(Container)(({ theme }) => ({
   marginTop: 10,
   display: "flex",
@@ -84,12 +23,39 @@ const ContainerStyle = styled(Container)(({ theme }) => ({
   alignItems: "center"
 }));
 const HomePage = () => {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(6);
+  const [fetchAllPost, { data, loading, error, refetch }] =
+    useFetchAllPostsLazyQuery();
+  useEffect(() => {
+    fetchAllPost({
+      variables: {
+        paginateInput: {
+          limit: limit,
+          page: page
+        }
+      }
+    });
+  }, [page]);
+  console.log(data);
+
   return (
     <Page title="Blog App">
       <ContainerStyle maxWidth="xl">
         <SearchBar />
         <ShowData data={data} />
-        <Pagination count={10} sx={{ marginTop: "20px" }} />
+        <TablePagination
+          rowsPerPageOptions={[10]}
+          component="div"
+          count={data?.fetchAllPosts?.count!}
+          rowsPerPage={limit}
+          page={page - 1}
+          onPageChange={(event, value) => {
+            setPage(value + 1);
+          }}
+          showFirstButton
+          showLastButton
+        />
       </ContainerStyle>
     </Page>
   );

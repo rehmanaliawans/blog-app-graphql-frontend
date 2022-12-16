@@ -1,0 +1,21 @@
+query FetchAllUser($paginateInput: PaginateInput!) {
+  fetchAllUser(paginateInput: $paginateInput) {
+    users {
+      firstName
+      lastName
+      email
+    }
+    count
+  }
+}
+
+query FetchAllPosts($paginateInput: PaginateInput!) {
+  fetchAllPosts(paginateInput: $paginateInput) {
+    posts {
+      id
+      title
+      description
+    }
+    count
+  }
+}

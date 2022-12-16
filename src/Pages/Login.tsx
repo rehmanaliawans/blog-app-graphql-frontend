@@ -1,40 +1,8 @@
 import { Link as RouterLink } from "react-router-dom";
-
-import { styled } from "@mui/material/styles";
-import { Card, Link, Container, Typography } from "@mui/material";
-
+import { Link, Container, Typography } from "@mui/material";
 import Page from "../components/Page";
 import { LoginForm } from "../sections/auth/login";
-
-const RootStyle = styled("div")(({ theme }) => ({
-  [theme.breakpoints.up("md")]: {
-    display: "flex"
-  }
-}));
-
-const SectionStyle = styled(Card)(({ theme }) => ({
-  width: "100%",
-  maxWidth: 464,
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  margin: theme.spacing(2, 0, 2, 2),
-  [theme.breakpoints.down("md")]: {
-    display: "none"
-  }
-}));
-
-const ContentStyle = styled("div")(({ theme }) => ({
-  maxWidth: 480,
-  margin: "auto",
-  minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  flexDirection: "column",
-  padding: theme.spacing(12, 0)
-}));
-
-// ----------------------------------------------------------------------
+import { ContentStyle, RootStyle, SectionStyle } from "../styledComponent/auth";
 
 export default function Login() {
   return (

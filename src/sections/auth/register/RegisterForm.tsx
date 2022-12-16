@@ -96,10 +96,10 @@ const RegisterForm = () => {
         <TextField
           placeholder="Enter Password"
           label="Password"
-          type={showPassword ? "text" : "password"}
           error={errors.password ? true : false}
           {...register("password")}
           helperText={errors.password && errors.password.message}
+          type={showPassword ? "text" : "password"}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">

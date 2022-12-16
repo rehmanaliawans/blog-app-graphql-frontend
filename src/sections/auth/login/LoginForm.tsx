@@ -104,7 +104,7 @@ const LoginForm = () => {
         justifyContent="flex-end"
         sx={{ my: 2 }}
       >
-        <Link variant="subtitle2" component={RouterLink} to="/register">
+        <Link variant="subtitle2" component={RouterLink} to="/forgot-password">
           Forgot Password?
         </Link>
       </Stack>

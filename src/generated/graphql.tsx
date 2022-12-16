@@ -283,6 +283,13 @@ export type UpdatePasswordMutationVariables = Exact<{
 
 export type UpdatePasswordMutation = { __typename?: 'Mutation', updatePassword: { __typename?: 'ResponseMsgPayload', message: string, status: number } };
 
+export type CreateUserPostMutationVariables = Exact<{
+  createPostInput: CreatePostInput;
+}>;
+
+
+export type CreateUserPostMutation = { __typename?: 'Mutation', createUserPost: { __typename?: 'ResponseMsgPayload', message: string, status: number } };
+
 
 export const LoginDocument = gql`
     mutation Login($loginUser: LoginUserInput!) {
@@ -424,3 +431,37 @@ export function useUpdatePasswordMutation(baseOptions?: Apollo.MutationHookOptio
 export type UpdatePasswordMutationHookResult = ReturnType<typeof useUpdatePasswordMutation>;
 export type UpdatePasswordMutationResult = Apollo.MutationResult<UpdatePasswordMutation>;
 export type UpdatePasswordMutationOptions = Apollo.BaseMutationOptions<UpdatePasswordMutation, UpdatePasswordMutationVariables>;
+export const CreateUserPostDocument = gql`
+    mutation CreateUserPost($createPostInput: CreatePostInput!) {
+  createUserPost(createPostInput: $createPostInput) {
+    message
+    status
+  }
+}
+    `;
+export type CreateUserPostMutationFn = Apollo.MutationFunction<CreateUserPostMutation, CreateUserPostMutationVariables>;
+
+/**
+ * __useCreateUserPostMutation__
+ *
+ * To run a mutation, you first call `useCreateUserPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserPostMutation, { data, loading, error }] = useCreateUserPostMutation({
+ *   variables: {
+ *      createPostInput: // value for 'createPostInput'
+ *   },
+ * });
+ */
+export function useCreateUserPostMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserPostMutation, CreateUserPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateUserPostMutation, CreateUserPostMutationVariables>(CreateUserPostDocument, options);
+      }
+export type CreateUserPostMutationHookResult = ReturnType<typeof useCreateUserPostMutation>;
+export type CreateUserPostMutationResult = Apollo.MutationResult<CreateUserPostMutation>;
+export type CreateUserPostMutationOptions = Apollo.BaseMutationOptions<CreateUserPostMutation, CreateUserPostMutationVariables>;

@@ -17,8 +17,8 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 // components
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { saveToken } from "../../../utils";
-import { useLoginMutation, LoginUserInput } from "../../../generated/graphql";
+import { saveToken } from "../../utils";
+import { useLoginMutation, LoginUserInput } from "../../generated/graphql";
 
 // ----------------------------------------------------------------------
 
@@ -117,6 +117,7 @@ const LoginForm = () => {
       >
         Login
       </LoadingButton>
+
       {error && (
         <Typography variant="caption" color="error">
           {error.message}

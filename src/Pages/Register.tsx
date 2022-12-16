@@ -1,8 +1,8 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Link, Container, Typography } from "@mui/material";
 import Page from "../components/Page";
-import { RegisterForm } from "../sections/auth/register";
-import { ContentStyle, RootStyle, SectionStyle } from "../styledComponent/auth";
+import { RegisterForm } from "../sections/auth";
+import { ContentStyle, RootStyle, SectionStyle } from "../styledComponent";
 
 export default function Register() {
   return (

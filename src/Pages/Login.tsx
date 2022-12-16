@@ -1,8 +1,8 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Link, Container, Typography } from "@mui/material";
 import Page from "../components/Page";
-import { LoginForm } from "../sections/auth/login";
-import { ContentStyle, RootStyle, SectionStyle } from "../styledComponent/auth";
+import { LoginForm } from "../sections/auth";
+import { ContentStyle, RootStyle, SectionStyle } from "../styledComponent";
 
 export default function Login() {
   return (

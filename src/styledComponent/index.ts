@@ -6,6 +6,7 @@ export const RootStyle = styled("div")(({ theme }) => ({
     display: "flex"
   }
 }));
+
 export const ForgotRootStyle = styled("div")(({ theme }) => ({
   display: "flex",
   justifyContent: "center",

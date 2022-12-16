@@ -28,3 +28,10 @@ mutation UpdatePassword($passwordUpdateInput: UpdatePasswordInput!) {
     status
   }
 }
+
+mutation CreateUserPost($createPostInput: CreatePostInput!) {
+  createUserPost(createPostInput: $createPostInput) {
+    message
+    status
+  }
+}

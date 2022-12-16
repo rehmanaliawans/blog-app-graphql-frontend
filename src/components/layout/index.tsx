@@ -1,14 +1,14 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { styled } from "@mui/material/styles";
+import NavBar from "./NavBar";
 
-const APP_BAR_MOBILE = 0;
-const APP_BAR_DESKTOP = 0;
+const APP_BAR_MOBILE = 64;
+const APP_BAR_DESKTOP = 92;
 
 const RootStyle = styled("div")({
   display: "flex",
-  justifyContent: "center",
-  backgroundColor: "#fff"
+  justifyContent: "center"
 });
 
 const MainStyle = styled("div")(({ theme }) => ({
@@ -24,6 +24,7 @@ const MainStyle = styled("div")(({ theme }) => ({
 const PageLayout = () => {
   return (
     <RootStyle>
+      <NavBar />
       <MainStyle>
         <Outlet />
       </MainStyle>

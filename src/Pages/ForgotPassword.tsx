@@ -1,8 +1,8 @@
 import { Container, Link, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import Page from "../components/Page";
-import { ForgotPasswordForm } from "../sections/auth/forgotPassword";
-import { ForgotRootStyle } from "../styledComponent/auth";
+import { ForgotPasswordForm } from "../sections/auth";
+import { ForgotRootStyle } from "../styledComponent";
 
 const ForgotPassword = () => {
   return (

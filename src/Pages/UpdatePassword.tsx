@@ -1,12 +1,12 @@
 import { Container, Link, Typography } from "@mui/material";
 import React from "react";
 import Page from "../components/Page";
-import { ForgotRootStyle } from "../styledComponent/auth";
+import { ForgotRootStyle } from "../styledComponent";
 import { Link as RouterLink } from "react-router-dom";
-import { UpdatePasswordForm } from "../sections/auth/updatePassword";
+import { UpdatePasswordForm } from "../sections/auth";
 const UpdatePassword = () => {
   return (
-    <Page title="Forgot Password">
+    <Page title="Update Password">
       <ForgotRootStyle>
         <Container maxWidth="sm">
           <Typography variant="h4" gutterBottom color="primary">

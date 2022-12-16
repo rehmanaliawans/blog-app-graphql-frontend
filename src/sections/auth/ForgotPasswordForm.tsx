@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import {
   ForgotPasswordMutationVariables,
   useForgotPasswordMutation
-} from "../../../generated/graphql";
+} from "../../generated/graphql";
 
 const ForgotPasswordForm = () => {
   const [forgotPasswordMutation, { data, loading, error }] =

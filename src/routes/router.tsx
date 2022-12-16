@@ -1,6 +1,7 @@
 import React from "react";
 import { useRoutes } from "react-router-dom";
 import PageLayout from "../components/layout";
+import CreatePost from "../Pages/CreatePost";
 import ForgotPassword from "../Pages/ForgotPassword";
 import HomePage from "../Pages/HomePage";
 import Login from "../Pages/Login";
@@ -55,6 +56,10 @@ export default function Router() {
         {
           path: "/",
           element: <HomePage />
+        },
+        {
+          path: "/create-post",
+          element: <CreatePost />
         }
       ]
     },

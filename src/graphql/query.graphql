@@ -25,6 +25,7 @@ query FetchPostById($postId: String!) {
     id
     title
     description
+    attachmentUrl
     postComments {
       id
       commentBody

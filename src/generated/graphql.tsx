@@ -33,6 +33,12 @@ export type AllUsersDto = {
   users?: Maybe<Array<User>>;
 };
 
+export type CreateCommentInput = {
+  commentBody: Scalars['String'];
+  parentId?: InputMaybe<Scalars['String']>;
+  postId: Scalars['String'];
+};
+
 export type CreatePostInput = {
   attachmentUrl?: InputMaybe<Scalars['String']>;
   description: Scalars['String'];
@@ -65,16 +71,24 @@ export type LoginUserInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createPostComment: ResponseMsgPayload;
   createUser: CreatedUser;
   createUserPost: ResponseMsgPayload;
+  deleteComment: ResponseMsgPayload;
   deletePost: ResponseMsgPayload;
   deleteUser: ResponseMsgPayload;
   forgotPassword: ForgotPassword;
   login: AccessUserPayload;
   signUp: CreatedUser;
+  updateComment: ResponseMsgPayload;
   updatePassword: ResponseMsgPayload;
   updateUser: ResponseMsgPayload;
   updateUserPost: ResponseMsgPayload;
+};
+
+
+export type MutationCreatePostCommentArgs = {
+  createCommentInput: CreateCommentInput;
 };
 
 
@@ -85,6 +99,11 @@ export type MutationCreateUserArgs = {
 
 export type MutationCreateUserPostArgs = {
   createPostInput: CreatePostInput;
+};
+
+
+export type MutationDeleteCommentArgs = {
+  commentId: Scalars['String'];
 };
 
 
@@ -110,6 +129,11 @@ export type MutationLoginArgs = {
 
 export type MutationSignUpArgs = {
   signUpUserInput: CreateUserInput;
+};
+
+
+export type MutationUpdateCommentArgs = {
+  updateCommentInput: UpdateCommentInput;
 };
 
 
@@ -148,6 +172,7 @@ export type Post = {
 
 export type PostComment = {
   __typename?: 'PostComment';
+  Parent: PostComment;
   commentBody: Scalars['String'];
   createdAt: Scalars['DateTime'];
   id: Scalars['String'];
@@ -208,6 +233,11 @@ export type ResponseMsgPayload = {
   __typename?: 'ResponseMsgPayload';
   message: Scalars['String'];
   status: Scalars['Float'];
+};
+
+export type UpdateCommentInput = {
+  commentBody: Scalars['String'];
+  commentId: Scalars['String'];
 };
 
 export type UpdatePasswordInput = {
@@ -309,7 +339,7 @@ export type FetchPostByIdQueryVariables = Exact<{
 }>;
 
 
-export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, createdAt: any, updatedAt: any, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string }, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, user: { __typename?: 'User', id: string, firstName: string, lastName: string } }> | null }> | null } };
+export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, attachmentUrl?: string | null, createdAt: any, updatedAt: any, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string }, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, user: { __typename?: 'User', id: string, firstName: string, lastName: string } }> | null }> | null } };
 
 
 export const LoginDocument = gql`
@@ -572,6 +602,7 @@ export const FetchPostByIdDocument = gql`
     id
     title
     description
+    attachmentUrl
     postComments {
       id
       commentBody

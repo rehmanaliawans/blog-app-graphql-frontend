@@ -38,6 +38,7 @@ const FileLabel = styled("label")(({ theme }) => ({
 }));
 const CreatePostForm = () => {
   const [fileLoading, setFileLoading] = useState(false);
+  const [image, setImage] = useState([]);
   const [createUserPostMutation, { data, error, reset }] =
     useCreateUserPostMutation({
       onCompleted: (data) => {
@@ -46,7 +47,7 @@ const CreatePostForm = () => {
 
           setValue("title", "");
           setValue("description", "");
-          setValue("file", [{ name: "" }]);
+          setValue("file", []);
           setTimeout(() => {
             reset();
           }, 3000);
@@ -65,11 +66,7 @@ const CreatePostForm = () => {
   const defaultValues = {
     title: "",
     description: "",
-    file: [
-      {
-        name: ""
-      }
-    ]
+    file: []
   };
 
   const {
@@ -83,46 +80,44 @@ const CreatePostForm = () => {
     defaultValues
   });
 
-  const onSubmit = async (data: {
-    title: string;
-    description: string;
-    file: any;
-  }) => {
+  const onSubmit = async (data: { title: string; description: string }) => {
     console.log(data);
     let postData: CreatePostInput = {
       title: data.title,
       description: data.description
     };
-    if (data?.file !== null) {
-      console.log("call");
-      setFileLoading(true);
+    if (image.length > 0) {
+      console.log("call", image, image[0]);
+      // setFileLoading(true);
       const fileData = new FormData();
-      fileData.append("file", data?.file[0]!);
+      fileData.append("file", image[0]);
       fileData.append("upload_preset", "Blog_post");
       fileData.append("cloud_name", "dxxv034dh");
-
-      const result = await fetch(
-        "https://api.cloudinary.com/v1_1/dxxv034dh/image/upload",
-        {
-          method: "POST",
-          body: fileData
+      console.log("================================", fileData);
+      fetch("https://api.cloudinary.com/v1_1/dxxv034dh/image/upload", {
+        method: "POST",
+        body: fileData
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          postData = {
+            ...postData,
+            attachmentUrl: data.url
+          };
+          createUserPostMutation({
+            variables: {
+              createPostInput: postData
+            }
+          });
+        })
+        .catch((err) => console.log(err));
+    } else {
+      createUserPostMutation({
+        variables: {
+          createPostInput: postData
         }
-      );
-      if (result) {
-        console.log(result.url);
-        postData = {
-          ...postData,
-          attachmentUrl: JSON.stringify(result.url)
-        };
-        console.log("Upload", JSON.stringify(postData));
-      }
+      });
     }
-
-    createUserPostMutation({
-      variables: {
-        createPostInput: postData
-      }
-    });
   };
   return (
     <MainBox component="form" onSubmit={handleSubmit(onSubmit)}>
@@ -150,14 +145,13 @@ const CreatePostForm = () => {
         <FileLabel htmlFor="fileupload" style={{ cursor: "pointer" }}>
           Attached file
         </FileLabel>
-        {watch("file")[0].name !== "" && (
-          <Typography variant="caption">{watch("file")[0].name}</Typography>
-        )}
 
         <input
           type="file"
           id="fileupload"
-          {...register("file")}
+          onChange={(e) => {
+            setImage(e.target.files as unknown as []);
+          }}
           style={{ display: "none" }}
           accept="image/*"
         />

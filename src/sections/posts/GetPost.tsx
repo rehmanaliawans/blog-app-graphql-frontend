@@ -23,6 +23,7 @@ const DescriptionCard = styled(TitleTypography)(() => ({
   overflowY: "auto"
 }));
 const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
+  console.log("GetPost", data);
   return (
     <MainBox>
       <Typography variant="h4" color="primary" gutterBottom>
@@ -36,6 +37,9 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
       </Typography>
 
       <DescriptionCard variant="body1" gutterBottom>
+        {data?.fetchPost?.attachmentUrl && (
+          <img alt="asdasd" src={data?.fetchPost?.attachmentUrl!} />
+        )}
         {data.fetchPost.description}
       </DescriptionCard>
 

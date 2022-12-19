@@ -28,11 +28,21 @@ query FetchPostById($postId: String!) {
     postComments {
       id
       commentBody
+      createdAt
+      user {
+        id
+        firstName
+        lastName
+      }
       reply {
         id
         commentBody
+        user {
+          id
+          firstName
+          lastName
+        }
       }
-      createdAt
     }
     createdAt
     updatedAt

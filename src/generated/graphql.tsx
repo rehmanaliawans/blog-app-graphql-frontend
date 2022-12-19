@@ -309,7 +309,7 @@ export type FetchPostByIdQueryVariables = Exact<{
 }>;
 
 
-export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, createdAt: any, updatedAt: any, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string }> | null }> | null } };
+export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, createdAt: any, updatedAt: any, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string }, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, user: { __typename?: 'User', id: string, firstName: string, lastName: string } }> | null }> | null } };
 
 
 export const LoginDocument = gql`
@@ -575,11 +575,21 @@ export const FetchPostByIdDocument = gql`
     postComments {
       id
       commentBody
+      createdAt
+      user {
+        id
+        firstName
+        lastName
+      }
       reply {
         id
         commentBody
+        user {
+          id
+          firstName
+          lastName
+        }
       }
-      createdAt
     }
     createdAt
     updatedAt

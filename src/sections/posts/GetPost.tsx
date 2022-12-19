@@ -2,6 +2,7 @@ import { Box, Card, Typography } from "@mui/material";
 import { padding, styled } from "@mui/system";
 import React from "react";
 import { FetchPostByIdQuery } from "../../generated/graphql";
+import CommentBox from "../../components/CommentBox";
 
 const MainBox = styled(Box)(() => ({
   width: "100%",
@@ -37,11 +38,11 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
       <DescriptionCard variant="body1" gutterBottom>
         {data.fetchPost.description}
       </DescriptionCard>
-      <Box>
-        <Typography variant="h6" color="primary" gutterBottom>
-          Comments:
-        </Typography>
-      </Box>
+
+      <Typography variant="h6" color="primary" gutterBottom>
+        Comments:
+      </Typography>
+      <CommentBox />
     </MainBox>
   );
 };

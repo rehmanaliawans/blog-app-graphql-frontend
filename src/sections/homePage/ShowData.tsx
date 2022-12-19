@@ -15,7 +15,7 @@ const ShowData = ({ data }: { data: FetchAllPostsQuery | undefined }) => {
       justifyContent="center"
     >
       {data?.fetchAllPosts?.posts?.map((card, index) => (
-        <Grid item lg={6} sm={6} xs={12} key={index}>
+        <Grid item lg={6} xl={6} sm={6} xs={12} key={index}>
           <MuiCard card={card} />
         </Grid>
       ))}

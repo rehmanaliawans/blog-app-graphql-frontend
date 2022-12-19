@@ -19,3 +19,22 @@ query FetchAllPosts($paginateInput: PaginateInput!) {
     count
   }
 }
+
+query FetchPostById($postId: String!) {
+  fetchPost(postId: $postId) {
+    id
+    title
+    description
+    postComments {
+      id
+      commentBody
+      reply {
+        id
+        commentBody
+      }
+      createdAt
+    }
+    createdAt
+    updatedAt
+  }
+}

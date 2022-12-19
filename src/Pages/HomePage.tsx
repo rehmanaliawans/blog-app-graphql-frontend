@@ -25,8 +25,8 @@ const ContainerStyle = styled(Container)(({ theme }) => ({
 const HomePage = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(6);
-  const [fetchAllPost, { data, loading, error, refetch }] =
-    useFetchAllPostsLazyQuery();
+  const [fetchAllPost, { data, loading, error }] = useFetchAllPostsLazyQuery();
+
   useEffect(() => {
     fetchAllPost({
       variables: {
@@ -34,7 +34,8 @@ const HomePage = () => {
           limit: limit,
           page: page
         }
-      }
+      },
+      fetchPolicy: "network-only"
     });
   }, [page]);
   console.log(data);

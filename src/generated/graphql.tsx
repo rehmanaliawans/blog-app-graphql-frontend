@@ -304,6 +304,13 @@ export type FetchAllPostsQueryVariables = Exact<{
 
 export type FetchAllPostsQuery = { __typename?: 'Query', fetchAllPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string }> | null } };
 
+export type FetchPostByIdQueryVariables = Exact<{
+  postId: Scalars['String'];
+}>;
+
+
+export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, createdAt: any, updatedAt: any, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string }> | null }> | null } };
+
 
 export const LoginDocument = gql`
     mutation Login($loginUser: LoginUserInput!) {
@@ -559,3 +566,51 @@ export function useFetchAllPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type FetchAllPostsQueryHookResult = ReturnType<typeof useFetchAllPostsQuery>;
 export type FetchAllPostsLazyQueryHookResult = ReturnType<typeof useFetchAllPostsLazyQuery>;
 export type FetchAllPostsQueryResult = Apollo.QueryResult<FetchAllPostsQuery, FetchAllPostsQueryVariables>;
+export const FetchPostByIdDocument = gql`
+    query FetchPostById($postId: String!) {
+  fetchPost(postId: $postId) {
+    id
+    title
+    description
+    postComments {
+      id
+      commentBody
+      reply {
+        id
+        commentBody
+      }
+      createdAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useFetchPostByIdQuery__
+ *
+ * To run a query within a React component, call `useFetchPostByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchPostByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchPostByIdQuery({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useFetchPostByIdQuery(baseOptions: Apollo.QueryHookOptions<FetchPostByIdQuery, FetchPostByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FetchPostByIdQuery, FetchPostByIdQueryVariables>(FetchPostByIdDocument, options);
+      }
+export function useFetchPostByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FetchPostByIdQuery, FetchPostByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FetchPostByIdQuery, FetchPostByIdQueryVariables>(FetchPostByIdDocument, options);
+        }
+export type FetchPostByIdQueryHookResult = ReturnType<typeof useFetchPostByIdQuery>;
+export type FetchPostByIdLazyQueryHookResult = ReturnType<typeof useFetchPostByIdLazyQuery>;
+export type FetchPostByIdQueryResult = Apollo.QueryResult<FetchPostByIdQuery, FetchPostByIdQueryVariables>;

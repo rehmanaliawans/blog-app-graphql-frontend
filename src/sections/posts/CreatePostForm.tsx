@@ -14,7 +14,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   CreatePostInput,
-  useCreateUserPostMutation
+  useCreateUserPostMutation,
+  useFetchAllUserQuery
 } from "../../generated/graphql";
 
 const MainBox = styled(Box)(() => ({
@@ -24,7 +25,6 @@ const MainBox = styled(Box)(() => ({
   flexDirection: "column",
   alignItems: "flex-start",
   justifyContent: "flex-start"
-  // background: "rgba(0,0,0,0.5)"
 }));
 const CreatePostForm = () => {
   const [createUserPostMutation, { data, loading, error, reset }] =

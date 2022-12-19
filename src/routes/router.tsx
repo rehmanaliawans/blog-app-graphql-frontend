@@ -10,6 +10,7 @@ import Register from "../Pages/Register";
 import UpdatePassword from "../Pages/UpdatePassword";
 import LoggedInProtection from "./LoggesInProtection";
 import LoggedOutProtection from "./LogggedOutProtection";
+import GetSinglePost from "../Pages/GetSinglePost";
 
 export default function Router() {
   return useRoutes([
@@ -60,6 +61,10 @@ export default function Router() {
         {
           path: "/create-post",
           element: <CreatePost />
+        },
+        {
+          path: "/get-post/:id",
+          element: <GetSinglePost />
         }
       ]
     },

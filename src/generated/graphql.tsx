@@ -158,7 +158,6 @@ export type PaginateInput = {
 
 export type Post = {
   __typename?: 'Post';
-  PostComments: Array<PostComment>;
   attachmentUrl?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   description: Scalars['String'];
@@ -172,12 +171,11 @@ export type Post = {
 
 export type PostComment = {
   __typename?: 'PostComment';
-  Parent: PostComment;
   commentBody: Scalars['String'];
   createdAt: Scalars['DateTime'];
   id: Scalars['String'];
   parent?: Maybe<PostComment>;
-  post: Post;
+  post?: Maybe<Post>;
   reply?: Maybe<Array<PostComment>>;
   updatedAt: Scalars['DateTime'];
   user: User;
@@ -320,6 +318,13 @@ export type CreateUserPostMutationVariables = Exact<{
 
 export type CreateUserPostMutation = { __typename?: 'Mutation', createUserPost: { __typename?: 'ResponseMsgPayload', message: string, status: number } };
 
+export type CreatePostCommentMutationVariables = Exact<{
+  createCommentInput: CreateCommentInput;
+}>;
+
+
+export type CreatePostCommentMutation = { __typename?: 'Mutation', createPostComment: { __typename?: 'ResponseMsgPayload', message: string, status: number } };
+
 export type FetchAllUserQueryVariables = Exact<{
   paginateInput: PaginateInput;
 }>;
@@ -339,7 +344,7 @@ export type FetchPostByIdQueryVariables = Exact<{
 }>;
 
 
-export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, attachmentUrl?: string | null, createdAt: any, updatedAt: any, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string }, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, user: { __typename?: 'User', id: string, firstName: string, lastName: string } }> | null }> | null } };
+export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, attachmentUrl?: string | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any, id: string }, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any }, reply?: Array<{ __typename?: 'PostComment', commentBody: string, id: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any } }> | null }> | null } };
 
 
 export const LoginDocument = gql`
@@ -516,6 +521,40 @@ export function useCreateUserPostMutation(baseOptions?: Apollo.MutationHookOptio
 export type CreateUserPostMutationHookResult = ReturnType<typeof useCreateUserPostMutation>;
 export type CreateUserPostMutationResult = Apollo.MutationResult<CreateUserPostMutation>;
 export type CreateUserPostMutationOptions = Apollo.BaseMutationOptions<CreateUserPostMutation, CreateUserPostMutationVariables>;
+export const CreatePostCommentDocument = gql`
+    mutation CreatePostComment($createCommentInput: CreateCommentInput!) {
+  createPostComment(createCommentInput: $createCommentInput) {
+    message
+    status
+  }
+}
+    `;
+export type CreatePostCommentMutationFn = Apollo.MutationFunction<CreatePostCommentMutation, CreatePostCommentMutationVariables>;
+
+/**
+ * __useCreatePostCommentMutation__
+ *
+ * To run a mutation, you first call `useCreatePostCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePostCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPostCommentMutation, { data, loading, error }] = useCreatePostCommentMutation({
+ *   variables: {
+ *      createCommentInput: // value for 'createCommentInput'
+ *   },
+ * });
+ */
+export function useCreatePostCommentMutation(baseOptions?: Apollo.MutationHookOptions<CreatePostCommentMutation, CreatePostCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePostCommentMutation, CreatePostCommentMutationVariables>(CreatePostCommentDocument, options);
+      }
+export type CreatePostCommentMutationHookResult = ReturnType<typeof useCreatePostCommentMutation>;
+export type CreatePostCommentMutationResult = Apollo.MutationResult<CreatePostCommentMutation>;
+export type CreatePostCommentMutationOptions = Apollo.BaseMutationOptions<CreatePostCommentMutation, CreatePostCommentMutationVariables>;
 export const FetchAllUserDocument = gql`
     query FetchAllUser($paginateInput: PaginateInput!) {
   fetchAllUser(paginateInput: $paginateInput) {
@@ -603,27 +642,44 @@ export const FetchPostByIdDocument = gql`
     title
     description
     attachmentUrl
+    createdAt
+    updatedAt
+    user {
+      firstName
+      lastName
+      email
+      createdAt
+      updatedAt
+      id
+    }
     postComments {
       id
       commentBody
       createdAt
+      updatedAt
       user {
         id
         firstName
         lastName
+        email
+        createdAt
+        updatedAt
       }
       reply {
-        id
         commentBody
+        id
         user {
           id
           firstName
           lastName
+          email
+          createdAt
+          updatedAt
         }
+        createdAt
+        updatedAt
       }
     }
-    createdAt
-    updatedAt
   }
 }
     `;

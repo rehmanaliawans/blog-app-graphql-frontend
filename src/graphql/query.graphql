@@ -26,26 +26,43 @@ query FetchPostById($postId: String!) {
     title
     description
     attachmentUrl
+    createdAt
+    updatedAt
+    user {
+      firstName
+      lastName
+      email
+      createdAt
+      updatedAt
+      id
+    }
     postComments {
       id
       commentBody
       createdAt
+      updatedAt
       user {
         id
         firstName
         lastName
+        email
+        createdAt
+        updatedAt
       }
       reply {
-        id
         commentBody
+        id
         user {
           id
           firstName
           lastName
+          email
+          createdAt
+          updatedAt
         }
+        createdAt
+        updatedAt
       }
     }
-    createdAt
-    updatedAt
   }
 }

@@ -18,35 +18,42 @@ const TitleTypography = styled(Typography)(() => ({
   backgroundColor: "#fff",
   borderRadius: "10px"
 }));
-const DescriptionCard = styled(TitleTypography)(() => ({
-  height: "25rem",
-  overflowY: "auto"
+const DescriptionCard = styled(Box)(() => ({
+  width: "100%",
+  padding: "10px 20px",
+  backgroundColor: "#fff",
+  borderRadius: "10px"
 }));
 const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
-  console.log("GetPost", data);
+  console.log("types", data?.fetchPost?.postComments);
   return (
     <MainBox>
       <Typography variant="h4" color="primary" gutterBottom>
         Title
       </Typography>
-      <TitleTypography variant="h3" gutterBottom>
+      <TitleTypography variant="h4" gutterBottom>
         {data.fetchPost.title}
       </TitleTypography>
       <Typography variant="h4" color="primary" gutterBottom>
         Description
       </Typography>
 
-      <DescriptionCard variant="body1" gutterBottom>
+      <DescriptionCard>
         {data?.fetchPost?.attachmentUrl && (
-          <img alt="asdasd" src={data?.fetchPost?.attachmentUrl!} />
+          <img
+            alt={data?.fetchPost?.title}
+            src={data?.fetchPost?.attachmentUrl!}
+            width="100%"
+            height="100%"
+          />
         )}
-        {data.fetchPost.description}
+        <Typography variant="body1">{data.fetchPost.description}</Typography>
       </DescriptionCard>
-
       <Typography variant="h6" color="primary" gutterBottom>
         Comments:
       </Typography>
-      <CommentBox />
+
+      <CommentBox comments={data?.fetchPost?.postComments!} />
     </MainBox>
   );
 };

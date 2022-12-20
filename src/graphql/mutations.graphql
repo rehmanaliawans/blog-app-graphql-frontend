@@ -35,3 +35,10 @@ mutation CreateUserPost($createPostInput: CreatePostInput!) {
     status
   }
 }
+
+mutation CreatePostComment($createCommentInput: CreateCommentInput!) {
+  createPostComment(createCommentInput: $createCommentInput) {
+    message
+    status
+  }
+}

@@ -40,5 +40,33 @@ mutation CreatePostComment($createCommentInput: CreateCommentInput!) {
   createPostComment(createCommentInput: $createCommentInput) {
     message
     status
+    comment {
+      id
+      commentBody
+      reply {
+        id
+        commentBody
+        user {
+          id
+          firstName
+          lastName
+          email
+          createdAt
+          updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      user {
+        id
+        firstName
+        lastName
+        email
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
   }
 }

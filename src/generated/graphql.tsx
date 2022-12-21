@@ -39,6 +39,13 @@ export type CreateCommentInput = {
   postId: Scalars['String'];
 };
 
+export type CreateCommentResponse = {
+  __typename?: 'CreateCommentResponse';
+  comment: PostComment;
+  message: Scalars['String'];
+  status: Scalars['Float'];
+};
+
 export type CreatePostInput = {
   attachmentUrl?: InputMaybe<Scalars['String']>;
   description: Scalars['String'];
@@ -71,7 +78,7 @@ export type LoginUserInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createPostComment: ResponseMsgPayload;
+  createPostComment: CreateCommentResponse;
   createUser: CreatedUser;
   createUserPost: ResponseMsgPayload;
   deleteComment: ResponseMsgPayload;
@@ -323,7 +330,7 @@ export type CreatePostCommentMutationVariables = Exact<{
 }>;
 
 
-export type CreatePostCommentMutation = { __typename?: 'Mutation', createPostComment: { __typename?: 'ResponseMsgPayload', message: string, status: number } };
+export type CreatePostCommentMutation = { __typename?: 'Mutation', createPostComment: { __typename?: 'CreateCommentResponse', message: string, status: number, comment: { __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, updatedAt: any, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any } }> | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any } } } };
 
 export type FetchAllUserQueryVariables = Exact<{
   paginateInput: PaginateInput;
@@ -526,6 +533,34 @@ export const CreatePostCommentDocument = gql`
   createPostComment(createCommentInput: $createCommentInput) {
     message
     status
+    comment {
+      id
+      commentBody
+      reply {
+        id
+        commentBody
+        user {
+          id
+          firstName
+          lastName
+          email
+          createdAt
+          updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      user {
+        id
+        firstName
+        lastName
+        email
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
   }
 }
     `;

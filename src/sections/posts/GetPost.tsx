@@ -53,7 +53,7 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
         Comments:
       </Typography>
 
-      <CommentBox comments={data?.fetchPost?.postComments!} />
+      <CommentBox showComments={data?.fetchPost?.postComments!} />
     </MainBox>
   );
 };

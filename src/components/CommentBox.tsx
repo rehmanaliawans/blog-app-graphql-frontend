@@ -8,7 +8,7 @@ import {
   Typography
 } from "@mui/material";
 import { styled } from "@mui/system";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import moment from "moment";
 import {
   PostComment,
@@ -16,6 +16,7 @@ import {
   useFetchPostByIdQuery
 } from "../generated/graphql";
 import { useLocation, useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 const MainCommentBox = styled(Paper)(({ theme }) => ({
   width: "100%",
@@ -65,7 +66,7 @@ const CommentDiv = ({
   );
 };
 
-const CommentBox = ({ comments }: { comments: PostComment[] }) => {
+const CommentBox = ({ showComments }: { showComments: PostComment[] }) => {
   const { id } = useParams();
   const [replyId, setReplyId] = useState("");
   const [reply, setReply] = useState({
@@ -73,11 +74,27 @@ const CommentBox = ({ comments }: { comments: PostComment[] }) => {
     message: ""
   });
   const [comment, setComment] = useState("");
-
+  const [comments, setComments] = useState<PostComment[]>(showComments);
   const [createPostCommentMutation] = useCreatePostCommentMutation({
-    refetchQueries: ["useFetchPostByIdQuery"],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
+    onCompleted: ({ createPostComment }) => {
+      const { comment: newComment } = createPostComment;
+      if (comment !== "") {
+        const allComments = [...comments, newComment];
+        allComments.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        setComments(allComments);
+      } else {
+        let singleComment = comments.find((comment) => comment.id === reply.id);
+        singleComment = {
+          ...singleComment!,
+          reply: [...singleComment?.reply!, newComment]
+        };
+        const finalComments = comments.filter(
+          (comment) => comment.id !== reply.id
+        );
+        const finalReply = [...finalComments, singleComment];
+        finalReply.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        setComments(finalReply);
+      }
       setReply({
         id: "",
         message: ""
@@ -87,7 +104,7 @@ const CommentBox = ({ comments }: { comments: PostComment[] }) => {
   });
 
   const handleReplyComment = () => {
-    if (reply.message !== "" && id && reply.id)
+    if (reply.message !== "" && id && reply.id) {
       createPostCommentMutation({
         variables: {
           createCommentInput: {
@@ -97,10 +114,11 @@ const CommentBox = ({ comments }: { comments: PostComment[] }) => {
           }
         }
       });
+    }
   };
+
   const handleCommentCall = () => {
-    console.log("reply call", { id }, { comment });
-    if (comment !== "" && id)
+    if (comment !== "" && id) {
       createPostCommentMutation({
         variables: {
           createCommentInput: {
@@ -109,7 +127,9 @@ const CommentBox = ({ comments }: { comments: PostComment[] }) => {
           }
         }
       });
+    }
   };
+
   return (
     <MainCommentBox>
       <TextField
@@ -125,7 +145,6 @@ const CommentBox = ({ comments }: { comments: PostComment[] }) => {
         }}
         value={comment}
         onChange={(e) => {
-          console.log("keydown", e.target.value);
           setComment(e.target.value);
         }}
         onKeyDown={(e) => {
@@ -134,12 +153,12 @@ const CommentBox = ({ comments }: { comments: PostComment[] }) => {
           }
         }}
       />
-      {comments.length > 0 ? (
-        comments.map((comment: any, index: number) => {
+      {comments?.length > 0 ? (
+        comments?.map((comment: any, index: number) => {
           return (
-            <>
+            <Fragment key={index}>
               <CommentDiv comment={comment} index={index} />
-              {comment.reply.length > 0 && (
+              {comment?.reply?.length > 0 && (
                 <ReplyDiv>
                   <Button
                     variant="text"
@@ -158,23 +177,24 @@ const CommentBox = ({ comments }: { comments: PostComment[] }) => {
 
                   {replyId === comment.id &&
                     comment.reply.map((reply: any, index: number) => (
-                      <CommentDiv comment={reply} index={index} />
+                      <Fragment key={index}>
+                        <CommentDiv comment={reply} index={index} />
+                      </Fragment>
                     ))}
                 </ReplyDiv>
               )}
               <TextField
-                fullWidth
                 placeholder="Enter comment reply..."
                 variant="standard"
                 label="Reply"
                 size="small"
                 sx={{
                   padding: "0px",
-                  marginLeft: "3rem"
+                  marginLeft: "3rem",
+                  width: "80%"
                 }}
                 value={reply.id === comment.id ? reply.message : ""}
                 onChange={(e) => {
-                  console.log("keydown", e.target.value);
                   setReply({
                     id: comment.id,
                     message: e.target.value
@@ -186,11 +206,13 @@ const CommentBox = ({ comments }: { comments: PostComment[] }) => {
                   }
                 }}
               />
-            </>
+            </Fragment>
           );
         })
       ) : (
-        <Typography>No comments</Typography>
+        <Typography color="primary" variant="h4" sx={{ textAlign: "center" }}>
+          No comments
+        </Typography>
       )}
     </MainCommentBox>
   );

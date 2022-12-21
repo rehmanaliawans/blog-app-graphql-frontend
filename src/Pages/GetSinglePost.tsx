@@ -19,7 +19,8 @@ const GetSinglePost = () => {
   const { data, loading, error } = useFetchPostByIdQuery({
     variables: {
       postId: id!
-    }
+    },
+    fetchPolicy: "network-only"
   });
   if (data) {
     console.log(data);

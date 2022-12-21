@@ -25,7 +25,8 @@ const ContainerStyle = styled(Container)(({ theme }) => ({
 const HomePage = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(6);
-  const [fetchAllPost, { data, loading, error }] = useFetchAllPostsLazyQuery();
+  const [fetchAllPost, { data, loading, fetchMore, error }] =
+    useFetchAllPostsLazyQuery();
 
   useEffect(() => {
     fetchAllPost({
@@ -44,7 +45,14 @@ const HomePage = () => {
     <Page title="Blog App">
       <ContainerStyle maxWidth="xl">
         <SearchBar />
-        <ShowData data={data} />
+        <ShowData
+          data={data}
+          fetchMore={fetchMore}
+          page={page}
+          setPage={setPage}
+          limit={limit}
+          setLimit={setLimit}
+        />
         <TablePagination
           rowsPerPageOptions={[10]}
           component="div"

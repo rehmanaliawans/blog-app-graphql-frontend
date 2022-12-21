@@ -2,21 +2,7 @@ import { Grid } from "@mui/material";
 import MuiCard from "../../components/Card";
 import { FetchAllPostsQuery } from "../../generated/graphql";
 
-const ShowData = ({
-  data,
-  fetchMore,
-  page,
-  setPage,
-  limit,
-  setLimit
-}: {
-  data: FetchAllPostsQuery | undefined;
-  fetchMore: any;
-  page: number;
-  limit: number;
-  setLimit: (limit: number) => void;
-  setPage: (page: number) => void;
-}) => {
+const ShowData = ({ data }: { data: FetchAllPostsQuery | undefined }) => {
   return (
     <Grid
       container

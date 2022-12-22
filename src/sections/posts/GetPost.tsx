@@ -1,4 +1,14 @@
-import { Box, Button, Card, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Typography
+} from "@mui/material";
 import { padding, styled } from "@mui/system";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
@@ -10,6 +20,7 @@ import CommentBox from "../../components/CommentBox";
 import { useGlobalContext } from "../../context";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
 const MainBox = styled(Box)(() => ({
   width: "100%",
@@ -35,6 +46,7 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
   const { userId } = useGlobalContext();
   const { id } = useParams();
   const navigate = useNavigate();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const [deletePostMutation] = useDeletePostMutation({
     onCompleted: ({ deletePost }) => {
@@ -47,6 +59,7 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
   });
 
   const handleDeletePost = () => {
+    setDeleteDialogOpen(false);
     deletePostMutation({
       variables: {
         postId: id!
@@ -67,7 +80,7 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
             >
               <BorderColorRoundedIcon color="primary" />
             </Button>
-            <Button onClick={() => handleDeletePost()}>
+            <Button onClick={() => setDeleteDialogOpen(true)}>
               <DeleteForeverRoundedIcon color="error" />
             </Button>
           </Box>
@@ -96,6 +109,28 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
       </Typography>
 
       <CommentBox showComments={data?.fetchPost?.postComments!} />
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure to delete this Post?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Comments also deleted when you delete this post!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Disagree</Button>
+          <Button onClick={() => handleDeletePost()} autoFocus>
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </MainBox>
   );
 };

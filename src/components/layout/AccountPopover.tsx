@@ -42,7 +42,7 @@ export default function AccountMenu({ user }: { user: GetCurrentUserQuery }) {
   return (
     <React.Fragment>
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "left" }}>
-        <Tooltip title="Account settings">
+        <Tooltip title="Profile">
           <IconButton
             onClick={handleClick}
             size="small"

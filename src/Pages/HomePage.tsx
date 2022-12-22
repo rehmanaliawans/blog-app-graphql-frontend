@@ -39,7 +39,7 @@ const HomePage = () => {
         {data?.fetchAllPosts.posts?.length! > 0 ? (
           <>
             {" "}
-            <ShowData data={data} />
+            <ShowData data={data?.fetchAllPosts?.posts!} />
             <TablePagination
               rowsPerPageOptions={[10]}
               component="div"

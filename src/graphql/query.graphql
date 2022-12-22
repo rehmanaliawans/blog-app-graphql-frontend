@@ -15,6 +15,16 @@ query FetchAllPosts($paginateInput: PaginateInput!) {
       id
       title
       description
+      createdAt
+      updatedAt
+      user {
+        id
+        firstName
+        email
+        lastName
+        createdAt
+        updatedAt
+      }
     }
     count
   }
@@ -25,6 +35,16 @@ query FetchUserPosts($paginateInput: PaginateInput!) {
       id
       title
       description
+      createdAt
+      updatedAt
+      user {
+        id
+        firstName
+        email
+        lastName
+        createdAt
+        updatedAt
+      }
     }
     count
   }

@@ -359,14 +359,14 @@ export type FetchAllPostsQueryVariables = Exact<{
 }>;
 
 
-export type FetchAllPostsQuery = { __typename?: 'Query', fetchAllPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string }> | null } };
+export type FetchAllPostsQuery = { __typename?: 'Query', fetchAllPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, email: string, lastName: string, createdAt: any, updatedAt: any } }> | null } };
 
 export type FetchUserPostsQueryVariables = Exact<{
   paginateInput: PaginateInput;
 }>;
 
 
-export type FetchUserPostsQuery = { __typename?: 'Query', fetchUserPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string }> | null } };
+export type FetchUserPostsQuery = { __typename?: 'Query', fetchUserPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, email: string, lastName: string, createdAt: any, updatedAt: any } }> | null } };
 
 export type FetchPostByIdQueryVariables = Exact<{
   postId: Scalars['String'];
@@ -732,6 +732,16 @@ export const FetchAllPostsDocument = gql`
       id
       title
       description
+      createdAt
+      updatedAt
+      user {
+        id
+        firstName
+        email
+        lastName
+        createdAt
+        updatedAt
+      }
     }
     count
   }
@@ -772,6 +782,16 @@ export const FetchUserPostsDocument = gql`
       id
       title
       description
+      createdAt
+      updatedAt
+      user {
+        id
+        firstName
+        email
+        lastName
+        createdAt
+        updatedAt
+      }
     }
     count
   }

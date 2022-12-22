@@ -9,8 +9,8 @@ import {
 } from "@mui/material";
 import SearchBar from "../components/SearchBar";
 import { useFetchUserPostsLazyQuery } from "../generated/graphql";
-import MyPostsShow from "../sections/posts/MyPosts";
 import { Link } from "react-router-dom";
+import ShowData from "../sections/homePage/ShowData";
 
 const ContainerStyle = styled(Container)(({ theme }) => ({
   marginTop: 10,
@@ -42,7 +42,7 @@ const MyPosts = () => {
         <SearchBar />
         {data?.fetchUserPosts.posts?.length! > 0 ? (
           <>
-            <MyPostsShow data={data} />
+            <ShowData data={data?.fetchUserPosts?.posts!} />
             <TablePagination
               rowsPerPageOptions={[10]}
               component="div"

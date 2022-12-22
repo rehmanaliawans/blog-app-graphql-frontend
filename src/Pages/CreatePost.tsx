@@ -21,7 +21,6 @@ const CreatePost = () => {
       setIsEdit(true);
     }
   });
-  console.log("id call from post", id.get("id"));
   useEffect(() => {
     if (id.get("id")) {
       fetchUserPost({

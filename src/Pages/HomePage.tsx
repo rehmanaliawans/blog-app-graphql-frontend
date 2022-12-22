@@ -38,7 +38,6 @@ const HomePage = () => {
       fetchPolicy: "network-only"
     });
   }, [page]);
-  console.log(data);
 
   return (
     <Page title="Blog App">

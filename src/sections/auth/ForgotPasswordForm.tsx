@@ -12,11 +12,7 @@ import {
 
 const ForgotPasswordForm = () => {
   const [forgotPasswordMutation, { data, loading, error }] =
-    useForgotPasswordMutation({
-      onCompleted: (data) => {
-        console.log("data", data);
-      }
-    });
+    useForgotPasswordMutation();
 
   const ForgotSchema = Yup.object().shape({
     email: Yup.string()
@@ -37,7 +33,6 @@ const ForgotPasswordForm = () => {
   });
 
   const onSubmit = async (data: ForgotPasswordMutationVariables) => {
-    console.log("call", data);
     forgotPasswordMutation({
       variables: {
         email: data.email

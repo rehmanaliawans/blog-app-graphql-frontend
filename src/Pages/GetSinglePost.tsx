@@ -15,26 +15,22 @@ const ContainerStyle = styled(Container)(() => ({
 }));
 const GetSinglePost = () => {
   const { id } = useParams();
-  console.log("location", id);
   const { data, loading, error } = useFetchPostByIdQuery({
     variables: {
       postId: id!
     },
     fetchPolicy: "network-only"
   });
-  if (data) {
-    console.log(data);
-  }
-  if (error) {
-    console.log("error call");
-  }
-  if (loading) {
-    return <p>loading</p>;
-  }
+
   return (
     <Page title="Get Post">
       <ContainerStyle maxWidth="lg">
-        <GetPost data={data!} />
+        {data && <GetPost data={data!} />}
+        {error && (
+          <Typography color="primary" variant="h3">
+            No Post found
+          </Typography>
+        )}
       </ContainerStyle>
     </Page>
   );

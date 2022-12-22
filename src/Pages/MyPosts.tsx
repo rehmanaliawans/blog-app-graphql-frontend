@@ -39,7 +39,6 @@ const MyPosts = () => {
     });
   }, [page]);
   const { userId } = useGlobalContext();
-  console.log({ userId });
 
   return (
     <Page title="Blog App">

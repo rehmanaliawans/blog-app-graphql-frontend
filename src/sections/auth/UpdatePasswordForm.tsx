@@ -53,7 +53,6 @@ const UpdatePasswordForm = () => {
   });
 
   const onSubmit = async (data: { password: string }) => {
-    console.log("call", data, searchParams.get("userKey"));
     if (searchParams.get("userKey")) {
       updatePasswordMutation({
         variables: {

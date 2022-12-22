@@ -159,11 +159,11 @@ const CommentBox = ({ showComments }: { showComments: PostComment[] }) => {
         }}
       />
       {comments?.length > 0 ? (
-        comments?.map((comment: any, index: number) => {
+        comments?.map((comment, index) => {
           return (
             <Fragment key={index}>
               <CommentDiv comment={comment} index={index} />
-              {comment?.reply?.length > 0 && (
+              {comment?.reply?.length! > 0 && (
                 <ReplyDiv>
                   <Button
                     variant="text"
@@ -181,7 +181,7 @@ const CommentBox = ({ showComments }: { showComments: PostComment[] }) => {
                   </Button>
 
                   {replyId === comment.id &&
-                    comment.reply.map((reply: any, index: number) => (
+                    comment?.reply?.map((reply, index) => (
                       <Fragment key={index}>
                         <CommentDiv comment={reply} index={index} />
                       </Fragment>

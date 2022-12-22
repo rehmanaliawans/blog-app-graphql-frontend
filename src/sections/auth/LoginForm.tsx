@@ -28,8 +28,6 @@ const LoginForm = () => {
 
   const [loginMutation, { loading, error }] = useLoginMutation({
     onCompleted: ({ login }) => {
-      console.log("call on complete", login);
-
       saveToken(login.access_token!, "token");
       navigate("/", { replace: true });
     }

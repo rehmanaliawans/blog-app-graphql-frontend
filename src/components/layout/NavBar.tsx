@@ -5,10 +5,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { deleteToken } from "../../utils";
 import client from "../../interceptor/connectGRaphql";
 import AccountPopover from "./AccountPopover";
-import {
-  GetCurrentUserQuery,
-  useGetCurrentUserQuery
-} from "../../generated/graphql";
+import { useGetCurrentUserQuery } from "../../generated/graphql";
 import { useGlobalContext } from "../../context";
 
 const APPBAR_MOBILE = 64;
@@ -51,7 +48,8 @@ const NavBar = () => {
     setUserId(data?.getCurrentUser?.id);
   }
   if (error) {
-    console.log(error);
+    deleteToken("token");
+    navigate("/login");
   }
   return (
     <RootStyle>

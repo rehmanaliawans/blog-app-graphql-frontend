@@ -48,7 +48,6 @@ const uploadImage = (image: (string | Blob)[]) => {
     fileData.append("file", image[0]);
     fileData.append("upload_preset", "Blog_post");
     fileData.append("cloud_name", "dxxv034dh");
-    console.log("================================", fileData);
 
     fetch("https://api.cloudinary.com/v1_1/dxxv034dh/image/upload", {
       method: "POST",
@@ -72,8 +71,6 @@ const CreatePostForm = ({
   isEdit: Boolean;
   setIsEdit: (edit: boolean) => void;
 }) => {
-  console.log("isEdit: " + isEdit, post);
-
   const [id, setId] = useSearchParams();
   const [fileLoading, setFileLoading] = useState(false);
   const [image, setImage] = useState([]);
@@ -81,42 +78,17 @@ const CreatePostForm = ({
     string | ArrayBuffer | null
   >();
 
-  const [createUserPostMutation, { data, error, reset }] =
-    useCreateUserPostMutation({
-      onCompleted: (data) => {
-        if (data.createUserPost.status === 200) {
-          toast.success(data.createUserPost.message);
-          setFileLoading(false);
-          setValue("title", "");
-          setValue("description", "");
-          setValue("file", []);
-          setPreviewImage(null);
-          setTimeout(() => {
-            reset();
-          }, 3000);
-        }
-      },
-      onError: (err) => {
-        toast.error(err.message);
-      }
-    });
-
-  const [
-    updateUserPostMutation,
-    { data: updateData, error: UpdateError, reset: UpdateReset }
-  ] = useUpdateUserPostMutation({
+  const [createUserPostMutation, { reset }] = useCreateUserPostMutation({
     onCompleted: (data) => {
-      if (data.updateUserPost.status === 200) {
-        toast.success(data.updateUserPost.message);
+      if (data.createUserPost.status === 200) {
+        toast.success(data.createUserPost.message);
         setFileLoading(false);
         setValue("title", "");
         setValue("description", "");
         setValue("file", []);
         setPreviewImage(null);
-        setId("id", undefined);
-        setIsEdit(false);
         setTimeout(() => {
-          UpdateReset();
+          reset();
         }, 3000);
       }
     },
@@ -124,6 +96,28 @@ const CreatePostForm = ({
       toast.error(err.message);
     }
   });
+
+  const [updateUserPostMutation, { reset: UpdateReset }] =
+    useUpdateUserPostMutation({
+      onCompleted: (data) => {
+        if (data.updateUserPost.status === 200) {
+          toast.success(data.updateUserPost.message);
+          setFileLoading(false);
+          setValue("title", "");
+          setValue("description", "");
+          setValue("file", []);
+          setPreviewImage(null);
+          setId("id", undefined);
+          setIsEdit(false);
+          setTimeout(() => {
+            UpdateReset();
+          }, 3000);
+        }
+      },
+      onError: (err) => {
+        toast.error(err.message);
+      }
+    });
 
   const LoginSchema = Yup.object().shape({
     title: Yup.string()
@@ -160,8 +154,6 @@ const CreatePostForm = ({
   });
 
   const onSubmit = async (data: { title: string; description: string }) => {
-    console.log(data);
-
     let postData: CreatePostInput = {
       title: data.title,
       description: data.description
@@ -172,11 +164,9 @@ const CreatePostForm = ({
       postId: ""
     };
 
-    console.log("edite data ", postData);
     if (image.length > 0) {
       setFileLoading(true);
       const imgUrl = await uploadImage(image);
-      console.log(imgUrl);
       if (imgUrl) {
         if (isEdit) {
           UpdatePostData = {
@@ -194,7 +184,6 @@ const CreatePostForm = ({
             ...postData,
             attachmentUrl: imgUrl as string
           };
-          console.log("call");
           createUserPostMutation({
             variables: {
               createPostInput: postData
@@ -204,7 +193,6 @@ const CreatePostForm = ({
       }
     } else {
       if (isEdit) {
-        console.log("edit call", UpdatePostData);
         UpdatePostData = {
           ...UpdatePostData,
           postId: id.get("id") as string

@@ -19,6 +19,16 @@ query FetchAllPosts($paginateInput: PaginateInput!) {
     count
   }
 }
+query FetchUserPosts($paginateInput: PaginateInput!) {
+  fetchUserPosts(paginateInput: $paginateInput) {
+    posts {
+      id
+      title
+      description
+    }
+    count
+  }
+}
 
 query FetchPostById($postId: String!) {
   fetchPost(postId: $postId) {
@@ -64,5 +74,16 @@ query FetchPostById($postId: String!) {
         updatedAt
       }
     }
+  }
+}
+
+query GetCurrentUser {
+  getCurrentUser {
+    id
+    email
+    firstName
+    lastName
+    createdAt
+    updatedAt
   }
 }

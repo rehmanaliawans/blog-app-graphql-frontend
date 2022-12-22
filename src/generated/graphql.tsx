@@ -195,6 +195,7 @@ export type Query = {
   fetchPost: Post;
   fetchUserPosts: AllPosts;
   findUserById: User;
+  getCurrentUser: User;
   searchPost: Array<UserPostEsResponse>;
   searchUserPostES: Array<UserPostEsResponse>;
 };
@@ -346,12 +347,24 @@ export type FetchAllPostsQueryVariables = Exact<{
 
 export type FetchAllPostsQuery = { __typename?: 'Query', fetchAllPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string }> | null } };
 
+export type FetchUserPostsQueryVariables = Exact<{
+  paginateInput: PaginateInput;
+}>;
+
+
+export type FetchUserPostsQuery = { __typename?: 'Query', fetchUserPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string }> | null } };
+
 export type FetchPostByIdQueryVariables = Exact<{
   postId: Scalars['String'];
 }>;
 
 
 export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, attachmentUrl?: string | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any, id: string }, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any }, reply?: Array<{ __typename?: 'PostComment', commentBody: string, id: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any } }> | null }> | null } };
+
+export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser: { __typename?: 'User', id: string, email: string, firstName: string, lastName: string, createdAt: any, updatedAt: any } };
 
 
 export const LoginDocument = gql`
@@ -670,6 +683,46 @@ export function useFetchAllPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type FetchAllPostsQueryHookResult = ReturnType<typeof useFetchAllPostsQuery>;
 export type FetchAllPostsLazyQueryHookResult = ReturnType<typeof useFetchAllPostsLazyQuery>;
 export type FetchAllPostsQueryResult = Apollo.QueryResult<FetchAllPostsQuery, FetchAllPostsQueryVariables>;
+export const FetchUserPostsDocument = gql`
+    query FetchUserPosts($paginateInput: PaginateInput!) {
+  fetchUserPosts(paginateInput: $paginateInput) {
+    posts {
+      id
+      title
+      description
+    }
+    count
+  }
+}
+    `;
+
+/**
+ * __useFetchUserPostsQuery__
+ *
+ * To run a query within a React component, call `useFetchUserPostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchUserPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchUserPostsQuery({
+ *   variables: {
+ *      paginateInput: // value for 'paginateInput'
+ *   },
+ * });
+ */
+export function useFetchUserPostsQuery(baseOptions: Apollo.QueryHookOptions<FetchUserPostsQuery, FetchUserPostsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FetchUserPostsQuery, FetchUserPostsQueryVariables>(FetchUserPostsDocument, options);
+      }
+export function useFetchUserPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FetchUserPostsQuery, FetchUserPostsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FetchUserPostsQuery, FetchUserPostsQueryVariables>(FetchUserPostsDocument, options);
+        }
+export type FetchUserPostsQueryHookResult = ReturnType<typeof useFetchUserPostsQuery>;
+export type FetchUserPostsLazyQueryHookResult = ReturnType<typeof useFetchUserPostsLazyQuery>;
+export type FetchUserPostsQueryResult = Apollo.QueryResult<FetchUserPostsQuery, FetchUserPostsQueryVariables>;
 export const FetchPostByIdDocument = gql`
     query FetchPostById($postId: String!) {
   fetchPost(postId: $postId) {
@@ -746,3 +799,42 @@ export function useFetchPostByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type FetchPostByIdQueryHookResult = ReturnType<typeof useFetchPostByIdQuery>;
 export type FetchPostByIdLazyQueryHookResult = ReturnType<typeof useFetchPostByIdLazyQuery>;
 export type FetchPostByIdQueryResult = Apollo.QueryResult<FetchPostByIdQuery, FetchPostByIdQueryVariables>;
+export const GetCurrentUserDocument = gql`
+    query GetCurrentUser {
+  getCurrentUser {
+    id
+    email
+    firstName
+    lastName
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetCurrentUserQuery__
+ *
+ * To run a query within a React component, call `useGetCurrentUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCurrentUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCurrentUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCurrentUserQuery(baseOptions?: Apollo.QueryHookOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, options);
+      }
+export function useGetCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, options);
+        }
+export type GetCurrentUserQueryHookResult = ReturnType<typeof useGetCurrentUserQuery>;
+export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentUserLazyQuery>;
+export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>;

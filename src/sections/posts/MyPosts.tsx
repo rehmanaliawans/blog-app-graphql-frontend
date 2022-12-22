@@ -5,7 +5,7 @@ import {
   FetchUserPostsQuery
 } from "../../generated/graphql";
 
-const ShowData = ({ data }: { data: FetchAllPostsQuery | undefined }) => {
+const MyPostsShow = ({ data }: { data: FetchUserPostsQuery | undefined }) => {
   return (
     <Grid
       container
@@ -17,7 +17,7 @@ const ShowData = ({ data }: { data: FetchAllPostsQuery | undefined }) => {
       display="flex"
       justifyContent="center"
     >
-      {data?.fetchAllPosts?.posts?.map((card, index) => (
+      {data?.fetchUserPosts?.posts?.map((card, index) => (
         <Grid
           item
           lg={6}
@@ -34,4 +34,4 @@ const ShowData = ({ data }: { data: FetchAllPostsQuery | undefined }) => {
   );
 };
 
-export default ShowData;
+export default MyPostsShow;

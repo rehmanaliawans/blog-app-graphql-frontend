@@ -4,6 +4,12 @@ import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { deleteToken } from "../../utils";
 import client from "../../interceptor/connectGRaphql";
+import AccountPopover from "./AccountPopover";
+import {
+  GetCurrentUserQuery,
+  useGetCurrentUserQuery
+} from "../../generated/graphql";
+import { useGlobalContext } from "../../context";
 
 const APPBAR_MOBILE = 44;
 const APPBAR_DESKTOP = 62;
@@ -36,6 +42,16 @@ const HomeButton = styled(RouterLink)(({ theme }) => ({
 const NavBar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  const { setUserId } = useGlobalContext();
+  const { data, loading, error } = useGetCurrentUserQuery();
+
+  if (data && !loading) {
+    setUserId(data?.getCurrentUser?.id);
+  }
+  if (error) {
+    console.log(error);
+  }
   return (
     <RootStyle>
       <ToolbarStyle>
@@ -54,6 +70,7 @@ const NavBar = () => {
               Create Post
             </Button>
           )}
+          <AccountPopover user={data!} />
 
           <LogoutIcon
             color="primary"

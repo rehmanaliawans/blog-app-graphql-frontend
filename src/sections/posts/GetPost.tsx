@@ -25,7 +25,6 @@ const DescriptionCard = styled(Box)(() => ({
   borderRadius: "10px"
 }));
 const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
-  console.log("types", data?.fetchPost?.postComments);
   return (
     <MainBox>
       <Typography variant="h4" color="primary" gutterBottom>
@@ -43,8 +42,8 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
           <img
             alt={data?.fetchPost?.title}
             src={data?.fetchPost?.attachmentUrl!}
-            width="100%"
-            height="100%"
+            width="auto"
+            height="auto"
           />
         )}
         <Typography variant="body1">{data.fetchPost.description}</Typography>

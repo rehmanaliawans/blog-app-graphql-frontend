@@ -17,6 +17,7 @@ import {
 } from "../generated/graphql";
 import { useLocation, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import { useGlobalContext } from "../context";
 
 const MainCommentBox = styled(Paper)(({ theme }) => ({
   width: "100%",
@@ -38,6 +39,7 @@ const CommentDiv = ({
   comment: PostComment;
   index: number;
 }) => {
+  const { userId } = useGlobalContext();
   return (
     <Grid container wrap="nowrap" spacing={2} key={comment.id} mt={1}>
       <Grid item>
@@ -47,7 +49,9 @@ const CommentDiv = ({
       </Grid>
       <Grid justifyContent="left" item xs zeroMinWidth>
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          {comment?.user?.firstName + " " + comment?.user?.lastName}
+          {comment?.user?.id === userId
+            ? "You"
+            : comment?.user?.firstName + " " + comment?.user?.lastName}
         </Typography>
         <Typography
           variant="caption"
@@ -58,7 +62,8 @@ const CommentDiv = ({
             top: "-10px"
           }}
         >
-          posted {moment(comment?.createdAt).format("lll")}
+          {/* posted {moment(comment?.createdAt).format("lll")} */}
+          posted {moment(comment?.createdAt).fromNow()}
         </Typography>
         <Typography>{comment?.commentBody}</Typography>
       </Grid>

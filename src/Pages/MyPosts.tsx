@@ -1,19 +1,18 @@
-/* eslint-disable react-hooks/rules-of-hooks */
+import React, { useEffect, useState } from "react";
+import Page from "../components/Page";
 import {
   Box,
   Container,
-  Grid,
-  Pagination,
   TablePagination,
-  Typography
+  Typography,
+  styled
 } from "@mui/material";
-import Page from "../components/Page";
 import SearchBar from "../components/SerachBar";
 import ShowData from "../sections/homePage/ShowData";
-import { styled } from "@mui/material/styles";
-import { useFetchAllPostsLazyQuery } from "../generated/graphql";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useFetchUserPostsLazyQuery } from "../generated/graphql";
+import MyPostsShow from "../sections/posts/MyPosts";
 import { Link } from "react-router-dom";
+import { useGlobalContext } from "../context";
 
 const ContainerStyle = styled(Container)(({ theme }) => ({
   marginTop: 10,
@@ -22,13 +21,14 @@ const ContainerStyle = styled(Container)(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center"
 }));
-const HomePage = () => {
+const MyPosts = () => {
   const [page, setPage] = useState(1);
   const limit = 6;
-  const [fetchAllPost, { data, loading, error }] = useFetchAllPostsLazyQuery();
+  const [fetchUserPosts, { data, loading, error }] =
+    useFetchUserPostsLazyQuery();
 
   useEffect(() => {
-    fetchAllPost({
+    fetchUserPosts({
       variables: {
         paginateInput: {
           limit: limit,
@@ -38,20 +38,20 @@ const HomePage = () => {
       fetchPolicy: "network-only"
     });
   }, [page]);
-  console.log(data);
+  const { userId } = useGlobalContext();
+  console.log({ userId });
 
   return (
     <Page title="Blog App">
       <ContainerStyle maxWidth="xl">
         <SearchBar />
-        {data?.fetchAllPosts.posts?.length! > 0 ? (
+        {data?.fetchUserPosts.posts?.length! > 0 ? (
           <>
-            {" "}
-            <ShowData data={data} />
+            <MyPostsShow data={data} />
             <TablePagination
               rowsPerPageOptions={[10]}
               component="div"
-              count={data?.fetchAllPosts?.count!}
+              count={data?.fetchUserPosts?.count!}
               rowsPerPage={limit}
               page={page - 1}
               onPageChange={(event, value) => {
@@ -63,12 +63,12 @@ const HomePage = () => {
           </>
         ) : (
           <Box mt={5} sx={{ textAlign: "center" }}>
-            <Typography variant="h3" color="primary" gutterBottom>
+            <Typography variant="h4" color="primary" gutterBottom>
               {" "}
-              No Blog
+              Please Write your first Blog
             </Typography>
             <Typography
-              variant="h3"
+              variant="h5"
               color="primary.dark"
               component={Link}
               to="/create-post"
@@ -83,4 +83,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default MyPosts;

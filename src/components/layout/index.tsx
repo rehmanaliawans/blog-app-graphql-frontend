@@ -2,8 +2,6 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import NavBar from "./NavBar";
-import { useGlobalContext } from "../../context";
-import { useGetCurrentUserQuery } from "../../generated/graphql";
 
 const APP_BAR_MOBILE = 64;
 const APP_BAR_DESKTOP = 92;

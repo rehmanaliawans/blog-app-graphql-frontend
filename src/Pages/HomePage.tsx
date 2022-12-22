@@ -1,18 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import {
-  Box,
-  Container,
-  Grid,
-  Pagination,
-  TablePagination,
-  Typography
-} from "@mui/material";
+import { Box, Container, TablePagination, Typography } from "@mui/material";
 import Page from "../components/Page";
-import SearchBar from "../components/SerachBar";
+import SearchBar from "../components/SearchBar";
 import ShowData from "../sections/homePage/ShowData";
 import { styled } from "@mui/material/styles";
 import { useFetchAllPostsLazyQuery } from "../generated/graphql";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const ContainerStyle = styled(Container)(({ theme }) => ({
@@ -25,7 +18,7 @@ const ContainerStyle = styled(Container)(({ theme }) => ({
 const HomePage = () => {
   const [page, setPage] = useState(1);
   const limit = 6;
-  const [fetchAllPost, { data, loading, error }] = useFetchAllPostsLazyQuery();
+  const [fetchAllPost, { data }] = useFetchAllPostsLazyQuery();
 
   useEffect(() => {
     fetchAllPost({

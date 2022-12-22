@@ -1,8 +1,8 @@
 import { Container, styled, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Page from "../components/Page";
 import CreatePostForm from "../sections/posts/CreatePostForm";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useFetchPostByIdLazyQuery } from "../generated/graphql";
 
 const ContainerStyle = styled(Container)(() => ({
@@ -14,7 +14,7 @@ const ContainerStyle = styled(Container)(() => ({
   width: "100vw"
 }));
 const CreatePost = () => {
-  const [id, setId] = useSearchParams();
+  const [id] = useSearchParams();
   const [isEdit, setIsEdit] = useState(false);
   const [fetchUserPost, { data }] = useFetchPostByIdLazyQuery({
     onCompleted: () => {

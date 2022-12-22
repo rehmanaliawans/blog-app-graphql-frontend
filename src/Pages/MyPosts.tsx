@@ -7,12 +7,10 @@ import {
   Typography,
   styled
 } from "@mui/material";
-import SearchBar from "../components/SerachBar";
-import ShowData from "../sections/homePage/ShowData";
+import SearchBar from "../components/SearchBar";
 import { useFetchUserPostsLazyQuery } from "../generated/graphql";
 import MyPostsShow from "../sections/posts/MyPosts";
 import { Link } from "react-router-dom";
-import { useGlobalContext } from "../context";
 
 const ContainerStyle = styled(Container)(({ theme }) => ({
   marginTop: 10,
@@ -24,8 +22,7 @@ const ContainerStyle = styled(Container)(({ theme }) => ({
 const MyPosts = () => {
   const [page, setPage] = useState(1);
   const limit = 6;
-  const [fetchUserPosts, { data, loading, error }] =
-    useFetchUserPostsLazyQuery();
+  const [fetchUserPosts, { data }] = useFetchUserPostsLazyQuery();
 
   useEffect(() => {
     fetchUserPosts({
@@ -38,7 +35,6 @@ const MyPosts = () => {
       fetchPolicy: "network-only"
     });
   }, [page]);
-  const { userId } = useGlobalContext();
 
   return (
     <Page title="Blog App">

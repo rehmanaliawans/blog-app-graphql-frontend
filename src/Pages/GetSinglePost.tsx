@@ -1,6 +1,6 @@
 import React from "react";
 import { useFetchPostByIdQuery } from "../generated/graphql";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Page from "../components/Page";
 import { Container, Typography, styled } from "@mui/material";
 import GetPost from "../sections/posts/GetPost";
@@ -15,7 +15,7 @@ const ContainerStyle = styled(Container)(() => ({
 }));
 const GetSinglePost = () => {
   const { id } = useParams();
-  const { data, loading, error } = useFetchPostByIdQuery({
+  const { data, error } = useFetchPostByIdQuery({
     variables: {
       postId: id!
     },

@@ -12,11 +12,9 @@ import React, { Fragment, useState } from "react";
 import moment from "moment";
 import {
   PostComment,
-  useCreatePostCommentMutation,
-  useFetchPostByIdQuery
+  useCreatePostCommentMutation
 } from "../generated/graphql";
-import { useLocation, useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import { useParams } from "react-router-dom";
 import { useGlobalContext } from "../context";
 
 const MainCommentBox = styled(Paper)(({ theme }) => ({

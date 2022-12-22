@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Card,
   Dialog,
   DialogActions,
   DialogContent,
@@ -9,7 +8,7 @@ import {
   DialogTitle,
   Typography
 } from "@mui/material";
-import { padding, styled } from "@mui/system";
+import { styled } from "@mui/system";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
 import {

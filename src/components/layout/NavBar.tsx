@@ -11,26 +11,27 @@ import {
 } from "../../generated/graphql";
 import { useGlobalContext } from "../../context";
 
-const APPBAR_MOBILE = 44;
-const APPBAR_DESKTOP = 62;
+const APPBAR_MOBILE = 64;
+const APPBAR_DESKTOP = 92;
+
 const RootStyle = styled(AppBar)(({ theme }) => ({
   boxShadow: "none",
   backdropFilter: "blur(6px)",
   WebkitBackdropFilter: "blur(6px)", // Fix on Mobile
   backgroundColor: "transparent",
   borderBottom: "1px solid #ccc",
-  // height: APPBAR_MOBILE,
+  height: APPBAR_MOBILE,
   [theme.breakpoints.up("lg")]: {
-    width: `calc(100%)`
-    // height: APPBAR_DESKTOP
+    width: `calc(100%)`,
+    height: APPBAR_DESKTOP
   }
 }));
 
 const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
-  // minHeight: APPBAR_MOBILE,
+  minHeight: APPBAR_MOBILE,
   [theme.breakpoints.up("lg")]: {
-    // minHeight: APPBAR_DESKTOP,
-    // padding: theme.spacing(0, 2)
+    minHeight: APPBAR_DESKTOP,
+    padding: theme.spacing(0, 2)
   }
 }));
 

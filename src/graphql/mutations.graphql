@@ -70,3 +70,17 @@ mutation CreatePostComment($createCommentInput: CreateCommentInput!) {
     }
   }
 }
+
+mutation UpdateUserPost($updatePostInput: UpdatePostInput!) {
+  updateUserPost(updatePostInput: $updatePostInput) {
+    message
+    status
+  }
+}
+
+mutation DeletePost($postId: String!) {
+  deletePost(postId: $postId) {
+    message
+    status
+  }
+}

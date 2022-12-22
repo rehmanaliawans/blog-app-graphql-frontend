@@ -9,14 +9,19 @@ import {
   TextField,
   Typography
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   CreatePostInput,
+  FetchPostByIdQuery,
+  UpdatePostInput,
   useCreateUserPostMutation,
-  useFetchAllUserQuery
+  useFetchAllUserQuery,
+  useUpdateUserPostMutation
 } from "../../generated/graphql";
+import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const MainBox = styled(Box)(() => ({
   width: "100%",
@@ -36,24 +41,90 @@ const FileLabel = styled("label")(({ theme }) => ({
   width: "8rem",
   textAlign: "center"
 }));
-const CreatePostForm = () => {
+
+const uploadImage = (image: (string | Blob)[]) => {
+  const promise = new Promise((resolve, reject) => {
+    const fileData = new FormData();
+    fileData.append("file", image[0]);
+    fileData.append("upload_preset", "Blog_post");
+    fileData.append("cloud_name", "dxxv034dh");
+    console.log("================================", fileData);
+
+    fetch("https://api.cloudinary.com/v1_1/dxxv034dh/image/upload", {
+      method: "POST",
+      body: fileData
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        resolve(data.url);
+      })
+      .catch((err) => reject(err));
+  });
+  return promise;
+};
+
+const CreatePostForm = ({
+  post,
+  isEdit,
+  setIsEdit
+}: {
+  post?: FetchPostByIdQuery;
+  isEdit: Boolean;
+  setIsEdit: (edit: boolean) => void;
+}) => {
+  console.log("isEdit: " + isEdit, post);
+
+  const [id, setId] = useSearchParams();
   const [fileLoading, setFileLoading] = useState(false);
   const [image, setImage] = useState([]);
+  const [previewImage, setPreviewImage] = useState<
+    string | ArrayBuffer | null
+  >();
+
   const [createUserPostMutation, { data, error, reset }] =
     useCreateUserPostMutation({
       onCompleted: (data) => {
         if (data.createUserPost.status === 200) {
+          toast.success(data.createUserPost.message);
           setFileLoading(false);
-
           setValue("title", "");
           setValue("description", "");
           setValue("file", []);
+          setPreviewImage(null);
           setTimeout(() => {
             reset();
           }, 3000);
         }
+      },
+      onError: (err) => {
+        toast.error(err.message);
       }
     });
+
+  const [
+    updateUserPostMutation,
+    { data: updateData, error: UpdateError, reset: UpdateReset }
+  ] = useUpdateUserPostMutation({
+    onCompleted: (data) => {
+      if (data.updateUserPost.status === 200) {
+        toast.success(data.updateUserPost.message);
+        setFileLoading(false);
+        setValue("title", "");
+        setValue("description", "");
+        setValue("file", []);
+        setPreviewImage(null);
+        setId("id", undefined);
+        setIsEdit(false);
+        setTimeout(() => {
+          UpdateReset();
+        }, 3000);
+      }
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    }
+  });
+
   const LoginSchema = Yup.object().shape({
     title: Yup.string()
       .required("Title is required")
@@ -63,6 +134,15 @@ const CreatePostForm = () => {
       .min(3, "Minimum 3 characters required"),
     file: Yup.mixed()
   });
+
+  useEffect(() => {
+    if (isEdit) {
+      setValue("title", post?.fetchPost?.title!);
+      setValue("description", post?.fetchPost?.description!);
+      setPreviewImage(post?.fetchPost?.attachmentUrl);
+    }
+  }, [isEdit]);
+
   const defaultValues = {
     title: "",
     description: "",
@@ -72,7 +152,6 @@ const CreatePostForm = () => {
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors }
   } = useForm({
@@ -82,41 +161,67 @@ const CreatePostForm = () => {
 
   const onSubmit = async (data: { title: string; description: string }) => {
     console.log(data);
+
     let postData: CreatePostInput = {
       title: data.title,
       description: data.description
     };
+    let UpdatePostData: UpdatePostInput = {
+      title: postData.title,
+      description: postData.description,
+      postId: ""
+    };
+
+    console.log("edite data ", postData);
     if (image.length > 0) {
-      console.log("call", image, image[0]);
-      // setFileLoading(true);
-      const fileData = new FormData();
-      fileData.append("file", image[0]);
-      fileData.append("upload_preset", "Blog_post");
-      fileData.append("cloud_name", "dxxv034dh");
-      console.log("================================", fileData);
-      fetch("https://api.cloudinary.com/v1_1/dxxv034dh/image/upload", {
-        method: "POST",
-        body: fileData
-      })
-        .then((res) => res.json())
-        .then((data) => {
+      setFileLoading(true);
+      const imgUrl = await uploadImage(image);
+      console.log(imgUrl);
+      if (imgUrl) {
+        if (isEdit) {
+          UpdatePostData = {
+            ...UpdatePostData,
+            postId: id.get("id") as string,
+            attachmentUrl: imgUrl as string
+          };
+          updateUserPostMutation({
+            variables: {
+              updatePostInput: UpdatePostData
+            }
+          });
+        } else {
           postData = {
             ...postData,
-            attachmentUrl: data.url
+            attachmentUrl: imgUrl as string
           };
+          console.log("call");
           createUserPostMutation({
             variables: {
               createPostInput: postData
             }
           });
-        })
-        .catch((err) => console.log(err));
-    } else {
-      createUserPostMutation({
-        variables: {
-          createPostInput: postData
         }
-      });
+      }
+    } else {
+      if (isEdit) {
+        console.log("edit call", UpdatePostData);
+        UpdatePostData = {
+          ...UpdatePostData,
+          postId: id.get("id") as string
+        };
+
+        updateUserPostMutation({
+          variables: {
+            updatePostInput: UpdatePostData
+          }
+        });
+      } else {
+        createUserPostMutation({
+          variables: {
+            createPostInput: postData
+          }
+        });
+      }
     }
   };
   return (
@@ -129,6 +234,7 @@ const CreatePostForm = () => {
           {...register("title")}
           error={errors.title ? true : false}
           helperText={errors.title && errors.title.message}
+          InputLabelProps={{ shrink: true }}
         />
 
         <TextField
@@ -140,21 +246,38 @@ const CreatePostForm = () => {
           error={errors.description ? true : false}
           helperText={errors.description && errors.description.message}
           {...register("description")}
+          InputLabelProps={{ shrink: true }}
         />
 
         <FileLabel htmlFor="fileupload" style={{ cursor: "pointer" }}>
           Attached file
         </FileLabel>
-
         <input
           type="file"
           id="fileupload"
-          onChange={(e) => {
+          onChange={(e: any) => {
+            if (!e.target.files[0]) return;
             setImage(e.target.files as unknown as []);
+            const reader = new FileReader();
+            reader.onload = () => {
+              if (reader.readyState === 2) {
+                setPreviewImage(reader.result);
+              }
+            };
+            reader.readAsDataURL(e?.target?.files[0]);
           }}
           style={{ display: "none" }}
           accept="image/*"
         />
+        {previewImage && (
+          <Box>
+            <img
+              src={previewImage as string}
+              alt="blog-post-images"
+              style={{ width: "300px", height: "300px", objectFit: "cover" }}
+            />
+          </Box>
+        )}
 
         <LoadingButton
           size="large"
@@ -163,19 +286,9 @@ const CreatePostForm = () => {
           loading={fileLoading}
           sx={{ width: { sm: "100%", md: "20%" } }}
         >
-          Create
+          {`${isEdit ? "Update" : "Create"}`}
         </LoadingButton>
       </Stack>
-      {data?.createUserPost.status === 200 && (
-        <Typography variant="caption" mt={1} color="success.main">
-          {data.createUserPost.message}
-        </Typography>
-      )}
-      {error && (
-        <Typography variant="caption" mt={1} color="error">
-          {error.message}
-        </Typography>
-      )}
     </MainBox>
   );
 };

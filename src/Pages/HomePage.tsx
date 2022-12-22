@@ -42,7 +42,7 @@ const HomePage = () => {
 
   return (
     <Page title="Blog App">
-      <ContainerStyle maxWidth="xl">
+      <ContainerStyle maxWidth="lg">
         <SearchBar />
         {data?.fetchAllPosts.posts?.length! > 0 ? (
           <>

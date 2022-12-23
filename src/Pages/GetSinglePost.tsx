@@ -15,7 +15,11 @@ const ContainerStyle = styled(Container)(() => ({
 }));
 const GetSinglePost = () => {
   const { id } = useParams();
-  const { data, error } = useFetchPostByIdQuery({
+  const {
+    data,
+    error,
+    refetch: refetchPost
+  } = useFetchPostByIdQuery({
     variables: {
       postId: id!
     },
@@ -25,7 +29,7 @@ const GetSinglePost = () => {
   return (
     <Page title="Get Post">
       <ContainerStyle maxWidth="lg">
-        {data && <GetPost data={data!} />}
+        {data && <GetPost data={data!} refetchPost={refetchPost} />}
         {error && (
           <Typography color="primary" variant="h3">
             No Post found

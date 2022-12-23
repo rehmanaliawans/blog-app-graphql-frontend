@@ -124,3 +124,10 @@ query SearchPost($queryString: String!) {
     }
   }
 }
+
+mutation DeleteComment($commentId: String!) {
+  deleteComment(commentId: $commentId) {
+    message
+    status
+  }
+}

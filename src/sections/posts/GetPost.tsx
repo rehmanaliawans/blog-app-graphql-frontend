@@ -20,6 +20,7 @@ import { useGlobalContext } from "../../context";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import DialogBox from "../../components/DialogBox";
 
 const MainBox = styled(Box)(() => ({
   width: "100%",
@@ -41,7 +42,13 @@ const DescriptionCard = styled(Box)(() => ({
   backgroundColor: "#fff",
   borderRadius: "10px"
 }));
-const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
+const GetPost = ({
+  data,
+  refetchPost
+}: {
+  data: FetchPostByIdQuery;
+  refetchPost: any;
+}) => {
   const { userId } = useGlobalContext();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -54,7 +61,7 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
         toast.success(deletePost.message);
       }
     },
-    onError: (error) => console.error(error)
+    onError: (error) => toast.error(error.message)
   });
 
   const handleDeletePost = () => {
@@ -107,29 +114,17 @@ const GetPost = ({ data }: { data: FetchPostByIdQuery }) => {
         Comments:
       </Typography>
 
-      <CommentBox showComments={data?.fetchPost?.postComments!} />
-
-      <Dialog
+      <CommentBox
+        showComments={data?.fetchPost?.postComments!}
+        refetchPost={refetchPost}
+      />
+      <DialogBox
+        title="Are you sure to delete this Post?"
+        description="Comments also deleted when you delete this post!"
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Are you sure to delete this Post?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Comments also deleted when you delete this post!
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Disagree</Button>
-          <Button onClick={() => handleDeletePost()} autoFocus>
-            Agree
-          </Button>
-        </DialogActions>
-      </Dialog>
+        handleClose={() => setDeleteDialogOpen(false)}
+        handleAgree={() => handleDeletePost()}
+      />
     </MainBox>
   );
 };

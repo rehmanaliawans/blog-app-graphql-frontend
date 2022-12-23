@@ -8,14 +8,18 @@ import {
   Typography
 } from "@mui/material";
 import { styled } from "@mui/system";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import moment from "moment";
 import {
   PostComment,
-  useCreatePostCommentMutation
+  useCreatePostCommentMutation,
+  useDeleteCommentMutation
 } from "../generated/graphql";
 import { useParams } from "react-router-dom";
 import { useGlobalContext } from "../context";
+import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
+import DialogBox from "./DialogBox";
+import { toast } from "react-toastify";
 
 const MainCommentBox = styled(Paper)(({ theme }) => ({
   width: "100%",
@@ -30,14 +34,19 @@ const ReplyDiv = styled(Box)(({ theme }) => ({
     paddingLeft: theme.spacing(2)
   }
 }));
+
 const CommentDiv = ({
   comment,
-  index
+  index,
+  handleCommentDelete
 }: {
   comment: PostComment;
   index: number;
+  handleCommentDelete: (id: string) => void;
 }) => {
   const { userId } = useGlobalContext();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   return (
     <Grid container wrap="nowrap" spacing={2} key={comment.id} mt={1}>
       <Grid item>
@@ -46,38 +55,73 @@ const CommentDiv = ({
         </Avatar>
       </Grid>
       <Grid justifyContent="left" item xs zeroMinWidth>
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          {comment?.user?.id === userId
-            ? "You"
-            : comment?.user?.firstName + " " + comment?.user?.lastName}
-        </Typography>
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: "bold",
-            color: "grey",
-            position: "relative",
-            top: "-10px"
-          }}
-        >
-          {/* posted {moment(comment?.createdAt).format("lll")} */}
-          posted {moment(comment?.createdAt).fromNow()}
-        </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              {comment?.user?.id === userId
+                ? "You"
+                : comment?.user?.firstName + " " + comment?.user?.lastName}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: "bold",
+                color: "grey",
+                position: "relative",
+                top: "-10px"
+              }}
+            >
+              {/* posted {moment(comment?.createdAt).format("lll")} */}
+              posted {moment(comment?.createdAt).fromNow()}
+            </Typography>
+          </Box>
+          {comment.user.id === userId && (
+            <Button
+              size="small"
+              color="error"
+              variant="text"
+              sx={{ textTransform: "capitalize" }}
+              onClick={() => setDeleteDialogOpen(true)}
+            >
+              Delete
+            </Button>
+          )}
+        </Box>
         <Typography>{comment?.commentBody}</Typography>
       </Grid>
+      <DialogBox
+        title="Are you sure to delete this comment?"
+        description="Replies also deleted when you delete this comment!"
+        open={deleteDialogOpen}
+        handleClose={() => setDeleteDialogOpen(false)}
+        handleAgree={() => {
+          setDeleteDialogOpen(false);
+          handleCommentDelete(comment.id);
+        }}
+      />
     </Grid>
   );
 };
 
-const CommentBox = ({ showComments }: { showComments: PostComment[] }) => {
+const CommentBox = ({
+  showComments,
+  refetchPost
+}: {
+  showComments: PostComment[];
+  refetchPost: any;
+}) => {
   const { id } = useParams();
   const [replyId, setReplyId] = useState("");
   const [reply, setReply] = useState({
     id: "",
     message: ""
   });
+  console.log("showComments", showComments);
   const [comment, setComment] = useState("");
-  const [comments, setComments] = useState<PostComment[]>(showComments);
+  const [comments, setComments] = useState<PostComment[]>([]);
+  const [replyDelete, setReplyDelete] = useState(false);
+  const [commentId, setCommentId] = useState("");
+
   const [createPostCommentMutation] = useCreatePostCommentMutation({
     onCompleted: ({ createPostComment }) => {
       const { comment: newComment } = createPostComment;
@@ -106,6 +150,30 @@ const CommentBox = ({ showComments }: { showComments: PostComment[] }) => {
     }
   });
 
+  useEffect(() => {
+    if (showComments.length > 0) {
+      setComments(showComments);
+    } else {
+      setComments([]);
+    }
+  }, [showComments, replyDelete]);
+
+  const [deleteCommentMutation, { data, loading, error }] =
+    useDeleteCommentMutation({
+      onCompleted: (data) => {
+        refetchPost();
+        const replyData = comments.filter((comment) => {
+          if (comment.id === commentId) return comment;
+        });
+        if (!replyData) {
+          setReplyDelete(!replyDelete);
+        }
+        toast.success(data.deleteComment.message);
+        console.log("deleted ", replyData);
+      },
+      onError: (error) => toast.error(error.message)
+    });
+
   const handleReplyComment = () => {
     if (reply.message !== "" && id && reply.id) {
       createPostCommentMutation({
@@ -131,6 +199,15 @@ const CommentBox = ({ showComments }: { showComments: PostComment[] }) => {
         }
       });
     }
+  };
+  const handleCommentDelete = (id: string) => {
+    setCommentId(id);
+    deleteCommentMutation({
+      variables: {
+        commentId: id
+      }
+    });
+    console.log("Delete", id, data);
   };
 
   return (
@@ -160,7 +237,11 @@ const CommentBox = ({ showComments }: { showComments: PostComment[] }) => {
         comments?.map((comment, index) => {
           return (
             <Fragment key={index}>
-              <CommentDiv comment={comment} index={index} />
+              <CommentDiv
+                comment={comment}
+                index={index}
+                handleCommentDelete={(id) => handleCommentDelete(id)}
+              />
               {comment?.reply?.length! > 0 && (
                 <ReplyDiv>
                   <Button
@@ -181,7 +262,11 @@ const CommentBox = ({ showComments }: { showComments: PostComment[] }) => {
                   {replyId === comment.id &&
                     comment?.reply?.map((reply, index) => (
                       <Fragment key={index}>
-                        <CommentDiv comment={reply} index={index} />
+                        <CommentDiv
+                          comment={reply}
+                          index={index}
+                          handleCommentDelete={(id) => handleCommentDelete(id)}
+                        />
                       </Fragment>
                     ))}
                 </ReplyDiv>

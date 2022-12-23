@@ -51,7 +51,7 @@ const HomePage = () => {
   };
   return (
     <Page title="Blog App">
-      <ContainerStyle maxWidth="lg">
+      <ContainerStyle maxWidth="lg" sx={{ width: "90vw" }}>
         <SearchBar
           handleSearchPost={(queryString) => handleSearchPost(queryString)}
         />

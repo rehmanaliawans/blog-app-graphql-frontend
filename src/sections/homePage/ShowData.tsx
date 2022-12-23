@@ -22,7 +22,7 @@ const ShowData = ({ data }: { data: Post[] | undefined }) => {
           sm={6}
           xs={12}
           key={index}
-          sx={{ width: "100vw" }}
+          sx={{ width: "calc(100% -16px) " }}
         >
           <MuiCard card={card} />
         </Grid>

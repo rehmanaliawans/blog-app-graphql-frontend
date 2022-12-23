@@ -11,7 +11,7 @@ const MuiCard = ({
   card: { title: string; description: string; id: string };
 }) => {
   return (
-    <Card sx={{ minWidth: { sm: "20vw" } }}>
+    <Card>
       <CardContent sx={{ height: "8rem" }}>
         <Typography gutterBottom variant="h5" component="div">
           {card?.title}
@@ -22,8 +22,7 @@ const MuiCard = ({
           sx={{
             overflow: "hidden",
             whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-            width: "30vw"
+            textOverflow: "ellipsis"
           }}
         >
           {card?.description}

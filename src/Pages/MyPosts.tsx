@@ -8,7 +8,10 @@ import {
   styled
 } from "@mui/material";
 import SearchBar from "../components/SearchBar";
-import { useFetchUserPostsLazyQuery } from "../generated/graphql";
+import {
+  useFetchUserPostsLazyQuery,
+  useSearchPostLazyQuery
+} from "../generated/graphql";
 import { Link } from "react-router-dom";
 import ShowData from "../sections/homePage/ShowData";
 
@@ -23,6 +26,8 @@ const MyPosts = () => {
   const [page, setPage] = useState(1);
   const limit = 6;
   const [fetchUserPosts, { data }] = useFetchUserPostsLazyQuery();
+  const [searchPriority, setSearchPriority] = useState(false);
+  const [searchPost, { data: searchData }] = useSearchPostLazyQuery();
 
   useEffect(() => {
     fetchUserPosts({
@@ -36,13 +41,30 @@ const MyPosts = () => {
     });
   }, [page]);
 
+  const handleSearchPost = (queryString: string) => {
+    setSearchPriority(queryString === "" ? false : true);
+    searchPost({
+      variables: {
+        queryString: queryString
+      }
+    });
+  };
   return (
     <Page title="Blog App">
       <ContainerStyle maxWidth="xl">
-        <SearchBar />
-        {data?.fetchUserPosts.posts?.length! > 0 ? (
+        <SearchBar
+          handleSearchPost={(queryString) => handleSearchPost(queryString)}
+        />
+        {(data?.fetchUserPosts.posts?.length! > 0 && !searchPriority) ||
+        (searchData?.searchPost?.length! > 0 && searchPriority) ? (
           <>
-            <ShowData data={data?.fetchUserPosts?.posts!} />
+            <ShowData
+              data={
+                searchData?.searchPost?.length! > 0
+                  ? searchData?.searchPost!
+                  : data?.fetchUserPosts?.posts!
+              }
+            />
             <TablePagination
               rowsPerPageOptions={[10]}
               component="div"
@@ -60,7 +82,7 @@ const MyPosts = () => {
           <Box mt={5} sx={{ textAlign: "center" }}>
             <Typography variant="h4" color="primary" gutterBottom>
               {" "}
-              Please Write your first Blog
+              No post found
             </Typography>
             <Typography
               variant="h5"

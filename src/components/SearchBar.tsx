@@ -4,6 +4,7 @@ import Stack from "@mui/material/Stack";
 import Autocomplete from "@mui/material/Autocomplete";
 import { alpha, InputBase, styled } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { debounce } from "lodash";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -47,7 +48,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   }
 }));
 
-export default function SearchBar() {
+export default function SearchBar({
+  handleSearchPost
+}: {
+  handleSearchPost?: (queryString: string) => void;
+}) {
   return (
     <Search sx={{ border: "1px solid black", minWidth: "66%" }}>
       <SearchIconWrapper>
@@ -56,6 +61,9 @@ export default function SearchBar() {
       <StyledInputBase
         placeholder="Search…"
         inputProps={{ "aria-label": "search" }}
+        onChange={debounce((e) => {
+          handleSearchPost && handleSearchPost(e.target.value);
+        }, 500)}
       />
     </Search>
   );

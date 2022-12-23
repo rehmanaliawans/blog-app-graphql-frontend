@@ -166,25 +166,25 @@ export type PaginateInput = {
 export type Post = {
   __typename?: 'Post';
   attachmentUrl?: Maybe<Scalars['String']>;
-  createdAt: Scalars['DateTime'];
+  createdAt?: Maybe<Scalars['DateTime']>;
   description: Scalars['String'];
   id: Scalars['String'];
   postComments?: Maybe<Array<PostComment>>;
   readTime?: Maybe<Scalars['String']>;
   title: Scalars['String'];
-  updatedAt: Scalars['DateTime'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
   user: User;
 };
 
 export type PostComment = {
   __typename?: 'PostComment';
   commentBody: Scalars['String'];
-  createdAt: Scalars['DateTime'];
+  createdAt?: Maybe<Scalars['DateTime']>;
   id: Scalars['String'];
   parent?: Maybe<PostComment>;
   post?: Maybe<Post>;
   reply?: Maybe<Array<PostComment>>;
-  updatedAt: Scalars['DateTime'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
   user: User;
 };
 
@@ -196,7 +196,7 @@ export type Query = {
   fetchUserPosts: AllPosts;
   findUserById: User;
   getCurrentUser: User;
-  searchPost: Array<UserPostEsResponse>;
+  searchPost: Array<Post>;
   searchUserPostES: Array<UserPostEsResponse>;
 };
 
@@ -270,13 +270,13 @@ export type UpdateUserInput = {
 
 export type User = {
   __typename?: 'User';
-  createdAt: Scalars['DateTime'];
+  createdAt?: Maybe<Scalars['DateTime']>;
   email: Scalars['String'];
   firstName: Scalars['String'];
   fullName?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   lastName: Scalars['String'];
-  updatedAt: Scalars['DateTime'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type UserPostEsResponse = {
@@ -331,7 +331,7 @@ export type CreatePostCommentMutationVariables = Exact<{
 }>;
 
 
-export type CreatePostCommentMutation = { __typename?: 'Mutation', createPostComment: { __typename?: 'CreateCommentResponse', message: string, status: number, comment: { __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, updatedAt: any, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any } }> | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any } } } };
+export type CreatePostCommentMutation = { __typename?: 'Mutation', createPostComment: { __typename?: 'CreateCommentResponse', message: string, status: number, comment: { __typename?: 'PostComment', id: string, commentBody: string, createdAt?: any | null, updatedAt?: any | null, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null } }> | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null } } } };
 
 export type UpdateUserPostMutationVariables = Exact<{
   updatePostInput: UpdatePostInput;
@@ -359,26 +359,33 @@ export type FetchAllPostsQueryVariables = Exact<{
 }>;
 
 
-export type FetchAllPostsQuery = { __typename?: 'Query', fetchAllPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, email: string, lastName: string, createdAt: any, updatedAt: any } }> | null } };
+export type FetchAllPostsQuery = { __typename?: 'Query', fetchAllPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, email: string, lastName: string, createdAt?: any | null, updatedAt?: any | null } }> | null } };
 
 export type FetchUserPostsQueryVariables = Exact<{
   paginateInput: PaginateInput;
 }>;
 
 
-export type FetchUserPostsQuery = { __typename?: 'Query', fetchUserPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, email: string, lastName: string, createdAt: any, updatedAt: any } }> | null } };
+export type FetchUserPostsQuery = { __typename?: 'Query', fetchUserPosts: { __typename?: 'AllPosts', count?: number | null, posts?: Array<{ __typename?: 'Post', id: string, title: string, description: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, email: string, lastName: string, createdAt?: any | null, updatedAt?: any | null } }> | null } };
 
 export type FetchPostByIdQueryVariables = Exact<{
   postId: Scalars['String'];
 }>;
 
 
-export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, attachmentUrl?: string | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any, id: string }, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any }, reply?: Array<{ __typename?: 'PostComment', commentBody: string, id: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt: any, updatedAt: any } }> | null }> | null } };
+export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, attachmentUrl?: string | null, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null, id: string }, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null }, reply?: Array<{ __typename?: 'PostComment', commentBody: string, id: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null } }> | null }> | null } };
 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser: { __typename?: 'User', id: string, email: string, firstName: string, lastName: string, createdAt: any, updatedAt: any } };
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser: { __typename?: 'User', id: string, email: string, firstName: string, lastName: string, createdAt?: any | null, updatedAt?: any | null } };
+
+export type SearchPostQueryVariables = Exact<{
+  queryString: Scalars['String'];
+}>;
+
+
+export type SearchPostQuery = { __typename?: 'Query', searchPost: Array<{ __typename?: 'Post', id: string, title: string, description: string, readTime?: string | null, attachmentUrl?: string | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, fullName?: string | null } }> };
 
 
 export const LoginDocument = gql`
@@ -940,3 +947,49 @@ export function useGetCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetCurrentUserQueryHookResult = ReturnType<typeof useGetCurrentUserQuery>;
 export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentUserLazyQuery>;
 export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
+export const SearchPostDocument = gql`
+    query SearchPost($queryString: String!) {
+  searchPost(queryString: $queryString) {
+    id
+    title
+    description
+    readTime
+    attachmentUrl
+    user {
+      id
+      firstName
+      lastName
+      email
+      fullName
+    }
+  }
+}
+    `;
+
+/**
+ * __useSearchPostQuery__
+ *
+ * To run a query within a React component, call `useSearchPostQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchPostQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchPostQuery({
+ *   variables: {
+ *      queryString: // value for 'queryString'
+ *   },
+ * });
+ */
+export function useSearchPostQuery(baseOptions: Apollo.QueryHookOptions<SearchPostQuery, SearchPostQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchPostQuery, SearchPostQueryVariables>(SearchPostDocument, options);
+      }
+export function useSearchPostLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchPostQuery, SearchPostQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchPostQuery, SearchPostQueryVariables>(SearchPostDocument, options);
+        }
+export type SearchPostQueryHookResult = ReturnType<typeof useSearchPostQuery>;
+export type SearchPostLazyQueryHookResult = ReturnType<typeof useSearchPostLazyQuery>;
+export type SearchPostQueryResult = Apollo.QueryResult<SearchPostQuery, SearchPostQueryVariables>;

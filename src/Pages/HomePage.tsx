@@ -4,9 +4,13 @@ import Page from "../components/Page";
 import SearchBar from "../components/SearchBar";
 import ShowData from "../sections/homePage/ShowData";
 import { styled } from "@mui/material/styles";
-import { useFetchAllPostsLazyQuery } from "../generated/graphql";
+import {
+  useFetchAllPostsLazyQuery,
+  useSearchPostLazyQuery
+} from "../generated/graphql";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { idText } from "typescript";
 
 const ContainerStyle = styled(Container)(({ theme }) => ({
   marginTop: 10,
@@ -19,7 +23,8 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const limit = 6;
   const [fetchAllPost, { data }] = useFetchAllPostsLazyQuery();
-
+  const [searchPost, { data: searchData }] = useSearchPostLazyQuery();
+  const [searchPriority, setSearchPriority] = useState(false);
   useEffect(() => {
     fetchAllPost({
       variables: {
@@ -32,14 +37,39 @@ const HomePage = () => {
     });
   }, [page]);
 
+  if (searchData) {
+    console.log("searchData", searchData.searchPost);
+  }
+
+  const handleSearchPost = (queryString: string) => {
+    setSearchPriority(queryString === "" ? false : true);
+    searchPost({
+      variables: {
+        queryString: queryString
+      }
+    });
+  };
   return (
     <Page title="Blog App">
       <ContainerStyle maxWidth="lg">
-        <SearchBar />
-        {data?.fetchAllPosts.posts?.length! > 0 ? (
+        <SearchBar
+          handleSearchPost={(queryString) => handleSearchPost(queryString)}
+        />
+        {(data?.fetchAllPosts?.posts?.length! > 0 && !searchPriority) ||
+        (searchData?.searchPost?.length! > 0 && searchPriority) ? (
           <>
-            {" "}
-            <ShowData data={data?.fetchAllPosts?.posts!} />
+            {console.log(
+              searchData,
+              searchPriority,
+              data?.fetchAllPosts?.posts
+            )}{" "}
+            <ShowData
+              data={
+                searchData?.searchPost?.length! > 0
+                  ? searchData?.searchPost!
+                  : data?.fetchAllPosts?.posts!
+              }
+            />
             <TablePagination
               rowsPerPageOptions={[10]}
               component="div"
@@ -55,12 +85,12 @@ const HomePage = () => {
           </>
         ) : (
           <Box mt={5} sx={{ textAlign: "center" }}>
-            <Typography variant="h3" color="primary" gutterBottom>
+            <Typography variant="h4" color="primary" gutterBottom>
               {" "}
-              No Blog
+              No post found
             </Typography>
             <Typography
-              variant="h3"
+              variant="h5"
               color="primary.dark"
               component={Link}
               to="/create-post"

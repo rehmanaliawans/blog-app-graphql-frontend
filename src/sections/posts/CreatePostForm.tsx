@@ -1,15 +1,7 @@
 import * as Yup from "yup";
 import { LoadingButton } from "@mui/lab";
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  Stack,
-  styled,
-  TextField,
-  Typography
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Box, Stack, styled, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
@@ -17,7 +9,6 @@ import {
   FetchPostByIdQuery,
   UpdatePostInput,
   useCreateUserPostMutation,
-  useFetchAllUserQuery,
   useUpdateUserPostMutation
 } from "../../generated/graphql";
 import { useSearchParams } from "react-router-dom";

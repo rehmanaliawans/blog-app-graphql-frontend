@@ -8,7 +8,7 @@ import {
   Typography
 } from "@mui/material";
 import { styled } from "@mui/system";
-import React, { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import moment from "moment";
 import {
   Post,
@@ -71,8 +71,8 @@ const CommentDiv = ({
     message: ""
   });
   return (
-    <>
-      <Grid container wrap="nowrap" spacing={2} key={comment.id} mt={1}>
+    <Fragment key={comment.id}>
+      <Grid container wrap="nowrap" spacing={2} mt={1}>
         <Grid item>
           <Avatar sx={{ backgroundColor: index % 2 === 0 ? "Red" : "Orange" }}>
             {comment.user.id === userId
@@ -219,15 +219,17 @@ const CommentDiv = ({
           {showReplies.status === true &&
             showReplies.id === comment.id &&
             comment?.reply?.map((reply, index) => (
-              <CommentDiv
-                comment={reply}
-                index={index}
-                handleCommentDelete={(id) => handleCommentDelete(id)}
-                handleEditComment={(reply) => handleEditComment(reply)}
-                handleReplyComment={(reply) => handleReplyComment(reply)}
-                editDialogOpen={editDialogOpen}
-                setEditDialogOpen={setEditDialogOpen}
-              />
+              <Fragment key={index}>
+                <CommentDiv
+                  comment={reply}
+                  index={index}
+                  handleCommentDelete={(id) => handleCommentDelete(id)}
+                  handleEditComment={(reply) => handleEditComment(reply)}
+                  handleReplyComment={(reply) => handleReplyComment(reply)}
+                  editDialogOpen={editDialogOpen}
+                  setEditDialogOpen={setEditDialogOpen}
+                />
+              </Fragment>
             ))}
         </ReplyDiv>
       )}
@@ -258,7 +260,7 @@ const CommentDiv = ({
           }
         }}
       />
-    </>
+    </Fragment>
   );
 };
 
@@ -270,7 +272,6 @@ const CommentBox = ({
   refetchPost: () => Post[];
 }) => {
   const { id } = useParams();
-  const [replyId, setReplyId] = useState("");
 
   console.log("showComments", showComments);
   const [comment, setComment] = useState("");
@@ -290,15 +291,14 @@ const CommentBox = ({
     onError: (err) => toast.error(err.message)
   });
 
-  const [deleteCommentMutation, { data, loading, error }] =
-    useDeleteCommentMutation({
-      onCompleted: (data) => {
-        refetchPost();
-        setReplyDelete(!replyDelete);
-        toast.success(data.deleteComment.message);
-      },
-      onError: (error) => toast.error(error.message)
-    });
+  const [deleteCommentMutation, { data }] = useDeleteCommentMutation({
+    onCompleted: (data) => {
+      refetchPost();
+      setReplyDelete(!replyDelete);
+      toast.success(data.deleteComment.message);
+    },
+    onError: (error) => toast.error(error.message)
+  });
 
   const [updateCommentMutation] = useUpdateCommentMutation({
     onCompleted: (data) => {

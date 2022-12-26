@@ -2,15 +2,12 @@ import * as Yup from "yup";
 import {
   GetCurrentUserQuery,
   UpdateUserInput,
-  useUpdateUserMutation,
-  useUpdateUserPostMutation
+  useUpdateUserMutation
 } from "../../generated/graphql";
 import { Box, Button, Stack, TextField } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "../../context";
 import { toast } from "react-toastify";
 
 const ProfileForm = ({

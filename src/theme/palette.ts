@@ -1,5 +1,3 @@
-import { alpha } from "@mui/material/styles";
-
 // ----------------------------------------------------------------------
 
 function createGradient(color1: string, color2: string) {

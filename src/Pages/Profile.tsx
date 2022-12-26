@@ -5,12 +5,7 @@ import { useGetCurrentUserQuery } from "../generated/graphql";
 import ProfileForm from "../sections/user/ProfileForm";
 
 const Profile = () => {
-  const {
-    data,
-    loading,
-    error,
-    refetch: refetchUser
-  } = useGetCurrentUserQuery();
+  const { data, refetch: refetchUser } = useGetCurrentUserQuery();
 
   return (
     <Page title="Profile">

@@ -273,7 +273,6 @@ const CommentBox = ({
 }) => {
   const { id } = useParams();
 
-  console.log("showComments", showComments);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState<PostComment[]>([]);
   const [replyDelete, setReplyDelete] = useState(false);
@@ -314,7 +313,6 @@ const CommentBox = ({
   });
 
   useEffect(() => {
-    console.log("call effect");
     if (showComments.length > 0) {
       setComments(showComments);
     } else {
@@ -355,12 +353,9 @@ const CommentBox = ({
         commentId: id
       }
     });
-    console.log("Delete", id, data);
   };
 
   const handleEditComment = (reply: { id: string; message: string }) => {
-    console.log("Edit", reply);
-
     updateCommentMutation({
       variables: {
         updateCommentInput: {

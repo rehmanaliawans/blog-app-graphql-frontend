@@ -62,7 +62,6 @@ const ProfileForm = ({
       firstName.trim() !== profileData.getCurrentUser.firstName ||
       lastName.trim() !== profileData.getCurrentUser.lastName
     ) {
-      //   reset();
       setBtnDisabled(false);
     } else {
       setBtnDisabled(true);
@@ -81,7 +80,6 @@ const ProfileForm = ({
       }
     });
   };
-  console.log("profile", profileData.getCurrentUser);
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>

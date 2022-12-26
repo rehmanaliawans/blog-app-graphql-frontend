@@ -1,9 +1,7 @@
 import * as Yup from "yup";
 import { useState } from "react";
-// form
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-// @mui
 import {
   Stack,
   IconButton,
@@ -15,12 +13,9 @@ import {
 } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
-// components
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { saveToken } from "../../utils";
 import { useLoginMutation, LoginUserInput } from "../../generated/graphql";
-
-// ----------------------------------------------------------------------
 
 const LoginForm = () => {
   const navigate = useNavigate();

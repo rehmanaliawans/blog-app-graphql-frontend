@@ -1,4 +1,3 @@
-// packages block
 import {
   ApolloClient,
   InMemoryCache,
@@ -27,7 +26,6 @@ const httpLink = new HttpLink({
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    // Check for unauthorized or forbidden errors
     const unauthorized = graphQLErrors.find(
       (error) => error.message === "invalid token"
     );

@@ -7,7 +7,6 @@ import {
   Typography,
   styled
 } from "@mui/material";
-import SearchBar from "../components/SearchBar";
 import {
   useFetchUserPostsLazyQuery,
   useSearchPostLazyQuery
@@ -52,9 +51,6 @@ const MyPosts = () => {
   return (
     <Page title="Blog App">
       <ContainerStyle maxWidth="lg" sx={{ width: "90vw" }}>
-        <SearchBar
-          handleSearchPost={(queryString) => handleSearchPost(queryString)}
-        />
         {(data?.fetchUserPosts.posts?.length! > 0 && !searchPriority) ||
         (searchData?.searchPost?.length! > 0 && searchPriority) ? (
           <>

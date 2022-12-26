@@ -11,7 +11,7 @@ import {
   useCreateUserPostMutation,
   useUpdateUserPostMutation
 } from "../../generated/graphql";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const MainBox = styled(Box)(() => ({
@@ -62,6 +62,7 @@ const CreatePostForm = ({
   isEdit: Boolean;
   setIsEdit: (edit: boolean) => void;
 }) => {
+  const navigate = useNavigate();
   const [id, setId] = useSearchParams();
   const [fileLoading, setFileLoading] = useState(false);
   const [image, setImage] = useState([]);
@@ -78,6 +79,7 @@ const CreatePostForm = ({
         setValue("description", "");
         setValue("file", []);
         setPreviewImage(null);
+        navigate("/");
         setTimeout(() => {
           reset();
         }, 3000);
@@ -98,8 +100,9 @@ const CreatePostForm = ({
           setValue("description", "");
           setValue("file", []);
           setPreviewImage(null);
-          setId("id", undefined);
           setIsEdit(false);
+          navigate(`/get-post/${id.get("id")}`);
+
           setTimeout(() => {
             UpdateReset();
           }, 3000);

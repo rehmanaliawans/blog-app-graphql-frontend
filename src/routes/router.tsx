@@ -12,6 +12,7 @@ import LoggedInProtection from "./LoggesInProtection";
 import LoggedOutProtection from "./LogggedOutProtection";
 import GetSinglePost from "../Pages/GetSinglePost";
 import MyPosts from "../Pages/MyPosts";
+import Profile from "../Pages/Profile";
 
 export default function Router() {
   return useRoutes([
@@ -70,6 +71,10 @@ export default function Router() {
         {
           path: "/get-post/:id",
           element: <GetSinglePost />
+        },
+        {
+          path: "/profile",
+          element: <Profile />
         }
       ]
     },

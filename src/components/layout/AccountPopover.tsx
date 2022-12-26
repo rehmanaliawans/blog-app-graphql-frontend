@@ -8,13 +8,17 @@ import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router-dom";
 import { deleteToken } from "../../utils";
-import client from "../../interceptor/connectGRaphql";
+import client from "../../interceptor/connectGraphql";
 import { Stack } from "@mui/system";
 import { Popover } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { GetCurrentUserQuery } from "../../generated/graphql";
 
 const MENU_OPTIONS = [
+  {
+    label: "Profile",
+    linkTo: "/profile"
+  },
   {
     label: "My Post",
     linkTo: "/my-posts"

@@ -5,7 +5,7 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ApolloProvider } from "@apollo/client";
-import client from "./interceptor/connectGRaphql";
+import client from "./interceptor/connectGraphql";
 import { AppProvider } from "./context";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

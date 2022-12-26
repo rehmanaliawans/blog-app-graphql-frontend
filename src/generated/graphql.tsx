@@ -347,6 +347,20 @@ export type DeletePostMutationVariables = Exact<{
 
 export type DeletePostMutation = { __typename?: 'Mutation', deletePost: { __typename?: 'ResponseMsgPayload', message: string, status: number } };
 
+export type UpdateCommentMutationVariables = Exact<{
+  updateCommentInput: UpdateCommentInput;
+}>;
+
+
+export type UpdateCommentMutation = { __typename?: 'Mutation', updateComment: { __typename?: 'ResponseMsgPayload', message: string, status: number } };
+
+export type UpdateUserMutationVariables = Exact<{
+  updateUserInput: UpdateUserInput;
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'ResponseMsgPayload', message: string, status: number } };
+
 export type FetchAllUserQueryVariables = Exact<{
   paginateInput: PaginateInput;
 }>;
@@ -373,7 +387,7 @@ export type FetchPostByIdQueryVariables = Exact<{
 }>;
 
 
-export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, attachmentUrl?: string | null, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null, id: string }, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null }, reply?: Array<{ __typename?: 'PostComment', commentBody: string, id: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null } }> | null }> | null } };
+export type FetchPostByIdQuery = { __typename?: 'Query', fetchPost: { __typename?: 'Post', id: string, title: string, description: string, attachmentUrl?: string | null, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null, id: string }, postComments?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null }, reply?: Array<{ __typename?: 'PostComment', commentBody: string, id: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null }, reply?: Array<{ __typename?: 'PostComment', id: string, commentBody: string, createdAt?: any | null, updatedAt?: any | null, user: { __typename?: 'User', id: string, firstName: string, lastName: string, email: string, createdAt?: any | null, updatedAt?: any | null } }> | null }> | null }> | null } };
 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -699,6 +713,74 @@ export function useDeletePostMutation(baseOptions?: Apollo.MutationHookOptions<D
 export type DeletePostMutationHookResult = ReturnType<typeof useDeletePostMutation>;
 export type DeletePostMutationResult = Apollo.MutationResult<DeletePostMutation>;
 export type DeletePostMutationOptions = Apollo.BaseMutationOptions<DeletePostMutation, DeletePostMutationVariables>;
+export const UpdateCommentDocument = gql`
+    mutation UpdateComment($updateCommentInput: UpdateCommentInput!) {
+  updateComment(updateCommentInput: $updateCommentInput) {
+    message
+    status
+  }
+}
+    `;
+export type UpdateCommentMutationFn = Apollo.MutationFunction<UpdateCommentMutation, UpdateCommentMutationVariables>;
+
+/**
+ * __useUpdateCommentMutation__
+ *
+ * To run a mutation, you first call `useUpdateCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCommentMutation, { data, loading, error }] = useUpdateCommentMutation({
+ *   variables: {
+ *      updateCommentInput: // value for 'updateCommentInput'
+ *   },
+ * });
+ */
+export function useUpdateCommentMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCommentMutation, UpdateCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCommentMutation, UpdateCommentMutationVariables>(UpdateCommentDocument, options);
+      }
+export type UpdateCommentMutationHookResult = ReturnType<typeof useUpdateCommentMutation>;
+export type UpdateCommentMutationResult = Apollo.MutationResult<UpdateCommentMutation>;
+export type UpdateCommentMutationOptions = Apollo.BaseMutationOptions<UpdateCommentMutation, UpdateCommentMutationVariables>;
+export const UpdateUserDocument = gql`
+    mutation UpdateUser($updateUserInput: UpdateUserInput!) {
+  updateUser(updateUserInput: $updateUserInput) {
+    message
+    status
+  }
+}
+    `;
+export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      updateUserInput: // value for 'updateUserInput'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
+      }
+export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
+export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
 export const FetchAllUserDocument = gql`
     query FetchAllUser($paginateInput: PaginateInput!) {
   fetchAllUser(paginateInput: $paginateInput) {
@@ -882,6 +964,20 @@ export const FetchPostByIdDocument = gql`
         }
         createdAt
         updatedAt
+        reply {
+          id
+          commentBody
+          user {
+            id
+            firstName
+            lastName
+            email
+            createdAt
+            updatedAt
+          }
+          createdAt
+          updatedAt
+        }
       }
     }
   }

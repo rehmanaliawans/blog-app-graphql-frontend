@@ -28,7 +28,7 @@ const GetSinglePost = () => {
 
   return (
     <Page title="Get Post">
-      <ContainerStyle maxWidth="lg">
+      <ContainerStyle maxWidth="lg" sx={{ width: "95vw" }}>
         {data && <GetPost data={data!} refetchPost={refetchPost} />}
         {error && (
           <Typography color="primary" variant="h3">

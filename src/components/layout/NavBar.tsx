@@ -1,9 +1,9 @@
 import { AppBar, Box, Button, Stack, styled, Toolbar } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { deleteToken } from "../../utils";
-import client from "../../interceptor/connectGRaphql";
+import client from "../../interceptor/connectGraphql";
 import AccountPopover from "./AccountPopover";
 import { useGetCurrentUserQuery } from "../../generated/graphql";
 import { useGlobalContext } from "../../context";
@@ -44,13 +44,16 @@ const NavBar = () => {
   const { setUserId } = useGlobalContext();
   const { data, loading, error } = useGetCurrentUserQuery();
 
-  if (data && !loading) {
-    setUserId(data?.getCurrentUser?.id);
-  }
-  if (error) {
-    deleteToken("token");
-    navigate("/login");
-  }
+  useEffect(() => {
+    if (data && !loading) {
+      setUserId(data?.getCurrentUser?.id);
+    }
+    if (error) {
+      deleteToken("token");
+      navigate("/login");
+    }
+  }, [loading]);
+
   return (
     <RootStyle>
       <ToolbarStyle>

@@ -10,7 +10,6 @@ import {
 } from "../generated/graphql";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { idText } from "typescript";
 
 const ContainerStyle = styled(Container)(({ theme }) => ({
   marginTop: 10,
@@ -25,6 +24,7 @@ const HomePage = () => {
   const [fetchAllPost, { data }] = useFetchAllPostsLazyQuery();
   const [searchPost, { data: searchData }] = useSearchPostLazyQuery();
   const [searchPriority, setSearchPriority] = useState(false);
+
   useEffect(() => {
     fetchAllPost({
       variables: {
@@ -36,10 +36,6 @@ const HomePage = () => {
       fetchPolicy: "network-only"
     });
   }, [page]);
-
-  if (searchData) {
-    console.log("searchData", searchData.searchPost);
-  }
 
   const handleSearchPost = (queryString: string) => {
     setSearchPriority(queryString === "" ? false : true);
@@ -58,11 +54,6 @@ const HomePage = () => {
         {(data?.fetchAllPosts?.posts?.length! > 0 && !searchPriority) ||
         (searchData?.searchPost?.length! > 0 && searchPriority) ? (
           <>
-            {console.log(
-              searchData,
-              searchPriority,
-              data?.fetchAllPosts?.posts
-            )}{" "}
             <ShowData
               data={
                 searchData?.searchPost?.length! > 0

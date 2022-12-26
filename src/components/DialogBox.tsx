@@ -38,8 +38,10 @@ const DialogBox = ({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleClose()}>Disagree</Button>
-        <Button onClick={() => handleAgree()} autoFocus>
+        <Button onClick={() => handleClose()} color="primary">
+          Disagree
+        </Button>
+        <Button onClick={() => handleAgree()} autoFocus color="error">
           Agree
         </Button>
       </DialogActions>

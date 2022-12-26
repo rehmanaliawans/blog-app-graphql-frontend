@@ -262,7 +262,12 @@ const CreatePostForm = ({
             <img
               src={previewImage as string}
               alt="blog-post-images"
-              style={{ width: "300px", height: "300px", objectFit: "cover" }}
+              style={{
+                width: "300px",
+                height: "300px",
+                objectFit: "cover",
+                maxWidth: "100%"
+              }}
             />
           </Box>
         )}

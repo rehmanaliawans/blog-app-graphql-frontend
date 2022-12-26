@@ -106,6 +106,7 @@ const GetPost = ({
             src={data?.fetchPost?.attachmentUrl!}
             width="auto"
             height="auto"
+            style={{ maxWidth: "100%" }}
           />
         )}
         <Typography variant="body1">{data.fetchPost.description}</Typography>

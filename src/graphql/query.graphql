@@ -92,6 +92,20 @@ query FetchPostById($postId: String!) {
         }
         createdAt
         updatedAt
+        reply {
+          id
+          commentBody
+          user {
+            id
+            firstName
+            lastName
+            email
+            createdAt
+            updatedAt
+          }
+          createdAt
+          updatedAt
+        }
       }
     }
   }

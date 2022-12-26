@@ -84,3 +84,17 @@ mutation DeletePost($postId: String!) {
     status
   }
 }
+
+mutation UpdateComment($updateCommentInput: UpdateCommentInput!) {
+  updateComment(updateCommentInput: $updateCommentInput) {
+    message
+    status
+  }
+}
+
+mutation UpdateUser($updateUserInput: UpdateUserInput!) {
+  updateUser(updateUserInput: $updateUserInput) {
+    message
+    status
+  }
+}

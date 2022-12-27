@@ -5,6 +5,7 @@ import SearchBar from "../components/SearchBar";
 import ShowData from "../sections/homePage/ShowData";
 import { styled } from "@mui/material/styles";
 import {
+  SearchPostQuery,
   useFetchAllPostsLazyQuery,
   useSearchPostLazyQuery
 } from "../generated/graphql";
@@ -22,7 +23,9 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const limit = 6;
   const [fetchAllPost, { data }] = useFetchAllPostsLazyQuery();
-  const [searchPost, { data: searchData }] = useSearchPostLazyQuery();
+  const [searchPost, { data: searchData }] = useSearchPostLazyQuery({
+    onCompleted: (data: SearchPostQuery) => {}
+  });
   const [searchPriority, setSearchPriority] = useState(false);
 
   useEffect(() => {

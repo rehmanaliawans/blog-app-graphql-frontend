@@ -11,7 +11,7 @@ import { styled } from "@mui/system";
 import { Fragment, useEffect, useState } from "react";
 import moment from "moment";
 import {
-  Post,
+  FetchPostByIdQuery,
   PostComment,
   useCreatePostCommentMutation,
   useDeleteCommentMutation,
@@ -19,10 +19,9 @@ import {
 } from "../generated/graphql";
 import { useParams } from "react-router-dom";
 import { useGlobalContext } from "../context";
-import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
 import DialogBox from "./DialogBox";
 import { toast } from "react-toastify";
-import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
+import { ApolloQueryResult } from "@apollo/client";
 
 const MainCommentBox = styled(Paper)(({ theme }) => ({
   width: "100%",
@@ -32,9 +31,9 @@ const MainCommentBox = styled(Paper)(({ theme }) => ({
 }));
 const ReplyDiv = styled(Box)(({ theme }) => ({
   width: "100%",
-  paddingLeft: theme.spacing(8),
+  paddingLeft: theme.spacing(2),
   [theme.breakpoints.down("sm")]: {
-    paddingLeft: theme.spacing(2)
+    paddingLeft: theme.spacing(1)
   }
 }));
 
@@ -57,6 +56,7 @@ const CommentDiv = ({
 }) => {
   const { userId } = useGlobalContext();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [replyInputId, setReplyInputId] = useState("");
   const [showReplies, setShowReplies] = useState({
     id: "",
     status: false
@@ -160,10 +160,6 @@ const CommentDiv = ({
               fullWidth
               label="Edit comment"
               size="small"
-              sx={{
-                padding: "0px"
-                // width: "80%"
-              }}
               value={
                 editReply.id === comment.id
                   ? editReply.message
@@ -198,74 +194,93 @@ const CommentDiv = ({
         />
       </Grid>
 
-      {comment?.reply?.length! > 0 && (
-        <ReplyDiv>
-          <Button
-            variant="text"
-            color="primary"
-            sx={{ textTransform: "capitalize", fontSize: "12px" }}
-            onClick={() => {
-              if (showReplies.id === comment.id) {
-                setShowReplies({
+      <ReplyDiv>
+        <Button
+          variant="text"
+          color="primary"
+          sx={{
+            textTransform: "capitalize",
+            fontSize: "12px",
+            marginLeft: "1.5rem"
+          }}
+          onClick={() => {
+            replyInputId === comment.id
+              ? setReplyInputId("")
+              : setReplyInputId(comment.id);
+          }}
+        >
+          {replyInputId === comment.id ? "cancel" : "Reply"}
+        </Button>
+        {comment?.reply?.length! > 0 && (
+          <>
+            <Button
+              variant="text"
+              color="primary"
+              sx={{
+                textTransform: "capitalize",
+                fontSize: "12px",
+                marginLeft: "1.5rem"
+              }}
+              onClick={() => {
+                if (showReplies.id === comment.id) {
+                  setShowReplies({
+                    id: "",
+                    status: false
+                  });
+                } else {
+                  setShowReplies({
+                    id: comment.id,
+                    status: true
+                  });
+                }
+              }}
+            >
+              {showReplies.id === comment.id ? "hide replies" : "show replies"}
+            </Button>
+            {showReplies.status === true &&
+              showReplies.id === comment.id &&
+              comment?.reply?.map((reply, index) => (
+                <Fragment key={index}>
+                  <CommentDiv
+                    comment={reply}
+                    index={index}
+                    handleCommentDelete={(id) => handleCommentDelete(id)}
+                    handleEditComment={(reply) => handleEditComment(reply)}
+                    handleReplyComment={(reply) => handleReplyComment(reply)}
+                    editDialogOpen={editDialogOpen}
+                    setEditDialogOpen={setEditDialogOpen}
+                  />
+                </Fragment>
+              ))}
+          </>
+        )}
+      </ReplyDiv>
+      <ReplyDiv>
+        {replyInputId === comment.id && (
+          <TextField
+            placeholder="Enter reply..."
+            variant="standard"
+            label="reply"
+            size="small"
+            fullWidth
+            value={reply.id === comment.id ? reply.message : ""}
+            onChange={(e) => {
+              setReply({
+                id: comment.id,
+                message: e.target.value
+              });
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleReplyComment(reply);
+                setReply({
                   id: "",
-                  status: false
-                });
-              } else {
-                setShowReplies({
-                  id: comment.id,
-                  status: true
+                  message: ""
                 });
               }
             }}
-          >
-            {showReplies.id === comment.id ? "hide replies" : "show replies"}
-          </Button>
-          {showReplies.status === true &&
-            showReplies.id === comment.id &&
-            comment?.reply?.map((reply, index) => (
-              <Fragment key={index}>
-                <CommentDiv
-                  comment={reply}
-                  index={index}
-                  handleCommentDelete={(id) => handleCommentDelete(id)}
-                  handleEditComment={(reply) => handleEditComment(reply)}
-                  handleReplyComment={(reply) => handleReplyComment(reply)}
-                  editDialogOpen={editDialogOpen}
-                  setEditDialogOpen={setEditDialogOpen}
-                />
-              </Fragment>
-            ))}
-        </ReplyDiv>
-      )}
-      <ReplyDiv>
-        <TextField
-          placeholder="Enter reply..."
-          variant="standard"
-          label="reply"
-          size="small"
-          fullWidth
-          sx={{
-            padding: "0px"
-            // marginLeft: "3rem"
-            // width: "80%"
-          }}
-          value={reply.id === comment.id ? reply.message : ""}
-          onChange={(e) => {
-            setReply({
-              id: comment.id,
-              message: e.target.value
-            });
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleReplyComment(reply);
-              setReply({
-                id: "",
-                message: ""
-              });
-            }
-          }}
-        />
+          />
+        )}
       </ReplyDiv>
     </Fragment>
   );
@@ -276,7 +291,7 @@ const CommentBox = ({
   refetchPost
 }: {
   showComments: PostComment[];
-  refetchPost: () => Post[];
+  refetchPost: () => Promise<ApolloQueryResult<FetchPostByIdQuery>>;
 }) => {
   const { id } = useParams();
 
@@ -297,7 +312,7 @@ const CommentBox = ({
     onError: (err) => toast.error(err.message)
   });
 
-  const [deleteCommentMutation, { data }] = useDeleteCommentMutation({
+  const [deleteCommentMutation] = useDeleteCommentMutation({
     onCompleted: (data) => {
       refetchPost();
       setReplyDelete(!replyDelete);
@@ -328,13 +343,21 @@ const CommentBox = ({
   }, [showComments, replyDelete]);
 
   const handleReplyComment = (reply: { id: string; message: string }) => {
+    const checkNestedOneReply = comments.find((comment) =>
+      comment.reply?.find((re) => re?.reply?.find((res) => res.id === reply.id))
+    );
+
+    const checkOneReply = checkNestedOneReply?.reply?.find((comment) =>
+      comment.reply?.find((re) => re.id === reply?.id)
+    );
+
     if (reply.message !== "" && id && reply.id) {
       createPostCommentMutation({
         variables: {
           createCommentInput: {
             commentBody: reply.message,
             postId: id!,
-            parentId: reply.id
+            parentId: checkOneReply?.id ? checkOneReply?.id : reply.id
           }
         }
       });

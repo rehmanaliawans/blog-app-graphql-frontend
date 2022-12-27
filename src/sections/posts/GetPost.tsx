@@ -4,6 +4,7 @@ import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
 import {
   FetchPostByIdQuery,
+  Post,
   useDeletePostMutation
 } from "../../generated/graphql";
 import CommentBox from "../../components/CommentBox";
@@ -12,6 +13,7 @@ import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import DialogBox from "../../components/DialogBox";
+import { ApolloQueryResult } from "@apollo/client";
 
 const MainBox = styled(Box)(() => ({
   width: "100%",
@@ -38,7 +40,7 @@ const GetPost = ({
   refetchPost
 }: {
   data: FetchPostByIdQuery;
-  refetchPost: any;
+  refetchPost: () => Promise<ApolloQueryResult<FetchPostByIdQuery>>;
 }) => {
   const { userId } = useGlobalContext();
   const { id } = useParams();

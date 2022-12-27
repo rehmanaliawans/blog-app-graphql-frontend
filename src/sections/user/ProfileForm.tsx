@@ -2,6 +2,7 @@ import * as Yup from "yup";
 import {
   GetCurrentUserQuery,
   UpdateUserInput,
+  User,
   useUpdateUserMutation
 } from "../../generated/graphql";
 import { Box, Button, Stack, TextField } from "@mui/material";
@@ -9,13 +10,14 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { ApolloQueryResult } from "@apollo/client";
 
 const ProfileForm = ({
   profileData,
   refetchUser
 }: {
   profileData: GetCurrentUserQuery;
-  refetchUser: any;
+  refetchUser: () => Promise<ApolloQueryResult<GetCurrentUserQuery>>;
 }) => {
   const [updateUserMutation] = useUpdateUserMutation({
     onCompleted: (data) => {

@@ -72,9 +72,16 @@ const CommentDiv = ({
   });
   return (
     <Fragment key={comment.id}>
-      <Grid container wrap="nowrap" spacing={2} mt={1}>
+      <Grid container wrap="nowrap" spacing={1} mt={1}>
         <Grid item>
-          <Avatar sx={{ backgroundColor: index % 2 === 0 ? "Red" : "Orange" }}>
+          <Avatar
+            sx={{
+              backgroundColor: index % 2 === 0 ? "Red" : "Orange",
+              width: "30px",
+              height: "30px",
+              marginTop: "8px"
+            }}
+          >
             {comment.user.id === userId
               ? "Y"
               : comment.user.firstName[0].toUpperCase()}
@@ -130,12 +137,9 @@ const CommentDiv = ({
                     }
                   }}
                 >
-                  {editDialogOpen.isEdit &&
-                  editDialogOpen.id === comment?.id ? (
-                    "Cancel"
-                  ) : (
-                    <BorderColorRoundedIcon color="primary" />
-                  )}
+                  {editDialogOpen.isEdit && editDialogOpen.id === comment?.id
+                    ? "Cancel"
+                    : "Edit"}
                 </Button>
                 <Button
                   size="small"
@@ -144,7 +148,7 @@ const CommentDiv = ({
                   sx={{ textTransform: "capitalize" }}
                   onClick={() => setDeleteDialogOpen(true)}
                 >
-                  <DeleteForeverRoundedIcon color="inherit" />
+                  Delete
                 </Button>
               </Box>
             )}
@@ -152,13 +156,13 @@ const CommentDiv = ({
           {editDialogOpen.isEdit && editDialogOpen.id === comment.id ? (
             <TextField
               placeholder="Enter comment..."
-              variant="standard"
+              variant="outlined"
+              fullWidth
               label="Edit comment"
               size="small"
               sx={{
-                padding: "0px",
-                marginLeft: "3rem",
-                width: "80%"
+                padding: "0px"
+                // width: "80%"
               }}
               value={
                 editReply.id === comment.id
@@ -233,33 +237,36 @@ const CommentDiv = ({
             ))}
         </ReplyDiv>
       )}
-      <TextField
-        placeholder="Enter comment..."
-        variant="standard"
-        label="comment"
-        size="small"
-        sx={{
-          padding: "0px",
-          marginLeft: "3rem",
-          width: "80%"
-        }}
-        value={reply.id === comment.id ? reply.message : ""}
-        onChange={(e) => {
-          setReply({
-            id: comment.id,
-            message: e.target.value
-          });
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleReplyComment(reply);
+      <ReplyDiv>
+        <TextField
+          placeholder="Enter reply..."
+          variant="standard"
+          label="reply"
+          size="small"
+          fullWidth
+          sx={{
+            padding: "0px"
+            // marginLeft: "3rem"
+            // width: "80%"
+          }}
+          value={reply.id === comment.id ? reply.message : ""}
+          onChange={(e) => {
             setReply({
-              id: "",
-              message: ""
+              id: comment.id,
+              message: e.target.value
             });
-          }
-        }}
-      />
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleReplyComment(reply);
+              setReply({
+                id: "",
+                message: ""
+              });
+            }
+          }}
+        />
+      </ReplyDiv>
     </Fragment>
   );
 };

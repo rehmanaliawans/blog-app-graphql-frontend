@@ -65,8 +65,13 @@ const GetPost = ({
   };
   return (
     <MainBox>
-      <Box display="flex" justifyContent="space-between" sx={{ width: "100%" }}>
-        <Typography variant="h4" color="primary" gutterBottom>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{ width: "100%", marginBottom: "0.35rem" }}
+      >
+        <Typography variant="h4" color="primary">
           Title
         </Typography>
         {data?.fetchPost?.user?.id === userId && (

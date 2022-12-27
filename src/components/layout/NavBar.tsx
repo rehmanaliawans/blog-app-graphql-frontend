@@ -35,8 +35,19 @@ const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
 const HomeButton = styled(RouterLink)(({ theme }) => ({
   fontSize: "25px",
   textDecoration: "none",
-  color: theme.palette.primary.main
+  color: theme.palette.primary.main,
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "18px"
+  }
 }));
+const LogoutIconButton = styled(LogoutIcon)(({ theme }) => ({
+  cursor: "pointer",
+  display: "inline-block",
+  [theme.breakpoints.down("sm")]: {
+    display: "none"
+  }
+}));
+
 const NavBar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -57,7 +68,7 @@ const NavBar = () => {
   return (
     <RootStyle>
       <ToolbarStyle>
-        <Box sx={{ px: 2.5, py: 3, display: "inline-flex" }}>
+        <Box sx={{ display: "inline-flex" }}>
           <HomeButton to="/">Blog App</HomeButton>
         </Box>
         <Box sx={{ flexGrow: 1 }} />
@@ -68,15 +79,19 @@ const NavBar = () => {
           spacing={{ xs: 0.5, sm: 1.5 }}
         >
           {pathname !== "/create-post" && (
-            <Button variant="outlined" component={RouterLink} to="/create-post">
+            <Button
+              variant="outlined"
+              size="small"
+              component={RouterLink}
+              to="/create-post"
+            >
               Create Post
             </Button>
           )}
           <AccountPopover user={data!} />
 
-          <LogoutIcon
+          <LogoutIconButton
             color="primary"
-            sx={{ cursor: "pointer" }}
             onClick={async () => {
               deleteToken("token");
               await client.clearStore();

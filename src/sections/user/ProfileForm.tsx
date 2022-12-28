@@ -126,21 +126,6 @@ const ProfileForm = ({
             Update
           </Button>
         </Stack>
-        {/* <Stack
-          direction={{ xs: "column", sm: "row" }}
-          sx={{ display: "flex", justifyContent: "flex-end" }}
-        >
-          {error && (
-            <Label variant="ghost" color="error">
-              {error.message}
-            </Label>
-          )}
-          {data && (
-            <Label variant="ghost" color="success">
-              {data.updateUser}
-            </Label>
-          )}
-        </Stack> */}
       </Stack>
     </Box>
   );

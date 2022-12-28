@@ -2,10 +2,12 @@ import {
   Avatar,
   Box,
   Button,
+  Divider,
   Grid,
   Paper,
   TextField,
-  Typography
+  Typography,
+  useTheme
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { Fragment, useEffect, useState } from "react";
@@ -22,12 +24,15 @@ import { useGlobalContext } from "../context";
 import DialogBox from "./DialogBox";
 import { toast } from "react-toastify";
 import { ApolloQueryResult } from "@apollo/client";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 const MainCommentBox = styled(Paper)(({ theme }) => ({
   width: "100%",
   height: "30rem",
   overflowY: "auto",
-  padding: theme.spacing(2)
+  padding: theme.spacing(2),
+  position: "relative"
 }));
 const ReplyDiv = styled(Box)(({ theme }) => ({
   width: "100%",
@@ -44,7 +49,9 @@ const CommentDiv = ({
   handleReplyComment,
   handleEditComment,
   setEditDialogOpen,
-  editDialogOpen
+  editDialogOpen,
+  setReplyInputId,
+  replyInputId
 }: {
   comment: PostComment;
   index: number;
@@ -53,10 +60,11 @@ const CommentDiv = ({
   handleReplyComment: (reply: { id: string; message: string }) => void;
   editDialogOpen: { isEdit: boolean; id: string };
   setEditDialogOpen: (value: { isEdit: boolean; id: string }) => void;
+  setReplyInputId: (value: { isReply: boolean; id: string }) => void;
+  replyInputId: { isReply: boolean; id: string };
 }) => {
   const { userId } = useGlobalContext();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [replyInputId, setReplyInputId] = useState("");
   const [showReplies, setShowReplies] = useState({
     id: "",
     status: false
@@ -180,6 +188,35 @@ const CommentDiv = ({
           ) : (
             <Typography>{comment?.commentBody}</Typography>
           )}
+          {replyInputId.id === comment.id && replyInputId.isReply === true && (
+            <TextField
+              placeholder="Enter reply..."
+              variant="standard"
+              label="reply"
+              size="small"
+              fullWidth
+              value={reply.id === comment.id ? reply.message : ""}
+              onChange={(e) => {
+                setReply({
+                  id: comment.id,
+                  message: e.target.value
+                });
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleReplyComment(reply);
+                  setReply({
+                    id: "",
+                    message: ""
+                  });
+                  setReplyInputId({
+                    id: "",
+                    isReply: false
+                  });
+                }
+              }}
+            />
+          )}
         </Grid>
 
         <DialogBox
@@ -204,12 +241,18 @@ const CommentDiv = ({
             marginLeft: "1.5rem"
           }}
           onClick={() => {
-            replyInputId === comment.id
-              ? setReplyInputId("")
-              : setReplyInputId(comment.id);
+            replyInputId.id === comment.id && replyInputId.isReply === true
+              ? setReplyInputId({
+                  isReply: false,
+                  id: ""
+                })
+              : setReplyInputId({
+                  isReply: true,
+                  id: comment.id
+                });
           }}
         >
-          {replyInputId === comment.id ? "cancel" : "Reply"}
+          {replyInputId.id === comment.id ? "cancel" : "Reply"}
         </Button>
         {comment?.reply?.length! > 0 && (
           <>
@@ -217,11 +260,22 @@ const CommentDiv = ({
               variant="text"
               color="primary"
               sx={{
-                textTransform: "capitalize",
+                textTransform: "unset",
                 fontSize: "12px",
                 marginLeft: "1.5rem"
               }}
+              endIcon={
+                showReplies.id !== comment.id ? (
+                  <KeyboardArrowDownIcon />
+                ) : (
+                  <KeyboardArrowUpIcon />
+                )
+              }
               onClick={() => {
+                setReplyInputId({
+                  isReply: false,
+                  id: ""
+                });
                 if (showReplies.id === comment.id) {
                   setShowReplies({
                     id: "",
@@ -235,8 +289,10 @@ const CommentDiv = ({
                 }
               }}
             >
-              {showReplies.id === comment.id ? "hide replies" : "show replies"}
+              {showReplies.id === comment.id ? "Hide replies" : "Show replies"}
             </Button>
+            <Divider sx={{ borderStyle: "dashed" }} />
+
             {showReplies.status === true &&
               showReplies.id === comment.id &&
               comment?.reply?.map((reply, index) => (
@@ -249,37 +305,12 @@ const CommentDiv = ({
                     handleReplyComment={(reply) => handleReplyComment(reply)}
                     editDialogOpen={editDialogOpen}
                     setEditDialogOpen={setEditDialogOpen}
+                    setReplyInputId={setReplyInputId}
+                    replyInputId={replyInputId}
                   />
                 </Fragment>
               ))}
           </>
-        )}
-      </ReplyDiv>
-      <ReplyDiv>
-        {replyInputId === comment.id && (
-          <TextField
-            placeholder="Enter reply..."
-            variant="standard"
-            label="reply"
-            size="small"
-            fullWidth
-            value={reply.id === comment.id ? reply.message : ""}
-            onChange={(e) => {
-              setReply({
-                id: comment.id,
-                message: e.target.value
-              });
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleReplyComment(reply);
-                setReply({
-                  id: "",
-                  message: ""
-                });
-              }
-            }}
-          />
         )}
       </ReplyDiv>
     </Fragment>
@@ -293,6 +324,7 @@ const CommentBox = ({
   showComments: PostComment[];
   refetchPost: () => Promise<ApolloQueryResult<FetchPostByIdQuery>>;
 }) => {
+  const theme = useTheme();
   const { id } = useParams();
 
   const [comment, setComment] = useState("");
@@ -300,6 +332,10 @@ const CommentBox = ({
   const [replyDelete, setReplyDelete] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState({
     isEdit: false,
+    id: ""
+  });
+  const [replyInputId, setReplyInputId] = useState({
+    isReply: false,
     id: ""
   });
 
@@ -419,6 +455,7 @@ const CommentBox = ({
           }
         }}
       />
+
       {comments?.length > 0 ? (
         comments?.map((comment, index) => {
           return (
@@ -431,6 +468,8 @@ const CommentBox = ({
                 handleReplyComment={(reply) => handleReplyComment(reply)}
                 editDialogOpen={editDialogOpen}
                 setEditDialogOpen={setEditDialogOpen}
+                setReplyInputId={setReplyInputId}
+                replyInputId={replyInputId}
               />
             </Fragment>
           );

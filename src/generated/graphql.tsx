@@ -282,10 +282,10 @@ export type User = {
 export type UserPostEsResponse = {
   __typename?: 'UserPostESResponse';
   createdAt: Scalars['DateTime'];
+  description: Scalars['String'];
   firstName: Scalars['String'];
   id: Scalars['String'];
   lastName: Scalars['String'];
-  postDescription: Scalars['String'];
   postTitle: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   userId: Scalars['String'];

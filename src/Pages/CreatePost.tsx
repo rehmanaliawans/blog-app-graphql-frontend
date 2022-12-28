@@ -4,6 +4,8 @@ import Page from "../components/Page";
 import CreatePostForm from "../sections/posts/CreatePostForm";
 import { useSearchParams } from "react-router-dom";
 import { useFetchPostByIdLazyQuery } from "../generated/graphql";
+import { onError } from "@apollo/client/link/error";
+import { toast } from "react-toastify";
 
 const ContainerStyle = styled(Container)(() => ({
   marginTop: 10,
@@ -19,7 +21,8 @@ const CreatePost = () => {
   const [fetchUserPost, { data }] = useFetchPostByIdLazyQuery({
     onCompleted: () => {
       setIsEdit(true);
-    }
+    },
+    onError: (err) => toast.error(err.message)
   });
   useEffect(() => {
     if (id.get("id")) {

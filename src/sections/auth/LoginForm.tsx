@@ -16,6 +16,7 @@ import { LoadingButton } from "@mui/lab";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { saveToken } from "../../utils";
 import { useLoginMutation, LoginUserInput } from "../../generated/graphql";
+import { toast } from "react-toastify";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -25,7 +26,8 @@ const LoginForm = () => {
     onCompleted: ({ login }) => {
       saveToken(login.access_token!, "token");
       navigate("/", { replace: true });
-    }
+    },
+    onError: (err) => toast.error(err.message)
   });
 
   const LoginSchema = Yup.object().shape({

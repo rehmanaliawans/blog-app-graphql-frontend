@@ -15,6 +15,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { useSignupMutation, CreateUserInput } from "../../generated/graphql";
 import { saveToken } from "../../utils";
+import { toast } from "react-toastify";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -23,7 +24,8 @@ const RegisterForm = () => {
     onCompleted: ({ signUp }) => {
       saveToken(signUp.access_token, "token");
       navigate("/", { replace: true });
-    }
+    },
+    onError: (err) => toast.error(err.message)
   });
 
   const RegisterSchema = Yup.object().shape({

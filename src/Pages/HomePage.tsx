@@ -23,9 +23,7 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const limit = 6;
   const [fetchAllPost, { data }] = useFetchAllPostsLazyQuery();
-  const [searchPost, { data: searchData }] = useSearchPostLazyQuery({
-    onCompleted: (data: SearchPostQuery) => {}
-  });
+  const [searchPost, { data: searchData }] = useSearchPostLazyQuery();
   const [searchPriority, setSearchPriority] = useState(false);
 
   useEffect(() => {

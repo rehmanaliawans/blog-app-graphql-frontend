@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useUpdatePasswordMutation } from "../../generated/graphql";
 import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const UpdatePasswordForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,11 +22,12 @@ const UpdatePasswordForm = () => {
 
   const [updatePasswordMutation, { data, loading, error }] =
     useUpdatePasswordMutation({
-      onCompleted(data, clientOptions) {
+      onCompleted(data) {
         if (data.updatePassword.status === 200) {
           setSearchParams(undefined);
         }
-      }
+      },
+      onError: (err) => toast.error(err.message)
     });
   const updateSPasswordSchema = Yup.object().shape({
     password: Yup.string()

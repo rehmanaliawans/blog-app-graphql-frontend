@@ -146,7 +146,6 @@ const CommentBox = ({
         size="small"
         sx={{
           padding: "0px",
-          marginLeft: "10px",
           marginTop: "10px"
         }}
         value={comment}

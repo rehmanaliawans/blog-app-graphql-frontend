@@ -111,11 +111,16 @@ const CommentDiv = ({
                   variant="text"
                   sx={{ textTransform: "capitalize" }}
                   onClick={() => {
+                    setReplyInputId({
+                      id: "",
+                      isReply: false
+                    });
                     if (
                       editDialogOpen.isEdit &&
                       editDialogOpen.id === comment.id
                     ) {
                       setEditDialogOpen({ isEdit: false, id: "" });
+
                       setEditReply({
                         id: "",
                         message: ""
@@ -180,6 +185,8 @@ const CommentDiv = ({
               label="reply"
               size="small"
               fullWidth
+              autoFocus
+              InputLabelProps={{ shrink: true }}
               value={reply.id === comment.id ? reply.message : ""}
               onChange={(e) => {
                 setReply({
@@ -221,6 +228,8 @@ const CommentDiv = ({
           variant="text"
           color="primary"
           onClick={() => {
+            setEditDialogOpen({ isEdit: false, id: "" });
+
             replyInputId.id === comment.id && replyInputId.isReply === true
               ? setReplyInputId({
                   isReply: false,

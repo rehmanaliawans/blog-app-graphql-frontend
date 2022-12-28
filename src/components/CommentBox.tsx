@@ -36,10 +36,27 @@ const MainCommentBox = styled(Paper)(({ theme }) => ({
 }));
 const ReplyDiv = styled(Box)(({ theme }) => ({
   width: "100%",
-  paddingLeft: theme.spacing(2),
+  paddingLeft: theme.spacing(3),
   [theme.breakpoints.down("sm")]: {
     paddingLeft: theme.spacing(1)
   }
+}));
+const AvatarIcon = styled(Avatar)(({ index }: { index: number }) => ({
+  backgroundColor: index % 2 === 0 ? "#5c7c8b" : "#029489",
+  width: "35px",
+  height: "35px",
+  marginTop: "6px"
+}));
+const DateTypography = styled(Typography)(({ theme }) => ({
+  fontWeight: "bold",
+  color: theme.palette.grey[900],
+  position: "relative",
+  top: "-10px"
+}));
+const ReplyShowButton = styled(Button)(() => ({
+  textTransform: "unset",
+  fontSize: "12px",
+  marginLeft: "1.5rem"
 }));
 
 const CommentDiv = ({
@@ -82,18 +99,11 @@ const CommentDiv = ({
     <Fragment key={comment.id}>
       <Grid container wrap="nowrap" spacing={1} mt={1}>
         <Grid item>
-          <Avatar
-            sx={{
-              backgroundColor: index % 2 === 0 ? "Red" : "Orange",
-              width: "30px",
-              height: "30px",
-              marginTop: "8px"
-            }}
-          >
+          <AvatarIcon index={index}>
             {comment.user.id === userId
               ? "Y"
               : comment.user.firstName[0].toUpperCase()}
-          </Avatar>
+          </AvatarIcon>
         </Grid>
         <Grid justifyContent="left" item xs zeroMinWidth>
           <Box
@@ -107,18 +117,9 @@ const CommentDiv = ({
                   ? "You"
                   : comment?.user?.firstName + " " + comment?.user?.lastName}
               </Typography>
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: "bold",
-                  color: "grey",
-                  position: "relative",
-                  top: "-10px"
-                }}
-              >
-                {/* posted {moment(comment?.createdAt).format("lll")} */}
+              <DateTypography variant="caption">
                 posted {moment(comment?.createdAt).fromNow()}
-              </Typography>
+              </DateTypography>
             </Box>
             {comment.user.id === userId && (
               <Box>
@@ -186,12 +187,14 @@ const CommentDiv = ({
               }}
             />
           ) : (
-            <Typography>{comment?.commentBody}</Typography>
+            <Typography sx={{ lineBreak: "anywhere" }}>
+              {comment?.commentBody}
+            </Typography>
           )}
           {replyInputId.id === comment.id && replyInputId.isReply === true && (
             <TextField
               placeholder="Enter reply..."
-              variant="standard"
+              variant="outlined"
               label="reply"
               size="small"
               fullWidth
@@ -232,14 +235,9 @@ const CommentDiv = ({
       </Grid>
 
       <ReplyDiv>
-        <Button
+        <ReplyShowButton
           variant="text"
           color="primary"
-          sx={{
-            textTransform: "capitalize",
-            fontSize: "12px",
-            marginLeft: "1.5rem"
-          }}
           onClick={() => {
             replyInputId.id === comment.id && replyInputId.isReply === true
               ? setReplyInputId({
@@ -252,18 +250,13 @@ const CommentDiv = ({
                 });
           }}
         >
-          {replyInputId.id === comment.id ? "cancel" : "Reply"}
-        </Button>
+          {replyInputId.id === comment.id ? "Cancel" : "Reply"}
+        </ReplyShowButton>
         {comment?.reply?.length! > 0 && (
           <>
-            <Button
+            <ReplyShowButton
               variant="text"
               color="primary"
-              sx={{
-                textTransform: "unset",
-                fontSize: "12px",
-                marginLeft: "1.5rem"
-              }}
               endIcon={
                 showReplies.id !== comment.id ? (
                   <KeyboardArrowDownIcon />
@@ -290,7 +283,7 @@ const CommentDiv = ({
               }}
             >
               {showReplies.id === comment.id ? "Hide replies" : "Show replies"}
-            </Button>
+            </ReplyShowButton>
             <Divider sx={{ borderStyle: "dashed" }} />
 
             {showReplies.status === true &&

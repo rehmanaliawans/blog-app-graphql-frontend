@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 import { LoadingButton } from "@mui/lab";
 import { Box, Stack, styled, TextField } from "@mui/material";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
@@ -237,16 +237,21 @@ const CreatePostForm = ({
         <input
           type="file"
           id="fileupload"
-          onChange={(e: any) => {
-            if (!e.target.files[0]) return;
-            setImage(e.target.files as unknown as []);
-            const reader = new FileReader();
-            reader.onload = () => {
-              if (reader.readyState === 2) {
-                setPreviewImage(reader.result);
-              }
-            };
-            reader.readAsDataURL(e?.target?.files[0]);
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files ? e.target.files[0] : null;
+
+            if (file) {
+              setImage(e.target.files as unknown as []);
+              const reader = new FileReader();
+              reader.onload = () => {
+                if (reader.readyState === 2) {
+                  setPreviewImage(reader.result);
+                }
+              };
+              reader.readAsDataURL(file);
+            } else {
+              return;
+            }
           }}
           style={{ display: "none" }}
           accept="image/*"

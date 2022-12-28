@@ -35,6 +35,10 @@ const DescriptionCard = styled(Box)(() => ({
   backgroundColor: "#fff",
   borderRadius: "10px"
 }));
+
+const DescriptionTypo = styled(Typography)(() => ({
+  lineBreak: "anywhere"
+}));
 const GetPost = ({
   data,
   refetchPost
@@ -107,7 +111,9 @@ const GetPost = ({
             style={{ maxWidth: "100%" }}
           />
         )}
-        <Typography variant="body1">{data.fetchPost.description}</Typography>
+        <DescriptionTypo variant="body1">
+          {data.fetchPost.description}
+        </DescriptionTypo>
       </DescriptionCard>
       <Typography variant="h6" color="primary" gutterBottom>
         Comments:

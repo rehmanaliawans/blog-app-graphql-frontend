@@ -5,6 +5,13 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
+import { styled } from "@mui/material";
+
+const DescriptionTypo = styled(Typography)(() => ({
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis"
+}));
 const MuiCard = ({
   card
 }: {
@@ -16,17 +23,9 @@ const MuiCard = ({
         <Typography gutterBottom variant="h5" component="div">
           {card?.title}
         </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis"
-          }}
-        >
+        <DescriptionTypo variant="body2" color="text.secondary">
           {card?.description}
-        </Typography>
+        </DescriptionTypo>
       </CardContent>
       <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
         <Button size="small" component={RouterLink} to={`/get-post/${card.id}`}>

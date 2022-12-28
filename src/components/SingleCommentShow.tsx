@@ -7,6 +7,7 @@ import {
   Button,
   Divider,
   Grid,
+  InputAdornment,
   TextField,
   Typography,
   styled
@@ -15,6 +16,7 @@ import moment from "moment";
 import DialogBox from "./DialogBox";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import SendIcon from "@mui/icons-material/Send";
 
 const ReplyDiv = styled(Box)(({ theme }) => ({
   width: "100%",
@@ -161,6 +163,18 @@ const CommentDiv = ({
                   ? editReply.message
                   : comment?.commentBody
               }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment
+                    position="end"
+                    onClick={() => {
+                      handleEditComment(editReply);
+                    }}
+                  >
+                    <SendIcon />
+                  </InputAdornment>
+                )
+              }}
               onChange={(e) => {
                 setEditReply({
                   id: comment.id,
@@ -193,6 +207,26 @@ const CommentDiv = ({
                   id: comment.id,
                   message: e.target.value
                 });
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment
+                    position="end"
+                    onClick={() => {
+                      handleReplyComment(reply);
+                      setReply({
+                        id: "",
+                        message: ""
+                      });
+                      setReplyInputId({
+                        id: "",
+                        isReply: false
+                      });
+                    }}
+                  >
+                    <SendIcon />
+                  </InputAdornment>
+                )
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -294,6 +328,7 @@ const CommentDiv = ({
                   />
                 </Fragment>
               ))}
+            <Divider sx={{ borderStyle: "dashed" }} />
           </>
         )}
       </ReplyDiv>

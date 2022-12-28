@@ -1,4 +1,4 @@
-import { Paper, TextField, Typography, useTheme } from "@mui/material";
+import { InputAdornment, Paper, TextField, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 import { Fragment, useEffect, useState } from "react";
 import {
@@ -9,7 +9,7 @@ import {
   useUpdateCommentMutation
 } from "../generated/graphql";
 import { useParams } from "react-router-dom";
-
+import SendIcon from "@mui/icons-material/Send";
 import { toast } from "react-toastify";
 import { ApolloQueryResult } from "@apollo/client";
 import CommentDiv from "./SingleCommentShow";
@@ -151,6 +151,18 @@ const CommentBox = ({
         value={comment}
         onChange={(e) => {
           setComment(e.target.value);
+        }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment
+              position="end"
+              onClick={() => {
+                handleCommentCall();
+              }}
+            >
+              <SendIcon />
+            </InputAdornment>
+          )
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {

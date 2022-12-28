@@ -101,6 +101,8 @@ const CommentBox = ({
           }
         }
       });
+    } else {
+      toast.error("Comment required");
     }
   };
 
@@ -114,6 +116,8 @@ const CommentBox = ({
           }
         }
       });
+    } else {
+      toast.error("Comment required");
     }
   };
 
@@ -126,14 +130,18 @@ const CommentBox = ({
   };
 
   const handleEditComment = (reply: { id: string; message: string }) => {
-    updateCommentMutation({
-      variables: {
-        updateCommentInput: {
-          commentBody: reply.message,
-          commentId: reply.id
+    if (reply.id !== "" && reply.message !== "") {
+      updateCommentMutation({
+        variables: {
+          updateCommentInput: {
+            commentBody: reply.message,
+            commentId: reply.id
+          }
         }
-      }
-    });
+      });
+    } else {
+      toast.error("Comment required");
+    }
   };
 
   return (
@@ -160,7 +168,7 @@ const CommentBox = ({
                 handleCommentCall();
               }}
             >
-              <SendIcon />
+              <SendIcon sx={{ cursor: "pointer" }} />
             </InputAdornment>
           )
         }}

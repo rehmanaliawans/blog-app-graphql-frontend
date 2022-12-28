@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 import { LoadingButton } from "@mui/lab";
-import { Box, Stack, styled, TextField } from "@mui/material";
+import { Box, Button, Stack, styled, TextField } from "@mui/material";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -231,9 +231,23 @@ const CreatePostForm = ({
           InputLabelProps={{ shrink: true }}
         />
 
-        <FileLabel htmlFor="fileupload" style={{ cursor: "pointer" }}>
-          Attached file
-        </FileLabel>
+        <Stack display="flex" flexDirection="row">
+          <FileLabel htmlFor="fileupload">Attached file</FileLabel>
+          {image.length > 0 && (
+            <Button
+              onClick={() => {
+                setImage([]);
+                setPreviewImage("");
+              }}
+              variant="contained"
+              color="error"
+              sx={{ marginLeft: "10px", textTransform: "capitalize" }}
+            >
+              Remove
+            </Button>
+          )}
+        </Stack>
+
         <input
           type="file"
           id="fileupload"

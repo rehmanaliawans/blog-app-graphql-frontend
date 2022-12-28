@@ -171,7 +171,7 @@ const CommentDiv = ({
                       handleEditComment(editReply);
                     }}
                   >
-                    <SendIcon />
+                    <SendIcon sx={{ cursor: "pointer" }} />
                   </InputAdornment>
                 )
               }}
@@ -224,7 +224,7 @@ const CommentDiv = ({
                       });
                     }}
                   >
-                    <SendIcon />
+                    <SendIcon sx={{ cursor: "pointer" }} />
                   </InputAdornment>
                 )
               }}

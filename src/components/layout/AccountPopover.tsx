@@ -1,16 +1,18 @@
 import * as React from "react";
-import Box from "@mui/material/Box";
-import Avatar from "@mui/material/Avatar";
-import MenuItem from "@mui/material/MenuItem";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router-dom";
 import { deleteToken } from "../../utils";
 import client from "../../interceptor/connectGraphql";
 import { Stack } from "@mui/system";
-import { Popover } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Divider,
+  IconButton,
+  MenuItem,
+  Popover,
+  Tooltip,
+  Typography
+} from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { GetCurrentUserQuery } from "../../generated/graphql";
 

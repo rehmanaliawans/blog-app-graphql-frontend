@@ -157,26 +157,15 @@ const CommentBox = ({
           marginTop: "10px"
         }}
         value={comment}
-        onChange={(e) => {
-          setComment(e.target.value);
-        }}
+        onChange={(e) => setComment(e.target.value)}
         InputProps={{
           endAdornment: (
-            <InputAdornment
-              position="end"
-              onClick={() => {
-                handleCommentCall();
-              }}
-            >
+            <InputAdornment position="end" onClick={() => handleCommentCall()}>
               <SendIcon sx={{ cursor: "pointer" }} />
             </InputAdornment>
           )
         }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleCommentCall();
-          }
-        }}
+        onKeyDown={(e) => e.key === "Enter" && handleCommentCall()}
       />
 
       {!!comments?.length ? (

@@ -141,6 +141,22 @@ const CreatePostForm = ({
     resolver: yupResolver(LoginSchema),
     defaultValues
   });
+  const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+
+    if (file) {
+      setImage(e.target.files as unknown as []);
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setPreviewImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      return;
+    }
+  };
 
   const onSubmit = async (data: { title: string; description: string }) => {
     let postData: CreatePostInput = {
@@ -244,22 +260,7 @@ const CreatePostForm = ({
         <input
           type="file"
           id="fileupload"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            const file = e.target.files ? e.target.files[0] : null;
-
-            if (file) {
-              setImage(e.target.files as unknown as []);
-              const reader = new FileReader();
-              reader.onload = () => {
-                if (reader.readyState === 2) {
-                  setPreviewImage(reader.result);
-                }
-              };
-              reader.readAsDataURL(file);
-            } else {
-              return;
-            }
-          }}
+          onChange={(e) => handleChangeImage(e)}
           style={{ display: "none" }}
           accept="image/*"
         />

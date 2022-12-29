@@ -43,17 +43,7 @@ const ReplyShowButton = styled(Button)(() => ({
   marginLeft: "1.5rem"
 }));
 
-const CommentDiv = ({
-  comment,
-  index,
-  handleCommentDelete,
-  handleReplyComment,
-  handleEditComment,
-  setEditDialogOpen,
-  editDialogOpen,
-  setReplyInputId,
-  replyInputId
-}: {
+interface CommentProps {
   comment: PostComment;
   index: number;
   handleCommentDelete: (id: string) => void;
@@ -63,6 +53,18 @@ const CommentDiv = ({
   setEditDialogOpen: (value: { isEdit: boolean; id: string }) => void;
   setReplyInputId: (value: { isReply: boolean; id: string }) => void;
   replyInputId: { isReply: boolean; id: string };
+}
+
+const CommentDiv: React.FC<CommentProps> = ({
+  comment,
+  index,
+  handleCommentDelete,
+  handleReplyComment,
+  handleEditComment,
+  setEditDialogOpen,
+  editDialogOpen,
+  setReplyInputId,
+  replyInputId
 }) => {
   const { userId } = useGlobalContext();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -79,6 +81,69 @@ const CommentDiv = ({
     id: "",
     message: ""
   });
+
+  const checkEditComment = () => {
+    setReplyInputId({
+      id: "",
+      isReply: false
+    });
+    if (editDialogOpen.isEdit && editDialogOpen.id === comment.id) {
+      setEditDialogOpen({ isEdit: false, id: "" });
+
+      setEditReply({
+        id: "",
+        message: ""
+      });
+    } else {
+      setEditDialogOpen({
+        isEdit: true,
+        id: comment.id
+      });
+    }
+  };
+
+  const handleReplySetComment = () => {
+    handleReplyComment(reply);
+    setReply({
+      id: "",
+      message: ""
+    });
+    setReplyInputId({
+      id: "",
+      isReply: false
+    });
+  };
+
+  const handleEditSetComment = () => {
+    setEditDialogOpen({ isEdit: false, id: "" });
+    replyInputId.id === comment.id && replyInputId.isReply === true
+      ? setReplyInputId({
+          isReply: false,
+          id: ""
+        })
+      : setReplyInputId({
+          isReply: true,
+          id: comment.id
+        });
+  };
+
+  const handleShowHideReplies = () => {
+    setReplyInputId({
+      isReply: false,
+      id: ""
+    });
+    if (showReplies.id === comment.id) {
+      setShowReplies({
+        id: "",
+        status: false
+      });
+    } else {
+      setShowReplies({
+        id: comment.id,
+        status: true
+      });
+    }
+  };
   return (
     <Fragment key={comment.id}>
       <Grid container wrap="nowrap" spacing={1} mt={1}>
@@ -112,28 +177,7 @@ const CommentDiv = ({
                   color="primary"
                   variant="text"
                   sx={{ textTransform: "capitalize" }}
-                  onClick={() => {
-                    setReplyInputId({
-                      id: "",
-                      isReply: false
-                    });
-                    if (
-                      editDialogOpen.isEdit &&
-                      editDialogOpen.id === comment.id
-                    ) {
-                      setEditDialogOpen({ isEdit: false, id: "" });
-
-                      setEditReply({
-                        id: "",
-                        message: ""
-                      });
-                    } else {
-                      setEditDialogOpen({
-                        isEdit: true,
-                        id: comment.id
-                      });
-                    }
-                  }}
+                  onClick={() => checkEditComment()}
                 >
                   {editDialogOpen.isEdit && editDialogOpen.id === comment?.id
                     ? "Cancel"
@@ -167,9 +211,7 @@ const CommentDiv = ({
                 endAdornment: (
                   <InputAdornment
                     position="end"
-                    onClick={() => {
-                      handleEditComment(editReply);
-                    }}
+                    onClick={() => handleEditComment(editReply)}
                   >
                     <SendIcon sx={{ cursor: "pointer" }} />
                   </InputAdornment>
@@ -202,27 +244,17 @@ const CommentDiv = ({
               autoFocus
               InputLabelProps={{ shrink: true }}
               value={reply.id === comment.id ? reply.message : ""}
-              onChange={(e) => {
+              onChange={(e) =>
                 setReply({
                   id: comment.id,
                   message: e.target.value
-                });
-              }}
+                })
+              }
               InputProps={{
                 endAdornment: (
                   <InputAdornment
                     position="end"
-                    onClick={() => {
-                      handleReplyComment(reply);
-                      setReply({
-                        id: "",
-                        message: ""
-                      });
-                      setReplyInputId({
-                        id: "",
-                        isReply: false
-                      });
-                    }}
+                    onClick={() => handleReplySetComment()}
                   >
                     <SendIcon sx={{ cursor: "pointer" }} />
                   </InputAdornment>
@@ -261,19 +293,7 @@ const CommentDiv = ({
         <ReplyShowButton
           variant="text"
           color="primary"
-          onClick={() => {
-            setEditDialogOpen({ isEdit: false, id: "" });
-
-            replyInputId.id === comment.id && replyInputId.isReply === true
-              ? setReplyInputId({
-                  isReply: false,
-                  id: ""
-                })
-              : setReplyInputId({
-                  isReply: true,
-                  id: comment.id
-                });
-          }}
+          onClick={() => handleEditSetComment()}
         >
           {replyInputId.id === comment.id ? "Cancel" : "Reply"}
         </ReplyShowButton>
@@ -289,23 +309,7 @@ const CommentDiv = ({
                   <KeyboardArrowUpIcon />
                 )
               }
-              onClick={() => {
-                setReplyInputId({
-                  isReply: false,
-                  id: ""
-                });
-                if (showReplies.id === comment.id) {
-                  setShowReplies({
-                    id: "",
-                    status: false
-                  });
-                } else {
-                  setShowReplies({
-                    id: comment.id,
-                    status: true
-                  });
-                }
-              }}
+              onClick={() => handleShowHideReplies()}
             >
               {showReplies.id === comment.id ? "Hide replies" : "Show replies"}
             </ReplyShowButton>

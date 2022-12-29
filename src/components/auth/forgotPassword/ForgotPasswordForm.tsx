@@ -54,7 +54,7 @@ const ForgotPasswordForm = ({
           label="Email address"
           placeholder="Enter email address"
           {...register("email")}
-          error={errors.email ? true : false}
+          error={!!errors.email}
           helperText={errors.email && errors.email.message}
         />
         <LoadingButton

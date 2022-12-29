@@ -37,7 +37,7 @@ const HomePageContainer = () => {
   }, [page]);
 
   const handleSearchPost = (queryString: string) => {
-    setSearchPriority(queryString === "" ? false : true);
+    setSearchPriority(!!queryString);
     searchPost({
       variables: {
         queryString: queryString

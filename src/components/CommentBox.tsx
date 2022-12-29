@@ -91,13 +91,13 @@ const CommentBox = ({
       comment.reply?.find((re) => re.id === reply?.id)
     );
 
-    if (reply.message !== "" && id && reply.id) {
+    if (!!reply.message && id && reply.id) {
       createPostCommentMutation({
         variables: {
           createCommentInput: {
             commentBody: reply.message,
             postId: id!,
-            parentId: checkOneReply?.id ? checkOneReply?.id : reply.id
+            parentId: !!checkOneReply?.id ? checkOneReply?.id : reply.id
           }
         }
       });
@@ -107,7 +107,7 @@ const CommentBox = ({
   };
 
   const handleCommentCall = () => {
-    if (comment !== "" && id) {
+    if (!!comment && id) {
       createPostCommentMutation({
         variables: {
           createCommentInput: {
@@ -130,7 +130,7 @@ const CommentBox = ({
   };
 
   const handleEditComment = (reply: { id: string; message: string }) => {
-    if (reply.id !== "" && reply.message !== "") {
+    if (!!reply.id && !!reply.message) {
       updateCommentMutation({
         variables: {
           updateCommentInput: {
@@ -179,7 +179,7 @@ const CommentBox = ({
         }}
       />
 
-      {comments?.length > 0 ? (
+      {!!comments?.length ? (
         comments?.map((comment, index) => {
           return (
             <Fragment key={index}>

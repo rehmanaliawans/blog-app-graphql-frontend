@@ -7,9 +7,8 @@ import HomePage from "../Pages/HomePage";
 import Login from "../Pages/Login";
 import Page404 from "../Pages/Page404";
 import Register from "../Pages/Register";
-import UpdatePassword from "../Pages/UpdatePassword";
-import LoggedInProtection from "./LoggesInProtection";
-import LoggedOutProtection from "./LogggedOutProtection";
+import LoggedInProtection from "./LoggedInProtection";
+import LoggedOutProtection from "./LoggedOutProtection";
 import GetSinglePost from "../Pages/GetSinglePost";
 import MyPosts from "../Pages/MyPosts";
 import Profile from "../Pages/Profile";
@@ -40,14 +39,7 @@ export default function Router() {
         </LoggedOutProtection>
       )
     },
-    {
-      path: "/update-password",
-      element: (
-        <LoggedOutProtection redirectTo="/">
-          <UpdatePassword />
-        </LoggedOutProtection>
-      )
-    },
+
     {
       path: "/",
       element: (

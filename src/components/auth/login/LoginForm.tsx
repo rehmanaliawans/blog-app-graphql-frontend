@@ -68,7 +68,7 @@ const LoginForm = () => {
           label="Email address"
           placeholder="Enter email address"
           {...register("email")}
-          error={errors.email ? true : false}
+          error={!!errors.email}
           helperText={errors.email && errors.email.message}
         />
 
@@ -76,7 +76,7 @@ const LoginForm = () => {
           placeholder="Enter Password"
           label="Password"
           type={showPassword ? "text" : "password"}
-          error={errors.password ? true : false}
+          error={!!errors.password}
           {...register("password")}
           helperText={errors.password && errors.password.message}
           InputProps={{

@@ -153,32 +153,30 @@ const CreatePostForm = ({
       postId: ""
     };
 
-    if (image.length > 0) {
+    if (!!image.length) {
       setFileLoading(true);
       const imgUrl = await uploadImage(image);
-      if (imgUrl) {
-        if (isEdit) {
-          UpdatePostData = {
-            ...UpdatePostData,
-            postId: id.get("id") as string,
-            attachmentUrl: imgUrl as string
-          };
-          updateUserPostMutation({
-            variables: {
-              updatePostInput: UpdatePostData
-            }
-          });
-        } else {
-          postData = {
-            ...postData,
-            attachmentUrl: imgUrl as string
-          };
-          createUserPostMutation({
-            variables: {
-              createPostInput: postData
-            }
-          });
-        }
+      if (imgUrl && isEdit) {
+        UpdatePostData = {
+          ...UpdatePostData,
+          postId: id.get("id") as string,
+          attachmentUrl: imgUrl as string
+        };
+        updateUserPostMutation({
+          variables: {
+            updatePostInput: UpdatePostData
+          }
+        });
+      } else if (imgUrl) {
+        postData = {
+          ...postData,
+          attachmentUrl: imgUrl as string
+        };
+        createUserPostMutation({
+          variables: {
+            createPostInput: postData
+          }
+        });
       }
     } else {
       if (isEdit) {
@@ -209,7 +207,7 @@ const CreatePostForm = ({
           placeholder="Enter email address"
           size="medium"
           {...register("title")}
-          error={errors.title ? true : false}
+          error={!!errors.title}
           helperText={errors.title && errors.title.message}
           InputLabelProps={{ shrink: true }}
         />
@@ -220,7 +218,7 @@ const CreatePostForm = ({
           fullWidth
           multiline
           rows={10}
-          error={errors.description ? true : false}
+          error={!!errors.description}
           helperText={errors.description && errors.description.message}
           {...register("description")}
           InputLabelProps={{ shrink: true }}

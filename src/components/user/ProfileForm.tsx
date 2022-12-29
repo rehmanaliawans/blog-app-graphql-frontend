@@ -91,14 +91,14 @@ const ProfileForm = ({
             label="First name"
             placeholder="Enter first name"
             {...register("firstName")}
-            error={errors.firstName ? true : false}
+            error={!!errors.firstName}
             helperText={errors.firstName && errors.firstName.message}
           />
           <TextField
             label="Last name"
             placeholder="Enter last name"
             {...register("lastName")}
-            error={errors.lastName ? true : false}
+            error={!!errors.lastName}
             helperText={errors.lastName && errors.lastName.message}
           />
         </Stack>
@@ -107,7 +107,7 @@ const ProfileForm = ({
           label="email"
           placeholder="enter email address"
           {...register("email")}
-          error={errors.email ? true : false}
+          error={!!errors.email}
           helperText={errors.email && errors.email.message}
           disabled={true}
         />

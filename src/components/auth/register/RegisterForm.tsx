@@ -75,14 +75,14 @@ const RegisterForm = () => {
             label="First name"
             placeholder="Enter first name"
             {...register("firstName")}
-            error={errors.firstName ? true : false}
+            error={!!errors.firstName}
             helperText={errors.firstName && errors.firstName.message}
           />
           <TextField
             label="Last name"
             placeholder="Enter last name"
             {...register("lastName")}
-            error={errors.lastName ? true : false}
+            error={!!errors.lastName}
             helperText={errors.lastName && errors.lastName.message}
           />
         </Stack>
@@ -91,14 +91,14 @@ const RegisterForm = () => {
           label="Email address"
           placeholder="Enter email address"
           {...register("email")}
-          error={errors.email ? true : false}
+          error={!!errors.email}
           helperText={errors.email && errors.email.message}
         />
 
         <TextField
           placeholder="Enter Password"
           label="Password"
-          error={errors.password ? true : false}
+          error={!!errors.password}
           {...register("password")}
           helperText={errors.password && errors.password.message}
           type={showPassword ? "text" : "password"}

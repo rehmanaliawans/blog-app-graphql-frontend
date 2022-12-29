@@ -72,7 +72,7 @@ const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
           label="New password"
           placeholder="Enter new password"
           {...register("password")}
-          error={errors.password ? true : false}
+          error={!!errors.password}
           helperText={errors.password && errors.password.message}
           type={showPassword ? "text" : "password"}
           InputProps={{
@@ -92,7 +92,7 @@ const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
           label="confirm password"
           placeholder="Enter confirm password"
           {...register("confirmPassword")}
-          error={errors.confirmPassword ? true : false}
+          error={!!errors.confirmPassword}
           helperText={errors.confirmPassword && errors.confirmPassword.message}
           type={showPassword ? "text" : "password"}
         />

@@ -13,19 +13,18 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useUpdatePasswordMutation } from "../../generated/graphql";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const UpdatePasswordForm = () => {
+const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [updatePasswordMutation, { data, loading, error }] =
+  const [updatePasswordMutation, { loading, error }] =
     useUpdatePasswordMutation({
       onCompleted(data) {
-        if (data.updatePassword.status === 200) {
-          setSearchParams(undefined);
-        }
+        toast.success("Password updated successfully");
+        navigate("/login", { replace: true });
       },
       onError: (err) => toast.error(err.message)
     });
@@ -55,12 +54,12 @@ const UpdatePasswordForm = () => {
   });
 
   const onSubmit = async (data: { password: string }) => {
-    if (searchParams.get("userKey")) {
+    if (!!userKey) {
       updatePasswordMutation({
         variables: {
           passwordUpdateInput: {
             password: data.password,
-            userKey: searchParams?.get("userKey")!
+            userKey: userKey
           }
         }
       });
@@ -98,21 +97,16 @@ const UpdatePasswordForm = () => {
           type={showPassword ? "text" : "password"}
         />
 
-        {data?.updatePassword.status === 200 ? (
-          <Typography variant="caption" color="success">
-            {data.updatePassword.message}
-          </Typography>
-        ) : (
-          <LoadingButton
-            fullWidth
-            size="medium"
-            type="submit"
-            variant="contained"
-            loading={loading}
-          >
-            Update
-          </LoadingButton>
-        )}
+        <LoadingButton
+          fullWidth
+          size="medium"
+          type="submit"
+          variant="contained"
+          loading={loading}
+        >
+          Update
+        </LoadingButton>
+
         {error && (
           <Typography variant="caption" color="error">
             {error.message}

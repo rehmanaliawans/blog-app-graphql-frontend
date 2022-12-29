@@ -10,9 +10,17 @@ import {
   useForgotPasswordMutation
 } from "../../../generated/graphql";
 
-const ForgotPasswordForm = () => {
+const ForgotPasswordForm = ({
+  setUserKey
+}: {
+  setUserKey: (value: string) => void;
+}) => {
   const [forgotPasswordMutation, { data, loading, error }] =
-    useForgotPasswordMutation();
+    useForgotPasswordMutation({
+      onCompleted: ({ forgotPassword }) => {
+        setUserKey(forgotPassword.userKey);
+      }
+    });
 
   const ForgotSchema = Yup.object().shape({
     email: Yup.string()
@@ -49,27 +57,16 @@ const ForgotPasswordForm = () => {
           error={errors.email ? true : false}
           helperText={errors.email && errors.email.message}
         />
-        {data?.forgotPassword.userKey ? (
-          <Typography variant="caption" align="right">
-            <Link
-              variant="subtitle2"
-              component={RouterLink}
-              to={`/update-password?userKey=${data?.forgotPassword.userKey}`}
-            >
-              Click here to change your password
-            </Link>
-          </Typography>
-        ) : (
-          <LoadingButton
-            fullWidth
-            size="medium"
-            type="submit"
-            variant="contained"
-            loading={loading}
-          >
-            Send Request
-          </LoadingButton>
-        )}
+        <LoadingButton
+          fullWidth
+          size="medium"
+          type="submit"
+          variant="contained"
+          loading={loading}
+        >
+          Send Request
+        </LoadingButton>
+
         {error && (
           <Typography variant="caption" color="error">
             {error.message}

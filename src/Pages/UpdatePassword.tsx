@@ -3,7 +3,7 @@ import React from "react";
 import Page from "../components/Page";
 import { ForgotRootStyle } from "../styledComponent";
 import { Link as RouterLink } from "react-router-dom";
-import { UpdatePasswordForm } from "../sections/auth";
+import { UpdatePasswordForm } from "../components/auth";
 const UpdatePassword = () => {
   return (
     <Page title="Update Password">

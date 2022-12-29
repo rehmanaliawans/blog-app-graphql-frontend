@@ -10,7 +10,7 @@ import {
   UpdatePostInput,
   useCreateUserPostMutation,
   useUpdateUserPostMutation
-} from "../../generated/graphql";
+} from "../../../generated/graphql";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -90,28 +90,23 @@ const CreatePostForm = ({
     }
   });
 
-  const [updateUserPostMutation, { reset: UpdateReset }] =
-    useUpdateUserPostMutation({
-      onCompleted: (data) => {
-        if (data.updateUserPost.status === 200) {
-          toast.success(data.updateUserPost.message);
-          setFileLoading(false);
-          setValue("title", "");
-          setValue("description", "");
-          setValue("file", []);
-          setPreviewImage(null);
-          setIsEdit(false);
-          navigate(`/get-post/${id.get("id")}`);
-
-          setTimeout(() => {
-            UpdateReset();
-          }, 3000);
-        }
-      },
-      onError: (err) => {
-        toast.error(err.message);
+  const [updateUserPostMutation] = useUpdateUserPostMutation({
+    onCompleted: (data) => {
+      if (data.updateUserPost.status === 200) {
+        toast.success(data.updateUserPost.message);
+        setFileLoading(false);
+        setValue("title", "");
+        setValue("description", "");
+        setValue("file", []);
+        setPreviewImage(null);
+        setIsEdit(false);
+        navigate(`/get-post/${id.get("id")}`);
       }
-    });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    }
+  });
 
   const LoginSchema = Yup.object().shape({
     title: Yup.string()

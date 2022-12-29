@@ -6,13 +6,13 @@ import {
   FetchPostByIdQuery,
   Post,
   useDeletePostMutation
-} from "../../generated/graphql";
-import CommentBox from "../../components/CommentBox";
-import { useGlobalContext } from "../../context";
+} from "../../../generated/graphql";
+import CommentBox from "../../CommentBox";
+import { useGlobalContext } from "../../../context";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useState } from "react";
-import DialogBox from "../../components/DialogBox";
+import DialogBox from "../../DialogBox";
 import { ApolloQueryResult } from "@apollo/client";
 
 const MainBox = styled(Box)(() => ({

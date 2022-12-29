@@ -14,8 +14,8 @@ import {
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { saveToken } from "../../utils";
-import { useLoginMutation, LoginUserInput } from "../../generated/graphql";
+import { saveToken } from "../../../utils";
+import { useLoginMutation, LoginUserInput } from "../../../generated/graphql";
 import { toast } from "react-toastify";
 
 const LoginForm = () => {

@@ -13,8 +13,8 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { useSignupMutation, CreateUserInput } from "../../generated/graphql";
-import { saveToken } from "../../utils";
+import { useSignupMutation, CreateUserInput } from "../../../generated/graphql";
+import { saveToken } from "../../../utils";
 import { toast } from "react-toastify";
 
 const RegisterForm = () => {

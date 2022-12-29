@@ -1,41 +1,10 @@
-import { Link as RouterLink } from "react-router-dom";
-import { Link, Container, Typography } from "@mui/material";
 import Page from "../components/Page";
-import { RegisterForm } from "../sections/auth";
-import { ContentStyle, RootStyle, SectionStyle } from "../styledComponent";
+import RegisterContainer from "../components/auth/register/RegisterContainer";
 
 export default function Register() {
   return (
     <Page title="Register">
-      <RootStyle>
-        <SectionStyle>
-          <Typography variant="h3" sx={{ px: 6, mt: 10, mb: 5 }}>
-            Get started with register yourself!
-          </Typography>
-          <img alt="register" src="/images/register.png" />
-        </SectionStyle>
-
-        <Container>
-          <ContentStyle>
-            <Typography variant="h4" gutterBottom>
-              Register
-            </Typography>
-
-            <Typography sx={{ color: "text.secondary", mb: 5 }}>
-              Enter your details below.
-            </Typography>
-
-            <RegisterForm />
-
-            <Typography variant="body2" sx={{ mt: 3, textAlign: "center" }}>
-              Already have an account?{" "}
-              <Link variant="subtitle2" to="/login" component={RouterLink}>
-                Login
-              </Link>
-            </Typography>
-          </ContentStyle>
-        </Container>
-      </RootStyle>
+      <RegisterContainer />
     </Page>
   );
 }

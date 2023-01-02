@@ -1,22 +1,13 @@
-import { Fragment, useState } from "react";
-import { useGlobalContext } from "../context";
-import { PostComment } from "../generated/graphql";
-import {
-  Avatar,
-  Box,
-  Button,
-  Divider,
-  Grid,
-  InputAdornment,
-  TextField,
-  Typography,
-  styled
-} from "@mui/material";
-import moment from "moment";
-import DialogBox from "./DialogBox";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import SendIcon from "@mui/icons-material/Send";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import SendIcon from '@mui/icons-material/Send';
+import { Avatar, Box, Button, Divider, Grid, InputAdornment, styled, TextField, Typography } from '@mui/material';
+import moment from 'moment';
+import { Fragment, useReducer, useState } from 'react';
+
+import { useGlobalContext } from '../context';
+import { CommentProps, SingleCommentAction, SingleCommentSate } from '../interface';
+import DialogBox from './DialogBox';
 
 const ReplyDiv = styled(Box)(({ theme }) => ({
   width: "100%",
@@ -43,17 +34,45 @@ const ReplyShowButton = styled(Button)(() => ({
   marginLeft: "1.5rem"
 }));
 
-interface CommentProps {
-  comment: PostComment;
-  index: number;
-  handleCommentDelete: (id: string) => void;
-  handleEditComment: (editReply: { id: string; message: string }) => void;
-  handleReplyComment: (reply: { id: string; message: string }) => void;
-  editDialogOpen: { isEdit: boolean; id: string };
-  setEditDialogOpen: (value: { isEdit: boolean; id: string }) => void;
-  setReplyInputId: (value: { isReply: boolean; id: string }) => void;
-  replyInputId: { isReply: boolean; id: string };
-}
+const initialState = {
+  deleteDialogOpen: false,
+  reply: {
+    id: "",
+    message: ""
+  },
+  showReplies: {
+    status: false,
+    id: ""
+  },
+  editReply: {
+    message: "",
+    id: ""
+  }
+};
+const reducer = (state: SingleCommentSate, action: SingleCommentAction) => {
+  switch (action.type) {
+    case "SET_DELETE_DIALOG_OPEN":
+      return {
+        ...state,
+        deleteDialogOpen: action.value
+      };
+    case "SET_SHOW_REPLIES":
+      return {
+        ...state,
+        showReplies: action.value
+      };
+    case "SET_EDIT_REPLY":
+      return {
+        ...state,
+        editReply: action.value
+      };
+    case "SET_REPLY":
+      return {
+        ...state,
+        reply: action.value
+      };
+  }
+};
 
 const CommentDiv: React.FC<CommentProps> = ({
   comment,
@@ -61,86 +80,115 @@ const CommentDiv: React.FC<CommentProps> = ({
   handleCommentDelete,
   handleReplyComment,
   handleEditComment,
-  setEditDialogOpen,
+  onDispatch,
   editDialogOpen,
-  setReplyInputId,
   replyInputId
 }) => {
   const { userId } = useGlobalContext();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [showReplies, setShowReplies] = useState({
-    id: "",
-    status: false
-  });
-
-  const [editReply, setEditReply] = useState({
-    id: "",
-    message: ""
-  });
-  const [reply, setReply] = useState({
-    id: "",
-    message: ""
-  });
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { deleteDialogOpen, showReplies, editReply, reply } = state;
 
   const checkEditComment = () => {
-    setReplyInputId({
-      id: "",
-      isReply: false
+    onDispatch({
+      type: "REPLY_INPUT_ID",
+      value: {
+        isReply: false,
+        id: ""
+      }
     });
     if (editDialogOpen.isEdit && editDialogOpen.id === comment.id) {
-      setEditDialogOpen({ isEdit: false, id: "" });
-
-      setEditReply({
-        id: "",
-        message: ""
+      onDispatch({
+        type: "EDIT_DIALOG_OPEN",
+        value: {
+          isEdit: false,
+          id: ""
+        }
+      });
+      dispatch({
+        type: "SET_EDIT_REPLY",
+        value: {
+          message: "",
+          id: ""
+        }
       });
     } else {
-      setEditDialogOpen({
-        isEdit: true,
-        id: comment.id
+      onDispatch({
+        type: "EDIT_DIALOG_OPEN",
+        value: {
+          isEdit: true,
+          id: comment.id
+        }
       });
     }
   };
 
   const handleReplySetComment = () => {
     handleReplyComment(reply);
-    setReply({
-      id: "",
-      message: ""
+
+    dispatch({
+      type: "SET_REPLY",
+      value: {
+        message: "",
+        id: ""
+      }
     });
-    setReplyInputId({
-      id: "",
-      isReply: false
+    onDispatch({
+      type: "REPLY_INPUT_ID",
+      value: {
+        isReply: false,
+        id: ""
+      }
     });
   };
 
   const handleEditSetComment = () => {
-    setEditDialogOpen({ isEdit: false, id: "" });
+    onDispatch({
+      type: "EDIT_DIALOG_OPEN",
+      value: {
+        isEdit: false,
+        id: ""
+      }
+    });
     replyInputId.id === comment.id && replyInputId.isReply === true
-      ? setReplyInputId({
-          isReply: false,
-          id: ""
+      ? onDispatch({
+          type: "REPLY_INPUT_ID",
+          value: {
+            isReply: false,
+            id: ""
+          }
         })
-      : setReplyInputId({
-          isReply: true,
-          id: comment.id
+      : onDispatch({
+          type: "REPLY_INPUT_ID",
+          value: {
+            isReply: true,
+            id: comment.id
+          }
         });
   };
 
   const handleShowHideReplies = () => {
-    setReplyInputId({
-      isReply: false,
-      id: ""
+    onDispatch({
+      type: "REPLY_INPUT_ID",
+      value: {
+        isReply: false,
+        id: ""
+      }
     });
     if (showReplies.id === comment.id) {
-      setShowReplies({
-        id: "",
-        status: false
+      dispatch({
+        type: "SET_SHOW_REPLIES",
+        value: {
+          status: false,
+          id: ""
+        }
       });
     } else {
-      setShowReplies({
-        id: comment.id,
-        status: true
+      dispatch({
+        type: "SET_SHOW_REPLIES",
+        value: {
+          status: true,
+          id: comment.id
+        }
       });
     }
   };
@@ -149,26 +197,18 @@ const CommentDiv: React.FC<CommentProps> = ({
       <Grid container wrap="nowrap" spacing={1} mt={1}>
         <Grid item>
           <AvatarIcon index={index}>
-            {comment.user.id === userId
-              ? "Y"
-              : comment.user.firstName[0].toUpperCase()}
+            {comment.user.id === userId ? "Y" : comment.user.firstName[0].toUpperCase()}
           </AvatarIcon>
         </Grid>
         <Grid justifyContent="left" item xs zeroMinWidth>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
+          <Box display="flex" justifyContent="space-between" alignItems="center">
             <Box>
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                 {comment?.user?.id === userId
                   ? "You"
                   : comment?.user?.firstName + " " + comment?.user?.lastName}
               </Typography>
-              <DateTypography variant="caption">
-                posted {moment(comment?.createdAt).fromNow()}
-              </DateTypography>
+              <DateTypography variant="caption">posted {moment(comment?.createdAt).fromNow()}</DateTypography>
             </Box>
             {comment.user.id === userId && (
               <Box>
@@ -179,16 +219,19 @@ const CommentDiv: React.FC<CommentProps> = ({
                   sx={{ textTransform: "capitalize" }}
                   onClick={() => checkEditComment()}
                 >
-                  {editDialogOpen.isEdit && editDialogOpen.id === comment?.id
-                    ? "Cancel"
-                    : "Edit"}
+                  {editDialogOpen.isEdit && editDialogOpen.id === comment?.id ? "Cancel" : "Edit"}
                 </Button>
                 <Button
                   size="small"
                   color="error"
                   variant="text"
                   sx={{ textTransform: "capitalize" }}
-                  onClick={() => setDeleteDialogOpen(true)}
+                  onClick={() =>
+                    dispatch({
+                      type: "SET_DELETE_DIALOG_OPEN",
+                      value: true
+                    })
+                  }
                 >
                   Delete
                 </Button>
@@ -202,25 +245,21 @@ const CommentDiv: React.FC<CommentProps> = ({
               fullWidth
               label="Edit comment"
               size="small"
-              value={
-                editReply.id === comment.id
-                  ? editReply.message
-                  : comment?.commentBody
-              }
+              value={editReply.id === comment.id ? editReply.message : comment?.commentBody}
               InputProps={{
                 endAdornment: (
-                  <InputAdornment
-                    position="end"
-                    onClick={() => handleEditComment(editReply)}
-                  >
+                  <InputAdornment position="end" onClick={() => handleEditComment(editReply)}>
                     <SendIcon sx={{ cursor: "pointer" }} />
                   </InputAdornment>
                 )
               }}
               onChange={(e) => {
-                setEditReply({
-                  id: comment.id,
-                  message: e.target.value
+                dispatch({
+                  type: "SET_EDIT_REPLY",
+                  value: {
+                    message: e.target.value,
+                    id: comment.id
+                  }
                 });
               }}
               onKeyDown={(e) => {
@@ -230,9 +269,7 @@ const CommentDiv: React.FC<CommentProps> = ({
               }}
             />
           ) : (
-            <Typography sx={{ lineBreak: "anywhere" }}>
-              {comment?.commentBody}
-            </Typography>
+            <Typography sx={{ lineBreak: "anywhere" }}>{comment?.commentBody}</Typography>
           )}
           {replyInputId.id === comment.id && replyInputId.isReply === true && (
             <TextField
@@ -245,17 +282,17 @@ const CommentDiv: React.FC<CommentProps> = ({
               InputLabelProps={{ shrink: true }}
               value={reply.id === comment.id ? reply.message : ""}
               onChange={(e) =>
-                setReply({
-                  id: comment.id,
-                  message: e.target.value
+                dispatch({
+                  type: "SET_REPLY",
+                  value: {
+                    message: e.target.value,
+                    id: comment.id
+                  }
                 })
               }
               InputProps={{
                 endAdornment: (
-                  <InputAdornment
-                    position="end"
-                    onClick={() => handleReplySetComment()}
-                  >
+                  <InputAdornment position="end" onClick={() => handleReplySetComment()}>
                     <SendIcon sx={{ cursor: "pointer" }} />
                   </InputAdornment>
                 )
@@ -263,13 +300,19 @@ const CommentDiv: React.FC<CommentProps> = ({
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleReplyComment(reply);
-                  setReply({
-                    id: "",
-                    message: ""
+                  dispatch({
+                    type: "SET_REPLY",
+                    value: {
+                      message: "",
+                      id: ""
+                    }
                   });
-                  setReplyInputId({
-                    id: "",
-                    isReply: false
+                  onDispatch({
+                    type: "REPLY_INPUT_ID",
+                    value: {
+                      isReply: false,
+                      id: ""
+                    }
                   });
                 }
               }}
@@ -281,20 +324,24 @@ const CommentDiv: React.FC<CommentProps> = ({
           title="Are you sure to delete this comment?"
           description="Replies also deleted when you delete this comment!"
           open={deleteDialogOpen}
-          handleClose={() => setDeleteDialogOpen(false)}
+          handleClose={() =>
+            dispatch({
+              type: "SET_DELETE_DIALOG_OPEN",
+              value: false
+            })
+          }
           handleAgree={() => {
-            setDeleteDialogOpen(false);
+            dispatch({
+              type: "SET_DELETE_DIALOG_OPEN",
+              value: false
+            });
             handleCommentDelete(comment.id);
           }}
         />
       </Grid>
 
       <ReplyDiv>
-        <ReplyShowButton
-          variant="text"
-          color="primary"
-          onClick={() => handleEditSetComment()}
-        >
+        <ReplyShowButton variant="text" color="primary" onClick={() => handleEditSetComment()}>
           {replyInputId.id === comment.id ? "Cancel" : "Reply"}
         </ReplyShowButton>
         {comment?.reply?.length! > 0 && (
@@ -302,13 +349,7 @@ const CommentDiv: React.FC<CommentProps> = ({
             <ReplyShowButton
               variant="text"
               color="primary"
-              endIcon={
-                showReplies.id !== comment.id ? (
-                  <KeyboardArrowDownIcon />
-                ) : (
-                  <KeyboardArrowUpIcon />
-                )
-              }
+              endIcon={showReplies.id !== comment.id ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
               onClick={() => handleShowHideReplies()}
             >
               {showReplies.id === comment.id ? "Hide replies" : "Show replies"}
@@ -326,8 +367,7 @@ const CommentDiv: React.FC<CommentProps> = ({
                     handleEditComment={(reply) => handleEditComment(reply)}
                     handleReplyComment={(reply) => handleReplyComment(reply)}
                     editDialogOpen={editDialogOpen}
-                    setEditDialogOpen={setEditDialogOpen}
-                    setReplyInputId={setReplyInputId}
+                    onDispatch={onDispatch}
                     replyInputId={replyInputId}
                   />
                 </Fragment>

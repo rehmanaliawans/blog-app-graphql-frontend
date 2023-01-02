@@ -1,13 +1,9 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloLink,
-  HttpLink,
-  from
-} from "@apollo/client";
-import { onError } from "@apollo/client/link/error";
-import { deleteToken, getToken } from "../utils";
-import { offsetLimitPagination } from "@apollo/client/utilities";
+import { ApolloClient, ApolloLink, from, HttpLink, InMemoryCache } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
+import { offsetLimitPagination } from '@apollo/client/utilities';
+import { useNavigate } from 'react-router-dom';
+
+import { deleteToken, getToken } from '../utils';
 
 const authMiddleware = new ApolloLink((operation, forward) => {
   const token = getToken("token");
@@ -25,18 +21,15 @@ const httpLink = new HttpLink({
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
+  const navigate = useNavigate();
   if (graphQLErrors) {
-    const unauthorized = graphQLErrors.find(
-      (error) => error.message === "invalid token"
-    );
-    const forbidden = graphQLErrors.find(
-      (error) => error.message === "jwt expired"
-    );
+    const unauthorized = graphQLErrors.find((error) => error.message === "invalid token");
+    const forbidden = graphQLErrors.find((error) => error.message === "jwt expired");
 
     if (unauthorized || forbidden) {
       deleteToken("token");
       client.clearStore();
-      window.location.replace("/login");
+      navigate("/login", { replace: true }); //use history or use location
     }
   }
   if (networkError) {

@@ -1,25 +1,20 @@
-import * as Yup from "yup";
-import React, { useState } from "react";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import {
-  Box,
-  IconButton,
-  InputAdornment,
-  Stack,
-  TextField,
-  Typography
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { LoadingButton } from "@mui/lab";
-import { useSignupMutation, CreateUserInput } from "../../../generated/graphql";
-import { saveToken } from "../../../utils";
-import { toast } from "react-toastify";
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
+import { Box, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import * as Yup from 'yup';
+
+import { CreateUserInput, useSignupMutation } from '../../../generated/graphql';
+import { saveToken } from '../../../utils';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+
   const [signupMutation, { loading, error }] = useSignupMutation({
     onCompleted: ({ signUp }) => {
       saveToken(signUp.access_token, "token");
@@ -59,6 +54,7 @@ const RegisterForm = () => {
     resolver: yupResolver(RegisterSchema),
     defaultValues
   });
+
   const onSubmit = async (data: CreateUserInput) => {
     signupMutation({
       variables: {

@@ -1,18 +1,19 @@
-import * as Yup from "yup";
-import { LoadingButton } from "@mui/lab";
-import { Box, Button, Stack, styled, TextField } from "@mui/material";
-import { ChangeEvent, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { yupResolver } from '@hookform/resolvers/yup';
+import { LoadingButton } from '@mui/lab';
+import { Box, Button, Stack, styled, TextField } from '@mui/material';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import * as Yup from 'yup';
+
 import {
   CreatePostInput,
   FetchPostByIdQuery,
   UpdatePostInput,
   useCreateUserPostMutation,
-  useUpdateUserPostMutation
-} from "../../../generated/graphql";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { toast } from "react-toastify";
+  useUpdateUserPostMutation,
+} from '../../../generated/graphql';
 
 const MainBox = styled(Box)(() => ({
   width: "100%",

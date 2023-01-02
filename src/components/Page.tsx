@@ -1,6 +1,6 @@
-import { Helmet } from "react-helmet-async";
-import React, { forwardRef } from "react";
-import { Box } from "@mui/material";
+import { Box } from '@mui/material';
+import React, { forwardRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 type PageProps = {
   children: React.ReactNode;

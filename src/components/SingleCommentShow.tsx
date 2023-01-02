@@ -3,7 +3,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import SendIcon from '@mui/icons-material/Send';
 import { Avatar, Box, Button, Divider, Grid, InputAdornment, styled, TextField, Typography } from '@mui/material';
 import moment from 'moment';
-import { Fragment, useReducer, useState } from 'react';
+import { Fragment, useReducer } from 'react';
 
 import { useGlobalContext } from '../context';
 import { CommentProps, SingleCommentAction, SingleCommentSate } from '../interface';
@@ -84,6 +84,7 @@ const CommentDiv: React.FC<CommentProps> = ({
   editDialogOpen,
   replyInputId
 }) => {
+  const { id, user, commentBody, createdAt, reply: commentReply } = comment;
   const { userId } = useGlobalContext();
   const [state, dispatch] = useReducer(reducer, initialState);
   const { deleteDialogOpen, showReplies, editReply, reply } = state;
@@ -96,7 +97,7 @@ const CommentDiv: React.FC<CommentProps> = ({
         id: ""
       }
     });
-    if (editDialogOpen.isEdit && editDialogOpen.id === comment.id) {
+    if (editDialogOpen.isEdit && editDialogOpen.id === id) {
       onDispatch({
         type: "EDIT_DIALOG_OPEN",
         value: {
@@ -116,7 +117,7 @@ const CommentDiv: React.FC<CommentProps> = ({
         type: "EDIT_DIALOG_OPEN",
         value: {
           isEdit: true,
-          id: comment.id
+          id: id
         }
       });
     }
@@ -149,7 +150,7 @@ const CommentDiv: React.FC<CommentProps> = ({
         id: ""
       }
     });
-    replyInputId.id === comment.id && replyInputId.isReply === true
+    replyInputId.id === id && replyInputId.isReply === true
       ? onDispatch({
           type: "REPLY_INPUT_ID",
           value: {
@@ -161,7 +162,7 @@ const CommentDiv: React.FC<CommentProps> = ({
           type: "REPLY_INPUT_ID",
           value: {
             isReply: true,
-            id: comment.id
+            id: id
           }
         });
   };
@@ -174,7 +175,7 @@ const CommentDiv: React.FC<CommentProps> = ({
         id: ""
       }
     });
-    if (showReplies.id === comment.id) {
+    if (showReplies.id === id) {
       dispatch({
         type: "SET_SHOW_REPLIES",
         value: {
@@ -187,30 +188,26 @@ const CommentDiv: React.FC<CommentProps> = ({
         type: "SET_SHOW_REPLIES",
         value: {
           status: true,
-          id: comment.id
+          id: id
         }
       });
     }
   };
   return (
-    <Fragment key={comment.id}>
+    <Fragment key={id}>
       <Grid container wrap="nowrap" spacing={1} mt={1}>
         <Grid item>
-          <AvatarIcon index={index}>
-            {comment.user.id === userId ? "Y" : comment.user.firstName[0].toUpperCase()}
-          </AvatarIcon>
+          <AvatarIcon index={index}>{user.id === userId ? "Y" : user.firstName[0].toUpperCase()}</AvatarIcon>
         </Grid>
         <Grid justifyContent="left" item xs zeroMinWidth>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Box>
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                {comment?.user?.id === userId
-                  ? "You"
-                  : comment?.user?.firstName + " " + comment?.user?.lastName}
+                {user?.id === userId ? "You" : user?.firstName + " " + user?.lastName}
               </Typography>
-              <DateTypography variant="caption">posted {moment(comment?.createdAt).fromNow()}</DateTypography>
+              <DateTypography variant="caption">posted {moment(createdAt).fromNow()}</DateTypography>
             </Box>
-            {comment.user.id === userId && (
+            {user.id === userId && (
               <Box>
                 <Button
                   size="small"
@@ -219,7 +216,7 @@ const CommentDiv: React.FC<CommentProps> = ({
                   sx={{ textTransform: "capitalize" }}
                   onClick={() => checkEditComment()}
                 >
-                  {editDialogOpen.isEdit && editDialogOpen.id === comment?.id ? "Cancel" : "Edit"}
+                  {editDialogOpen.isEdit && editDialogOpen.id === id ? "Cancel" : "Edit"}
                 </Button>
                 <Button
                   size="small"
@@ -238,14 +235,14 @@ const CommentDiv: React.FC<CommentProps> = ({
               </Box>
             )}
           </Box>
-          {editDialogOpen.isEdit && editDialogOpen.id === comment.id ? (
+          {editDialogOpen.isEdit && editDialogOpen.id === id ? (
             <TextField
-              placeholder="Enter comment..."
+              placeholder="Enter comment.."
               variant="outlined"
               fullWidth
               label="Edit comment"
               size="small"
-              value={editReply.id === comment.id ? editReply.message : comment?.commentBody}
+              value={editReply.id === id ? editReply.message : commentBody}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end" onClick={() => handleEditComment(editReply)}>
@@ -258,7 +255,7 @@ const CommentDiv: React.FC<CommentProps> = ({
                   type: "SET_EDIT_REPLY",
                   value: {
                     message: e.target.value,
-                    id: comment.id
+                    id: id
                   }
                 });
               }}
@@ -269,9 +266,9 @@ const CommentDiv: React.FC<CommentProps> = ({
               }}
             />
           ) : (
-            <Typography sx={{ lineBreak: "anywhere" }}>{comment?.commentBody}</Typography>
+            <Typography sx={{ lineBreak: "anywhere" }}>{commentBody}</Typography>
           )}
-          {replyInputId.id === comment.id && replyInputId.isReply === true && (
+          {replyInputId.id === id && replyInputId.isReply === true && (
             <TextField
               placeholder="Enter reply..."
               variant="outlined"
@@ -280,13 +277,13 @@ const CommentDiv: React.FC<CommentProps> = ({
               fullWidth
               autoFocus
               InputLabelProps={{ shrink: true }}
-              value={reply.id === comment.id ? reply.message : ""}
+              value={reply.id === id ? reply.message : ""}
               onChange={(e) =>
                 dispatch({
                   type: "SET_REPLY",
                   value: {
                     message: e.target.value,
-                    id: comment.id
+                    id: id
                   }
                 })
               }
@@ -335,30 +332,30 @@ const CommentDiv: React.FC<CommentProps> = ({
               type: "SET_DELETE_DIALOG_OPEN",
               value: false
             });
-            handleCommentDelete(comment.id);
+            handleCommentDelete(id);
           }}
         />
       </Grid>
 
       <ReplyDiv>
         <ReplyShowButton variant="text" color="primary" onClick={() => handleEditSetComment()}>
-          {replyInputId.id === comment.id ? "Cancel" : "Reply"}
+          {replyInputId.id === id ? "Cancel" : "Reply"}
         </ReplyShowButton>
-        {comment?.reply?.length! > 0 && (
+        {commentReply?.length! > 0 && (
           <>
             <ReplyShowButton
               variant="text"
               color="primary"
-              endIcon={showReplies.id !== comment.id ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
+              endIcon={showReplies.id !== id ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
               onClick={() => handleShowHideReplies()}
             >
-              {showReplies.id === comment.id ? "Hide replies" : "Show replies"}
+              {showReplies.id === id ? "Hide replies" : "Show replies"}
             </ReplyShowButton>
             <Divider sx={{ borderStyle: "dashed" }} />
 
             {showReplies.status === true &&
-              showReplies.id === comment.id &&
-              comment?.reply?.map((reply, index) => (
+              showReplies.id === id &&
+              commentReply?.map((reply, index) => (
                 <Fragment key={index}>
                   <CommentDiv
                     comment={reply}

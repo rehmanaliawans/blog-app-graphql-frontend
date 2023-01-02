@@ -1,14 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Box, Container, TablePagination, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  useFetchAllPostsLazyQuery,
-  useSearchPostLazyQuery
-} from "../../generated/graphql";
-import SearchBar from "../SearchBar";
-import ShowData from "./ShowData";
+import { Box, Container, TablePagination, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { useFetchAllPostsLazyQuery, useSearchPostLazyQuery } from '../../generated/graphql';
+import SearchBar from '../SearchBar';
+import ShowData from './ShowData';
 
 const ContainerStyle = styled(Container)(({ theme }) => ({
   marginTop: 10,
@@ -24,7 +22,7 @@ const HomePageContainer = () => {
   const [searchPost, { data: searchData }] = useSearchPostLazyQuery();
   const [searchPriority, setSearchPriority] = useState(false);
 
-  useEffect(() => {
+  const fetchPosts = useCallback(() => {
     fetchAllPost({
       variables: {
         paginateInput: {
@@ -34,7 +32,11 @@ const HomePageContainer = () => {
       },
       fetchPolicy: "network-only"
     });
-  }, [page]);
+  }, [fetchAllPost, page]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   const handleSearchPost = (queryString: string) => {
     setSearchPriority(!!queryString);
@@ -44,25 +46,20 @@ const HomePageContainer = () => {
       }
     });
   };
+
+  if (data?.fetchAllPosts) var { posts, count } = data?.fetchAllPosts!;
+
   return (
     <ContainerStyle maxWidth="lg" sx={{ width: "90vw" }}>
-      <SearchBar
-        handleSearchPost={(queryString) => handleSearchPost(queryString)}
-      />
+      <SearchBar handleSearchPost={(queryString) => handleSearchPost(queryString)} />
       {(data?.fetchAllPosts?.posts?.length! > 0 && !searchPriority) ||
       (searchData?.searchPost?.length! > 0 && searchPriority) ? (
         <>
-          <ShowData
-            data={
-              searchData?.searchPost?.length! > 0
-                ? searchData?.searchPost!
-                : data?.fetchAllPosts?.posts!
-            }
-          />
+          <ShowData data={searchData?.searchPost?.length! > 0 ? searchData?.searchPost! : posts!} />
           <TablePagination
             rowsPerPageOptions={[10]}
             component="div"
-            count={data?.fetchAllPosts?.count!}
+            count={count!}
             rowsPerPage={limit}
             page={page - 1}
             onPageChange={(event, value) => {
@@ -78,12 +75,7 @@ const HomePageContainer = () => {
             {" "}
             No post found
           </Typography>
-          <Typography
-            variant="h5"
-            color="primary.dark"
-            component={Link}
-            to="/create-post"
-          >
+          <Typography variant="h5" color="primary.dark" component={Link} to="/create-post">
             {" "}
             Create New Post
           </Typography>

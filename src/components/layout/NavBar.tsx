@@ -1,12 +1,13 @@
-import { AppBar, Box, Button, Stack, styled, Toolbar } from "@mui/material";
-import React, { useEffect } from "react";
-import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { deleteToken } from "../../utils";
-import client from "../../interceptor/connectGraphql";
-import AccountPopover from "./AccountPopover";
-import { useGetCurrentUserQuery } from "../../generated/graphql";
-import { useGlobalContext } from "../../context";
+import LogoutIcon from '@mui/icons-material/Logout';
+import { AppBar, Box, Button, Stack, styled, Toolbar } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+
+import { useGlobalContext } from '../../context';
+import { useGetCurrentUserQuery } from '../../generated/graphql';
+import client from '../../interceptor/connectGraphql';
+import { deleteToken } from '../../utils';
+import AccountPopover from './AccountPopover';
 
 const APPBAR_MOBILE = 64;
 const APPBAR_DESKTOP = 92;
@@ -56,14 +57,16 @@ const NavBar = () => {
   const { data, loading, error } = useGetCurrentUserQuery();
 
   useEffect(() => {
+    console.log("call", data, loading, navigate, setUserId);
     if (data && !loading) {
+      console.log("inside call");
       setUserId(data?.getCurrentUser?.id);
     }
     if (error) {
       deleteToken("token");
       navigate("/login");
     }
-  }, [loading]);
+  }, [data, error, loading, navigate, setUserId]);
 
   return (
     <RootStyle>
@@ -79,12 +82,7 @@ const NavBar = () => {
           spacing={{ xs: 0.5, sm: 1.5 }}
         >
           {pathname !== "/create-post" && (
-            <Button
-              variant="outlined"
-              size="small"
-              component={RouterLink}
-              to="/create-post"
-            >
+            <Button variant="outlined" size="small" component={RouterLink} to="/create-post">
               Create Post
             </Button>
           )}

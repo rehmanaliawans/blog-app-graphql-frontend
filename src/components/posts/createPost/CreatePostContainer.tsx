@@ -1,9 +1,10 @@
-import { Container, styled, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useFetchPostByIdLazyQuery } from "../../../generated/graphql";
-import CreatePostForm from "./CreatePostForm";
+import { Container, styled, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { useFetchPostByIdLazyQuery } from '../../../generated/graphql';
+import CreatePostForm from './CreatePostForm';
 
 const ContainerStyle = styled(Container)(() => ({
   marginTop: 10,
@@ -30,14 +31,14 @@ const CreatePostContainer = () => {
         }
       });
     }
-  }, []);
+  }, [fetchUserPost, id]);
 
   return (
     <ContainerStyle maxWidth="md">
       <Typography variant="h4" gutterBottom color="primary">
         Create a new post
       </Typography>
-      <CreatePostForm post={data} isEdit={isEdit} setIsEdit={setIsEdit} />
+      <CreatePostForm post={data!} isEdit={isEdit} setIsEdit={setIsEdit} />
     </ContainerStyle>
   );
 };

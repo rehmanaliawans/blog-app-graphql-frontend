@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Container,
-  TablePagination,
-  Typography,
-  styled
-} from "@mui/material";
-import { useFetchUserPostsLazyQuery } from "../../generated/graphql";
-import ShowData from "../homePage/ShowData";
-import { Link } from "react-router-dom";
+import { Box, Container, styled, TablePagination, Typography } from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { useFetchUserPostsLazyQuery } from '../../generated/graphql';
+import ShowData from '../homePage/ShowData';
 
 const ContainerStyle = styled(Container)(({ theme }) => ({
   marginTop: 10,
@@ -22,7 +17,7 @@ const UserPostContainer = () => {
   const limit = 6;
   const [fetchUserPosts, { data }] = useFetchUserPostsLazyQuery();
 
-  useEffect(() => {
+  const fetUserOwnPosts = useCallback(() => {
     fetchUserPosts({
       variables: {
         paginateInput: {
@@ -32,17 +27,21 @@ const UserPostContainer = () => {
       },
       fetchPolicy: "network-only"
     });
-  }, [page]);
+  }, [fetchUserPosts, page]);
 
+  useEffect(() => {
+    fetUserOwnPosts();
+  }, [fetUserOwnPosts]);
+  if (data?.fetchUserPosts) var { posts, count } = data?.fetchUserPosts!;
   return (
     <ContainerStyle maxWidth="lg" sx={{ width: "90vw" }}>
-      {data?.fetchUserPosts.posts?.length! > 0 ? (
+      {posts?.length! > 0 ? (
         <>
-          <ShowData data={data?.fetchUserPosts?.posts!} />
+          <ShowData data={posts!} />
           <TablePagination
             rowsPerPageOptions={[10]}
             component="div"
-            count={data?.fetchUserPosts?.count!}
+            count={count!}
             rowsPerPage={limit}
             page={page - 1}
             onPageChange={(event, value) => {
@@ -58,12 +57,7 @@ const UserPostContainer = () => {
             {" "}
             No post found
           </Typography>
-          <Typography
-            variant="h5"
-            color="primary.dark"
-            component={Link}
-            to="/create-post"
-          >
+          <Typography variant="h5" color="primary.dark" component={Link} to="/create-post">
             {" "}
             Create New Post
           </Typography>

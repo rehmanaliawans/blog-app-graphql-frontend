@@ -1,16 +1,12 @@
-import * as Yup from "yup";
-import {
-  GetCurrentUserQuery,
-  UpdateUserInput,
-  User,
-  useUpdateUserMutation
-} from "../../generated/graphql";
-import { Box, Button, Stack, TextField } from "@mui/material";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { ApolloQueryResult } from "@apollo/client";
+import { ApolloQueryResult } from '@apollo/client';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Box, Button, Stack, TextField } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import * as Yup from 'yup';
+
+import { GetCurrentUserQuery, UpdateUserInput, useUpdateUserMutation } from '../../generated/graphql';
 
 const ProfileForm = ({
   profileData,
@@ -19,6 +15,7 @@ const ProfileForm = ({
   profileData: GetCurrentUserQuery;
   refetchUser: () => Promise<ApolloQueryResult<GetCurrentUserQuery>>;
 }) => {
+  const { firstName: pFirstName, lastName: pLastName, email, id } = profileData.getCurrentUser;
   const [updateUserMutation] = useUpdateUserMutation({
     onCompleted: (data) => {
       toast.success("Profile updated successfully!");
@@ -31,21 +28,15 @@ const ProfileForm = ({
   const [btnDisabled, setBtnDisabled] = useState(true);
 
   const RegisterSchema = Yup.object().shape({
-    firstName: Yup.string()
-      .required("First name required")
-      .min(3, "Minimum 3 characters"),
-    lastName: Yup.string()
-      .required("Last name required")
-      .min(3, "Minimum 3 characters"),
-    email: Yup.string()
-      .email("Email must be a valid email address")
-      .required("Email is required")
+    firstName: Yup.string().required("First name required").min(3, "Minimum 3 characters"),
+    lastName: Yup.string().required("Last name required").min(3, "Minimum 3 characters"),
+    email: Yup.string().email("Email must be a valid email address").required("Email is required")
   });
   const defaultValues = {
-    email: profileData.getCurrentUser.email,
-    firstName: profileData.getCurrentUser.firstName,
-    lastName: profileData.getCurrentUser.lastName,
-    id: profileData.getCurrentUser.id
+    email: email,
+    firstName: pFirstName,
+    lastName: pLastName,
+    id: id
   };
   const {
     register,
@@ -60,15 +51,12 @@ const ProfileForm = ({
   const [firstName, lastName] = watch(["firstName", "lastName"]);
 
   useEffect(() => {
-    if (
-      firstName.trim() !== profileData.getCurrentUser.firstName ||
-      lastName.trim() !== profileData.getCurrentUser.lastName
-    ) {
+    if (firstName.trim() !== pFirstName || lastName.trim() !== pLastName) {
       setBtnDisabled(false);
     } else {
       setBtnDisabled(true);
     }
-  }, [firstName, lastName]);
+  }, [firstName, lastName, pFirstName, pLastName]);
 
   const onSubmit = async (data: UpdateUserInput) => {
     data = {
@@ -112,10 +100,7 @@ const ProfileForm = ({
           disabled={true}
         />
 
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          sx={{ display: "flex", justifyContent: "flex-end" }}
-        >
+        <Stack direction={{ xs: "column", sm: "row" }} sx={{ display: "flex", justifyContent: "flex-end" }}>
           <Button
             size="medium"
             type="submit"

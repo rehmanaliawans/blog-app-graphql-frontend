@@ -6,10 +6,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import * as Yup from 'yup';
 
 import { CreateUserInput, useSignupMutation } from '../../../generated/graphql';
 import { saveToken } from '../../../utils';
+import { RegisterSchema } from '../../../utils/hookForm';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -23,23 +23,6 @@ const RegisterForm = () => {
     onError: (err) => toast.error(err.message)
   });
 
-  const RegisterSchema = Yup.object().shape({
-    firstName: Yup.string()
-      .required("First name required")
-      .min(3, "Minimum 3 characters"),
-    lastName: Yup.string()
-      .required("Last name required")
-      .min(3, "Minimum 3 characters"),
-    email: Yup.string()
-      .email("Email must be a valid email address")
-      .required("Email is required"),
-    password: Yup.string()
-      .required("Password is required")
-      .matches(
-        /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()"'.,<>;:`~|?-_]))(?=.{8,})/,
-        "Must contain 8 characters, one small letter,one capital letter, one number and one special case Character"
-      )
-  });
   const defaultValues = {
     email: "",
     password: "",

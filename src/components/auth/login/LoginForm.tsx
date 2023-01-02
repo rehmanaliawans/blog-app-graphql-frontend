@@ -1,22 +1,15 @@
-import * as Yup from "yup";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  Stack,
-  IconButton,
-  InputAdornment,
-  TextField,
-  Box,
-  Typography,
-  Link
-} from "@mui/material";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { LoadingButton } from "@mui/lab";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { saveToken } from "../../../utils";
-import { useLoginMutation, LoginUserInput } from "../../../generated/graphql";
-import { toast } from "react-toastify";
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
+import { Box, IconButton, InputAdornment, Link, Stack, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { LoginUserInput, useLoginMutation } from '../../../generated/graphql';
+import { saveToken } from '../../../utils';
+import { LoginSchema } from '../../../utils/hookForm';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -30,12 +23,6 @@ const LoginForm = () => {
     onError: (err) => toast.error(err.message)
   });
 
-  const LoginSchema = Yup.object().shape({
-    email: Yup.string()
-      .email("Email must be a valid email address")
-      .required("Email is required"),
-    password: Yup.string().required("Password is required")
-  });
   const defaultValues = {
     email: "",
     password: ""
@@ -82,10 +69,7 @@ const LoginForm = () => {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                >
+                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                   {showPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
@@ -93,23 +77,12 @@ const LoginForm = () => {
           }}
         />
       </Stack>
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="flex-end"
-        sx={{ my: 2 }}
-      >
+      <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 2 }}>
         <Link variant="subtitle2" component={RouterLink} to="/forgot-password">
           Forgot Password?
         </Link>
       </Stack>
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        variant="contained"
-        loading={loading}
-      >
+      <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={loading}>
         Login
       </LoadingButton>
 

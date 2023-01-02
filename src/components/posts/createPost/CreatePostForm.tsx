@@ -67,9 +67,7 @@ const CreatePostForm = ({
   const [id] = useSearchParams();
   const [fileLoading, setFileLoading] = useState(false);
   const [image, setImage] = useState([]);
-  const [previewImage, setPreviewImage] = useState<
-    string | ArrayBuffer | null
-  >();
+  const [previewImage, setPreviewImage] = useState<string | ArrayBuffer | null>();
 
   const [createUserPostMutation, { reset }] = useCreateUserPostMutation({
     onCompleted: (data) => {
@@ -110,22 +108,10 @@ const CreatePostForm = ({
   });
 
   const LoginSchema = Yup.object().shape({
-    title: Yup.string()
-      .required("Title is required")
-      .min(3, "Minimum 3 characters required"),
-    description: Yup.string()
-      .required("Description is required")
-      .min(3, "Minimum 3 characters required"),
+    title: Yup.string().required("Title is required").min(3, "Minimum 3 characters required"),
+    description: Yup.string().required("Description is required").min(3, "Minimum 3 characters required"),
     file: Yup.mixed()
   });
-
-  useEffect(() => {
-    if (isEdit) {
-      setValue("title", post?.fetchPost?.title!);
-      setValue("description", post?.fetchPost?.description!);
-      setPreviewImage(post?.fetchPost?.attachmentUrl);
-    }
-  }, [isEdit]);
 
   const defaultValues = {
     title: "",
@@ -142,6 +128,22 @@ const CreatePostForm = ({
     resolver: yupResolver(LoginSchema),
     defaultValues
   });
+
+  useEffect(() => {
+    if (isEdit) {
+      setValue("title", post?.fetchPost?.title!);
+      setValue("description", post?.fetchPost?.description!);
+      setPreviewImage(post?.fetchPost?.attachmentUrl);
+    }
+  }, [
+    isEdit,
+    post?.fetchPost?.attachmentUrl,
+    post?.fetchPost?.description,
+    post?.fetchPost?.title,
+    setValue
+  ]);
+
+  
   const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
 

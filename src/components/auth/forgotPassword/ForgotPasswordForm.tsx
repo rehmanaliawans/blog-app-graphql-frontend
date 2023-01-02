@@ -1,32 +1,19 @@
-import { LoadingButton } from "@mui/lab";
-import { Link as RouterLink } from "react-router-dom";
-import { Box, Link, TextField, Typography } from "@mui/material";
-import { Stack } from "@mui/system";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import {
-  ForgotPasswordMutationVariables,
-  useForgotPasswordMutation
-} from "../../../generated/graphql";
+import { yupResolver } from '@hookform/resolvers/yup';
+import { LoadingButton } from '@mui/lab';
+import { Box, TextField, Typography } from '@mui/material';
+import { Stack } from '@mui/system';
+import { useForm } from 'react-hook-form';
 
-const ForgotPasswordForm = ({
-  setUserKey
-}: {
-  setUserKey: (value: string) => void;
-}) => {
-  const [forgotPasswordMutation, { data, loading, error }] =
-    useForgotPasswordMutation({
-      onCompleted: ({ forgotPassword }) => {
-        setUserKey(forgotPassword.userKey);
-      }
-    });
+import { ForgotPasswordMutationVariables, useForgotPasswordMutation } from '../../../generated/graphql';
+import { ForgotSchema } from '../../../utils/hookForm';
 
-  const ForgotSchema = Yup.object().shape({
-    email: Yup.string()
-      .email("Email must be a valid email address")
-      .required("Email is required")
+const ForgotPasswordForm = ({ setUserKey }: { setUserKey: (value: string) => void }) => {
+  const [forgotPasswordMutation, { loading, error }] = useForgotPasswordMutation({
+    onCompleted: ({ forgotPassword }) => {
+      setUserKey(forgotPassword.userKey);
+    }
   });
+
   const defaultValues = {
     email: ""
   };
@@ -57,13 +44,7 @@ const ForgotPasswordForm = ({
           error={!!errors.email}
           helperText={errors.email && errors.email.message}
         />
-        <LoadingButton
-          fullWidth
-          size="medium"
-          type="submit"
-          variant="contained"
-          loading={loading}
-        >
+        <LoadingButton fullWidth size="medium" type="submit" variant="contained" loading={loading}>
           Send Request
         </LoadingButton>
 

@@ -1,44 +1,27 @@
-import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { LoadingButton } from "@mui/lab";
-import {
-  Box,
-  IconButton,
-  InputAdornment,
-  Stack,
-  TextField,
-  Typography
-} from "@mui/material";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useUpdatePasswordMutation } from "../../generated/graphql";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { toast } from "react-toastify";
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
+import { Box, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { useUpdatePasswordMutation } from '../../generated/graphql';
+import { updateSPasswordSchema } from '../../utils/hookForm';
 
 const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const [updatePasswordMutation, { loading, error }] =
-    useUpdatePasswordMutation({
-      onCompleted(data) {
-        toast.success("Password updated successfully");
-        navigate("/login", { replace: true });
-      },
-      onError: (err) => toast.error(err.message)
-    });
-  const updateSPasswordSchema = Yup.object().shape({
-    password: Yup.string()
-      .required("Password is required")
-      .matches(
-        /^((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()"'.,<>;:`~|?-_]))(?=.{8,})/,
-        "Must contain 8 characters, one small letter,one capital letter, one number and one special case Character"
-      ),
-    confirmPassword: Yup.string()
-      .required("Confirm password is required")
-      .oneOf([Yup.ref("password"), null], "Password does not match")
+  const [updatePasswordMutation, { loading, error }] = useUpdatePasswordMutation({
+    onCompleted(data) {
+      toast.success("Password updated successfully");
+      navigate("/login", { replace: true });
+    },
+    onError: (err) => toast.error(err.message)
   });
+
   const defaultValues = {
     password: "",
     confirmPassword: ""
@@ -78,10 +61,7 @@ const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                >
+                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                   {showPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
@@ -97,13 +77,7 @@ const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
           type={showPassword ? "text" : "password"}
         />
 
-        <LoadingButton
-          fullWidth
-          size="medium"
-          type="submit"
-          variant="contained"
-          loading={loading}
-        >
+        <LoadingButton fullWidth size="medium" type="submit" variant="contained" loading={loading}>
           Update
         </LoadingButton>
 

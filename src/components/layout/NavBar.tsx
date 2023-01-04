@@ -1,6 +1,6 @@
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AppBar, Box, Button, Stack, styled, Toolbar } from '@mui/material';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 
 import { useGlobalContext } from '../../context';
@@ -53,20 +53,19 @@ const NavBar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const { setUserId } = useGlobalContext();
+  const { setUserId, setUserName } = useGlobalContext();
   const { data, loading, error } = useGetCurrentUserQuery();
 
   useEffect(() => {
-    console.log("call", data, loading, navigate, setUserId);
     if (data && !loading) {
-      console.log("inside call");
       setUserId(data?.getCurrentUser?.id);
+      setUserName(data?.getCurrentUser?.firstName + " " + data?.getCurrentUser?.lastName);
     }
     if (error) {
       deleteToken("token");
       navigate("/login");
     }
-  }, [data, error, loading, navigate, setUserId]);
+  }, [data, error, loading, navigate, setUserId, setUserName]);
 
   return (
     <RootStyle>

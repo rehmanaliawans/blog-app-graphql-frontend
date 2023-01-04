@@ -1,17 +1,10 @@
-import React from "react";
-import { useRoutes } from "react-router-dom";
-import PageLayout from "../components/layout";
-import CreatePost from "../Pages/CreatePost";
-import ForgotPassword from "../Pages/ForgotPassword";
-import HomePage from "../Pages/HomePage";
-import Login from "../Pages/Login";
-import Page404 from "../Pages/Page404";
-import Register from "../Pages/Register";
-import LoggedInProtection from "./LoggedInProtection";
-import LoggedOutProtection from "./LoggedOutProtection";
-import GetSinglePost from "../Pages/GetSinglePost";
-import MyPosts from "../Pages/MyPosts";
-import Profile from "../Pages/Profile";
+import React from 'react';
+import { useRoutes } from 'react-router-dom';
+
+import PageLayout from '../components/layout';
+import { CreatePost, ForgotPassword, GetSinglePost, HomePage, Login, MyPosts, Page404, Profile, Register } from '../Pages';
+import LoggedInProtection from './LoggedInProtection';
+import LoggedOutProtection from './LoggedOutProtection';
 
 export default function Router() {
   return useRoutes([

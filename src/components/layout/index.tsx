@@ -1,7 +1,9 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
-import { styled } from "@mui/material/styles";
-import NavBar from "./NavBar";
+import { styled } from '@mui/material/styles';
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+
+import ChatPopup from './ChatPopup';
+import NavBar from './NavBar';
 
 const APP_BAR_MOBILE = 64;
 const APP_BAR_DESKTOP = 92;
@@ -20,6 +22,12 @@ const MainStyle = styled("div")(({ theme }) => ({
   }
 }));
 
+const ChatBoxStyle = styled("div")(({ theme }) => ({
+  position: "absolute",
+  bottom: 0,
+  right: "10px"
+}));
+
 const PageLayout = () => {
   return (
     <RootStyle>
@@ -27,6 +35,9 @@ const PageLayout = () => {
       <MainStyle>
         <Outlet />
       </MainStyle>
+      <ChatBoxStyle>
+        <ChatPopup />
+      </ChatBoxStyle>
     </RootStyle>
   );
 };

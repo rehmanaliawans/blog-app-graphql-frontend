@@ -2,9 +2,10 @@ import { ApolloQueryResult } from '@apollo/client';
 import SendIcon from '@mui/icons-material/Send';
 import { InputAdornment, Paper, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/system';
-import { Fragment, useEffect, useReducer } from 'react';
+import { Fragment, useCallback, useEffect, useReducer, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { io, Socket } from 'socket.io-client';
 
 import {
   FetchPostByIdQuery,
@@ -16,6 +17,8 @@ import {
 import { CommentBoxAction, CommentBoxSate } from '../interface';
 import CommentDiv from './SingleCommentShow';
 
+// console.log("REACT_APP_BACKEND_URL", process.env.REACT_APP_BACKEND_URL);
+// const socket = io(process.env.REACT_APP_BACKEND_URL!);
 const MainCommentBox = styled(Paper)(({ theme }) => ({
   width: "100%",
   height: "30rem",
@@ -75,12 +78,17 @@ const CommentBox = ({
   showComments: PostComment[];
   refetchPost: () => Promise<ApolloQueryResult<FetchPostByIdQuery>>;
 }) => {
+  // console.log("socket", socket);
   const { id } = useParams();
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  const [socket, setSocket] = useState<Socket>();
   const { comment, comments, replyDelete, editDialogOpen, replyInputId } = state;
+
   const [createPostCommentMutation] = useCreatePostCommentMutation({
     onCompleted: (data) => {
+      console.log("call emit");
+      socket?.emit("message", data.createPostComment.comment.commentBody);
+      console.log("after clal");
       toast.success(data.createPostComment.message);
       refetchPost();
       dispatch({
@@ -91,9 +99,25 @@ const CommentBox = ({
     onError: (err) => toast.error(err.message)
   });
 
+  useEffect(() => {
+    const socketCon = io(process.env.REACT_APP_SOCKET_URL!);
+    setSocket(socketCon);
+  }, [setSocket]);
+
+  const messageListener = useCallback(() => {
+    refetchPost();
+  }, [refetchPost]);
+
+  useEffect(() => {
+    socket?.on("message", messageListener);
+    return () => {
+      socket?.off("message", messageListener);
+    };
+  }, [messageListener, socket]);
+
   const [deleteCommentMutation] = useDeleteCommentMutation({
     onCompleted: (data) => {
-      refetchPost();
+      socket?.emit("message", data.deleteComment.message);
       dispatch({
         type: "REPLY_DELETE",
         value: !replyDelete
@@ -105,7 +129,7 @@ const CommentBox = ({
 
   const [updateCommentMutation] = useUpdateCommentMutation({
     onCompleted: (data) => {
-      refetchPost();
+      socket?.emit("message", data.updateComment.message);
       dispatch({
         type: "REPLY_DELETE",
         value: !replyDelete
@@ -191,7 +215,6 @@ const CommentBox = ({
       toast.error("Comment required");
     }
   };
-
   return (
     <MainCommentBox>
       <TextField

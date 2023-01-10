@@ -13,9 +13,19 @@ const DateTypography = styled(Typography)(({ theme }) => ({
   color: theme.palette.grey[500],
   position: "relative"
 }));
-const MessageBox = ({ side, text, time }: { side: string; text: string; time: string }) => {
+const MessageBox = ({
+  side,
+  text,
+  time,
+  messagesEndRef
+}: {
+  side: string;
+  text: string;
+  time: string;
+  messagesEndRef: any;
+}) => {
   return (
-    <Grid container wrap="nowrap" spacing={1} pl={1} pr={1}>
+    <Grid container wrap="nowrap" spacing={1} pl={1} pr={1} ref={messagesEndRef}>
       {side === "left" && (
         <Grid item>
           <AvatarIcon index={1}>Y</AvatarIcon>

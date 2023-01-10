@@ -2,7 +2,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Button, Paper, styled, TextField, Typography } from '@mui/material';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -32,10 +32,11 @@ interface Users {
   id: string;
   name: string;
   clientId: string;
-  room?: string;
+  room?: string[];
 }
 const ChatPopup = () => {
   const { userId, userName } = useGlobalContext();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [onlineUsers, setOnlineUsers] = useState<Users[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
@@ -43,8 +44,17 @@ const ChatPopup = () => {
   const [socket, setSocket] = useState<Socket>();
   const [user, setUser] = useState<Users>();
   const [chatMessage, setChatMessage] = useState<string>("");
+  const [newRoomCreate, setNewRoomCreate] = useState<string>("");
   const [messageList, setMessageList] = useState<MessageList[]>([]);
-  console.log("onlineUsers", onlineUsers);
+
+  const scrollToBottom = () => {
+    messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messageList]);
+
   useEffect(() => {
     if (userId) {
       const socketCon = io(`http://localhost:8001/chat-app`, {
@@ -54,89 +64,105 @@ const ChatPopup = () => {
         }
       });
       setSocket(socketCon);
-      console.log("socket con: ", socketCon);
     }
   }, [setSocket, userId, userName]);
 
-  const joinRoom = (room: string) => {
-    console.log("joinRoom: call");
-    socket?.emit("join_room", room);
+  const joinRoom = (room: string, user: Users) => {
+    setNewRoomCreate(room);
+    socket?.emit("join_room", room, user);
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (room: string) => {
     if (chatMessage !== "") {
       const messageData: MessageList = {
-        room: user?.room!,
+        room: room,
         author: userId,
         message: chatMessage,
         time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
       };
-      console.log("message: ", messageData);
       socket?.emit("send_message", messageData);
       setMessageList((list) => [...list, messageData]);
       setChatMessage("");
     }
   };
 
-  console.log("messages", messageList);
   useEffect(() => {
-    console.log("use effect clal");
-    socket?.on("join_room_check", (data) => {
-      console.log("join_room_check", data);
-      socket?.emit("join_room", data.room);
-      setUser(data);
-      setChatOpen(true);
-      setUsersOpen(false);
-      setChatOpen(true);
-      return;
-    });
     socket?.on("online_users", (data) => {
       setOnlineUsers(data);
       return;
     });
+
     socket?.on("receive_message", (data) => {
-      console.log("data received", data);
       setMessageList([...messageList, data]);
       return;
     });
-  }, [messageList, socket]);
+  }, [messageList, socket, userId]);
+
+  useEffect(() => {
+    socket?.on("join_room_check", (sendUser, newRoom) => {
+      if (!!onlineUsers.length) {
+        const newUsers = onlineUsers.map((user) => {
+          if (user.id === sendUser.id || user.id === userId) {
+            const data1 = {
+              ...user,
+              room: user?.room?.length! > 0 ? [...user?.room!, newRoom!] : [newRoom]
+            };
+            return data1;
+          } else {
+            return user;
+          }
+        });
+        let currentUser = onlineUsers?.find((user) => user.id === userId);
+        setNewRoomCreate(newRoom);
+
+        socket?.emit("join_room", newRoom, currentUser);
+
+        setOnlineUsers(newUsers);
+        setUser(sendUser);
+        setChatOpen(true);
+        setUsersOpen(false);
+        setChatOpen(true);
+      }
+      return;
+    });
+  }, [onlineUsers, socket, userId]);
 
   const handleUserCall = (id: string) => {
     let updateUser = onlineUsers;
     let currentUser = onlineUsers?.find((user) => user.id === userId);
     let user = onlineUsers?.find((user) => user.id === id.toString());
-    if (!user?.room || !currentUser?.room) {
-      console.log("no rooms");
-      const room = uuidv4();
-      console.log("user", id);
 
+    if (!user?.room?.includes(newRoomCreate!) || !currentUser?.room?.includes(newRoomCreate!)) {
+      const newRoom = uuidv4();
       currentUser = {
         ...currentUser!,
-        room: room!
+        room: currentUser?.room?.length! > 0 ? [...currentUser?.room!, newRoom!] : [newRoom]
       };
+
       user = {
         ...user!,
-        room: room!
+        room: user?.room?.length! > 0 ? [...user?.room!, newRoom!] : [newRoom!]
       };
+
       updateUser = onlineUsers?.map((user) => {
         if (user.id === id.toString() || user.id === userId) {
           const data = {
             ...user,
-            room: room!
+            room: user?.room?.length! > 0 ? [...user?.room!, newRoom!] : [newRoom!]
           };
           return data;
         }
         return user;
       });
 
-      joinRoom(room);
-      socket?.emit("join_room_request", user?.clientId, currentUser);
+      joinRoom(newRoom, currentUser);
+
+      socket?.emit("join_room_request", user?.clientId, currentUser, newRoom);
       setOnlineUsers(updateUser!);
       setUser(user);
       setUsersOpen(false);
       setChatOpen(true);
     } else {
-      console.log("have rooms");
       setUser(user);
       setUsersOpen(false);
       setChatOpen(true);
@@ -147,9 +173,6 @@ const ChatPopup = () => {
     <Box>
       <ChatBoxPaper
         onClick={() => {
-          //   if (!chatOpen) {
-          //     joinRoom();
-          //   }
           if (user && !usersOpen && !chatOpen) {
             setChatOpen(true);
           } else if (!chatOpen && !usersOpen) {
@@ -199,13 +222,14 @@ const ChatPopup = () => {
         >
           <Box sx={{ height: "27rem", width: "100%", overflowY: "scroll", overflowX: "hidden" }}>
             {messageList.map((message, index) => {
-              if (message.room === user?.room!) {
+              if (user?.room?.includes(message.room)) {
                 return (
                   <Fragment key={index}>
                     <MessageBox
                       text={message.message}
                       side={message.author === userId ? "right" : "left"}
                       time={message.time}
+                      messagesEndRef={messagesEndRef}
                     />
                   </Fragment>
                 );
@@ -233,14 +257,14 @@ const ChatPopup = () => {
               fullWidth
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  sendMessage();
+                  sendMessage(newRoomCreate);
                 }
               }}
             />
             <Button
               variant="contained"
               onClick={() => {
-                sendMessage();
+                sendMessage(newRoomCreate);
               }}
             >
               Send

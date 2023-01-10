@@ -1,20 +1,11 @@
-import * as React from "react";
-import { useNavigate } from "react-router-dom";
-import { deleteToken } from "../../utils";
-import client from "../../interceptor/connectGraphql";
-import { Stack } from "@mui/system";
-import {
-  Avatar,
-  Box,
-  Divider,
-  IconButton,
-  MenuItem,
-  Popover,
-  Tooltip,
-  Typography
-} from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
-import { GetCurrentUserQuery } from "../../generated/graphql";
+import { Avatar, Box, Divider, IconButton, MenuItem, Popover, Tooltip, Typography } from '@mui/material';
+import { Stack } from '@mui/system';
+import * as React from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+
+import { GetCurrentUserQuery } from '../../generated/graphql';
+import client from '../../interceptor/connectGraphql';
+import { deleteToken } from '../../utils';
 
 const MENU_OPTIONS = [
   {

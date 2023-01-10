@@ -2,20 +2,16 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Button, Paper, styled, TextField, Typography } from '@mui/material';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+import React, { Fragment, useEffect, useReducer, useRef, useState } from 'react';
+import { io } from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
 import { useGlobalContext } from '../../context';
+import { ChatAppAction, ChatAppState, MessageList, User } from '../../interface';
 import MessageBox from './MessageBox';
 import UsersShown from './UsersShown';
 
-interface MessageList {
-  room: string;
-  author: string;
-  message: string;
-  time: string;
-}
+
 const ChatBoxPaper = styled(Paper)(({ theme }) => ({
   width: "22rem",
   display: "flex",
@@ -28,47 +24,94 @@ const ChatBoxPaper = styled(Paper)(({ theme }) => ({
   borderBottomRightRadius: "0px"
 }));
 
-interface Users {
-  id: string;
-  name: string;
-  clientId: string;
-  room?: string[];
-}
+const initialState = {
+  onlineUsers: [],
+  chatOpen: false,
+  usersOpen: false,
+  socket: null,
+  user: null,
+  chatMessage: "",
+  newRoomCreate: "",
+  messageList: []
+};
+const reducer = (state: ChatAppState, action: ChatAppAction) => {
+  switch (action.type) {
+    case "SET_ONLINE_USERS":
+      return {
+        ...state,
+        onlineUsers: action.value
+      };
+    case "SET_CHAT_OPEN":
+      return {
+        ...state,
+        chatOpen: action.value
+      };
+    case "SET_USERS_OPEN":
+      return {
+        ...state,
+        usersOpen: action.value
+      };
+    case "SET_USER":
+      return {
+        ...state,
+        user: action.value
+      };
+    case "SET_SOCKET":
+      return {
+        ...state,
+        socket: action.value
+      };
+    case "SET_CHAT_MESSAGE":
+      return {
+        ...state,
+        chatMessage: action.value
+      };
+    case "SET_NEW_ROOM_CREATE":
+      return {
+        ...state,
+        newRoomCreate: action.value
+      };
+    case "SET_MESSAGE_LIST":
+      return {
+        ...state,
+        messageList: action.value
+      };
+  }
+};
 const ChatPopup = () => {
   const { userId, userName } = useGlobalContext();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { onlineUsers, chatOpen, usersOpen, user, socket, chatMessage, newRoomCreate, messageList } = state;
 
-  const [onlineUsers, setOnlineUsers] = useState<Users[]>([]);
-  const [chatOpen, setChatOpen] = useState(false);
-  const [usersOpen, setUsersOpen] = useState(false);
-  const [socket, setSocket] = useState<Socket>();
-  const [user, setUser] = useState<Users>();
-  const [chatMessage, setChatMessage] = useState<string>("");
-  const [newRoomCreate, setNewRoomCreate] = useState<string>("");
-  const [messageList, setMessageList] = useState<MessageList[]>([]);
-
-  const scrollToBottom = () => {
-    messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messageList]);
+  // // const [onlineUsers, setOnlineUsers] = useState<Users[]>([]);
+  // const [chatOpen, setChatOpen] = useState(false);
+  // const [usersOpen, setUsersOpen] = useState(false);
+  // const [socket, setSocket] = useState<Socket>();
+  // const [user, setUser] = useState<Users>();
+  // const [chatMessage, setChatMessage] = useState<string>("");
+  // const [newRoomCreate, setNewRoomCreate] = useState<string>("");
+  // const [messageList, setMessageList] = useState<MessageList[]>([]);
 
   useEffect(() => {
     if (userId) {
-      const socketCon = io(`http://localhost:8001/chat-app`, {
+      const socketCon = io(`http://localhost:8002/chat-app`, {
         query: {
           userId: userId,
           name: userName
         }
       });
-      setSocket(socketCon);
+      dispatch({
+        type: "SET_SOCKET",
+        value: socketCon
+      });
     }
-  }, [setSocket, userId, userName]);
+  }, [userId, userName]);
 
-  const joinRoom = (room: string, user: Users) => {
-    setNewRoomCreate(room);
+  const joinRoom = (room: string, user: User) => {
+    dispatch({
+      type: "SET_NEW_ROOM_CREATE",
+      value: room
+    });
     socket?.emit("join_room", room, user);
   };
 
@@ -81,19 +124,35 @@ const ChatPopup = () => {
         time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
       };
       socket?.emit("send_message", messageData);
-      setMessageList((list) => [...list, messageData]);
-      setChatMessage("");
+      dispatch({
+        type: "SET_MESSAGE_LIST",
+        value: [...messageList, messageData]
+      });
+      dispatch({
+        type: "SET_CHAT_MESSAGE",
+        value: ""
+      });
+      // setMessageList((list) => [...list, messageData]);
+      // setChatMessage("");
     }
   };
 
   useEffect(() => {
     socket?.on("online_users", (data) => {
-      setOnlineUsers(data);
+      dispatch({
+        type: "SET_ONLINE_USERS",
+        value: data
+      });
+      // setOnlineUsers(data);
       return;
     });
 
     socket?.on("receive_message", (data) => {
-      setMessageList([...messageList, data]);
+      // setMessageList([...messageList, data]);
+      dispatch({
+        type: "SET_MESSAGE_LIST",
+        value: [...messageList, data]
+      });
       return;
     });
   }, [messageList, socket, userId]);
@@ -101,34 +160,36 @@ const ChatPopup = () => {
   useEffect(() => {
     socket?.on("join_room_check", (sendUser, newRoom) => {
       if (!!onlineUsers.length) {
-        const newUsers = onlineUsers.map((user) => {
-          if (user.id === sendUser.id || user.id === userId) {
-            const data1 = {
-              ...user,
-              room: user?.room?.length! > 0 ? [...user?.room!, newRoom!] : [newRoom]
-            };
-            return data1;
-          } else {
-            return user;
-          }
-        });
         let currentUser = onlineUsers?.find((user) => user.id === userId);
-        setNewRoomCreate(newRoom);
+        // setNewRoomCreate(newRoom);
+        dispatch({
+          type: "SET_NEW_ROOM_CREATE",
+          value: newRoom
+        });
 
         socket?.emit("join_room", newRoom, currentUser);
-
-        setOnlineUsers(newUsers);
-        setUser(sendUser);
-        setChatOpen(true);
-        setUsersOpen(false);
-        setChatOpen(true);
+        dispatch({
+          type: "SET_USER",
+          value: sendUser
+        });
+        dispatch({
+          type: "SET_CHAT_OPEN",
+          value: true
+        });
+        dispatch({
+          type: "SET_USERS_OPEN",
+          value: false
+        });
+        // // setUser(sendUser);
+        // // setChatOpen(true);
+        // setUsersOpen(false);
+        // setChatOpen(true);
       }
       return;
     });
   }, [onlineUsers, socket, userId]);
 
   const handleUserCall = (id: string) => {
-    let updateUser = onlineUsers;
     let currentUser = onlineUsers?.find((user) => user.id === userId);
     let user = onlineUsers?.find((user) => user.id === id.toString());
 
@@ -144,28 +205,40 @@ const ChatPopup = () => {
         room: user?.room?.length! > 0 ? [...user?.room!, newRoom!] : [newRoom!]
       };
 
-      updateUser = onlineUsers?.map((user) => {
-        if (user.id === id.toString() || user.id === userId) {
-          const data = {
-            ...user,
-            room: user?.room?.length! > 0 ? [...user?.room!, newRoom!] : [newRoom!]
-          };
-          return data;
-        }
-        return user;
-      });
-
       joinRoom(newRoom, currentUser);
 
       socket?.emit("join_room_request", user?.clientId, currentUser, newRoom);
-      setOnlineUsers(updateUser!);
-      setUser(user);
-      setUsersOpen(false);
-      setChatOpen(true);
+      dispatch({
+        type: "SET_USER",
+        value: user
+      });
+      dispatch({
+        type: "SET_CHAT_OPEN",
+        value: true
+      });
+      dispatch({
+        type: "SET_USERS_OPEN",
+        value: false
+      });
+      // setUser(user);
+      // setUsersOpen(false);
+      // setChatOpen(true);
     } else {
-      setUser(user);
-      setUsersOpen(false);
-      setChatOpen(true);
+      dispatch({
+        type: "SET_USER",
+        value: user
+      });
+      dispatch({
+        type: "SET_CHAT_OPEN",
+        value: true
+      });
+      dispatch({
+        type: "SET_USERS_OPEN",
+        value: false
+      });
+      // setUser(user);
+      // setUsersOpen(false);
+      // setChatOpen(true);
     }
   };
 
@@ -174,13 +247,31 @@ const ChatPopup = () => {
       <ChatBoxPaper
         onClick={() => {
           if (user && !usersOpen && !chatOpen) {
-            setChatOpen(true);
+            dispatch({
+              type: "SET_CHAT_OPEN",
+              value: true
+            });
+            // setChatOpen(true);
           } else if (!chatOpen && !usersOpen) {
-            setUsersOpen(true);
+            // setUsersOpen(true);
+
+            dispatch({
+              type: "SET_USERS_OPEN",
+              value: true
+            });
           } else if (usersOpen && !chatOpen) {
-            setUsersOpen(false);
+            // setUsersOpen(false);
+
+            dispatch({
+              type: "SET_USERS_OPEN",
+              value: false
+            });
           } else if (!usersOpen && chatOpen) {
-            setChatOpen(false);
+            dispatch({
+              type: "SET_CHAT_OPEN",
+              value: false
+            });
+            // setChatOpen(false);
           }
         }}
       >
@@ -194,9 +285,22 @@ const ChatPopup = () => {
             <ArrowBackIcon
               sx={{ color: "whitesmoke" }}
               onClick={() => {
-                setUser(undefined);
-                setChatOpen(false);
-                setUsersOpen(true);
+                dispatch({
+                  type: "SET_USER",
+                  value: null
+                });
+                dispatch({
+                  type: "SET_CHAT_OPEN",
+                  value: false
+                });
+                dispatch({
+                  type: "SET_USERS_OPEN",
+                  value: true
+                });
+
+                // setUser(undefined);
+                // setChatOpen(false);
+                // setUsersOpen(true);
               }}
             />
           )}
@@ -229,7 +333,6 @@ const ChatPopup = () => {
                       text={message.message}
                       side={message.author === userId ? "right" : "left"}
                       time={message.time}
-                      messagesEndRef={messagesEndRef}
                     />
                   </Fragment>
                 );
@@ -250,7 +353,11 @@ const ChatPopup = () => {
               type="text"
               value={chatMessage}
               onChange={(e) => {
-                setChatMessage(e.target.value);
+                dispatch({
+                  type: "SET_CHAT_MESSAGE",
+                  value: e.target.value
+                });
+                // setChatMessage(e.target.value);
               }}
               size="small"
               placeholder="Enter Message"

@@ -1,3 +1,5 @@
+import { Socket } from 'socket.io-client';
+
 import { PostComment } from '../generated/graphql';
 
 export interface CardData {
@@ -6,7 +8,18 @@ export interface CardData {
   description: string;
   link: string;
 }
-
+export interface User {
+  id: string;
+  name: string;
+  clientId: string;
+  room?: string[];
+}
+export interface MessageList {
+  room: string;
+  author: string;
+  message: string;
+  time: string;
+}
 export interface CommentProps {
   comment: PostComment;
   index: number;
@@ -99,4 +112,48 @@ export type SingleCommentAction =
         message: string;
         id: string;
       };
+    };
+
+export type ChatAppState = {
+  onlineUsers: User[];
+  chatOpen: boolean;
+  usersOpen: boolean;
+  socket: Socket | null;
+  user: User | null;
+  chatMessage: string;
+  newRoomCreate: string;
+  messageList: MessageList[];
+};
+export type ChatAppAction =
+  | {
+      type: "SET_ONLINE_USERS";
+      value: User[];
+    }
+  | {
+      type: "SET_CHAT_OPEN";
+      value: boolean;
+    }
+  | {
+      type: "SET_USERS_OPEN";
+      value: boolean;
+    }
+  | {
+      type: "SET_USER";
+      value: User | null;
+    }
+  | {
+      type: "SET_SOCKET";
+      value: Socket;
+    }
+  | {
+      type: "SET_CHAT_MESSAGE";
+      value: string;
+    }
+  | {
+      type: "SET_NEW_ROOM_CREATE";
+      value: string;
+    }
+  | {
+      type: "SET_MESSAGE_LIST";
+      value: MessageList[];
     };

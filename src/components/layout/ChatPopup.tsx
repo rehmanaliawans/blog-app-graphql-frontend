@@ -112,7 +112,7 @@ const ChatPopup = () => {
       type: "SET_NEW_ROOM_CREATE",
       value: room
     });
-    socket?.emit("join_room", room, user);
+    socket?.emit("join_room", { room: room, user: user });
   };
 
   const sendMessage = async (room: string) => {
@@ -167,7 +167,7 @@ const ChatPopup = () => {
           value: newRoom
         });
 
-        socket?.emit("join_room", newRoom, currentUser);
+        socket?.emit("join_room", { room: newRoom, user: currentUser });
         dispatch({
           type: "SET_USER",
           value: sendUser
@@ -207,7 +207,11 @@ const ChatPopup = () => {
 
       joinRoom(newRoom, currentUser);
 
-      socket?.emit("join_room_request", user?.clientId, currentUser, newRoom);
+      socket?.emit("join_room_request", {
+        clientId: user?.clientId,
+        sendUser: currentUser,
+        newRoom: newRoom
+      });
       dispatch({
         type: "SET_USER",
         value: user

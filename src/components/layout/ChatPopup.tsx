@@ -3,14 +3,14 @@ import CircleIcon from "@mui/icons-material/Circle";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Button, Paper, styled, TextField, Typography } from '@mui/material';
-import React, { Fragment, useEffect, useReducer } from "react";
-import { io } from 'socket.io-client';
-import { v4 as uuidv4 } from 'uuid';
+import React, { Fragment, useEffect, useReducer, useState } from "react";
+import { io } from "socket.io-client";
+import { v4 as uuidv4 } from "uuid";
 
-import { useGlobalContext } from '../../context';
-import { ChatAppAction, ChatAppState, MessageList, User } from '../../interface';
-import MessageBox from './MessageBox';
-import UsersShown from './UsersShown';
+import { useGlobalContext } from "../../context";
+import { ChatAppAction, ChatAppState, MessageList, User } from "../../interface";
+import MessageBox from "./MessageBox";
+import UsersShown from "./UsersShown";
 
 const ChatBoxPaper = styled(Paper)(({ theme }) => ({
   width: "22rem",
@@ -150,7 +150,6 @@ const ChatPopup = () => {
   };
 
   useEffect(() => {
-    console.log();
     socket?.on("join_room_check", (sendUser, newRoom) => {
       if (!!onlineUsers.length) {
         let currentUser = onlineUsers?.find((user) => user.id === userId);
@@ -180,8 +179,12 @@ const ChatPopup = () => {
         type: "SET_MESSAGE_LIST",
         value: [...messageList, data]
       });
-
-      if (notifications.some((e) => e?.user?.id === data.author) && !chatOpen) {
+      let updateUser = onlineUsers?.find((user) => user.id === data.author);
+      dispatch({
+        type: "SET_USER",
+        value: updateUser!
+      });
+      if (notifications?.some((e) => e?.user?.id === data.author) && !chatOpen) {
         const notification = notifications.map((notification) => {
           if (notification.user?.id === data.author)
             return (notification = {
@@ -190,15 +193,14 @@ const ChatPopup = () => {
             });
           else return notification;
         });
-
         dispatch({
           type: "SET_NOTIFICATION",
           value: notification
         });
-      } else if (!notifications.some((e) => e?.user?.id === data.author) && !chatOpen) {
+      } else if (!notifications?.some((e) => e?.user?.id === data.author) || !chatOpen) {
         const notification = {
           status: true,
-          user: user,
+          user: updateUser!,
           count: 1
         };
 
@@ -242,7 +244,6 @@ const ChatPopup = () => {
     }
     if (!!notifications.length) {
       const notification = notifications.filter((notification) => notification.user?.id !== id);
-
       dispatch({
         type: "SET_NOTIFICATION",
         value: notification
@@ -322,7 +323,6 @@ const ChatPopup = () => {
           </Typography>
         </Box>
       </ChatBoxPaper>
-      
       {chatOpen && (
         <Paper
           sx={{
@@ -398,24 +398,22 @@ const ChatPopup = () => {
           <Box sx={{ height: "100%", width: "100%", overflowY: "scroll", overflowX: "hidden" }}>
             {onlineUsers.length >= 2 ? (
               onlineUsers.map((user, index) => {
-                let notification = undefined;
-                if (!!notifications.length) {
-                  notification = notifications.find(
-                    (notification) => notification?.user?.id === user.id && notification?.user?.id !== userId
-                  );
-                }
-                return (
-                  <Fragment key={index}>
-                    {user.id !== userId && (
+                if (user.id !== userId) {
+                  let notification = undefined;
+                  if (!!notifications.length) {
+                    notification = notifications.find((notification) => notification?.user?.id === user.id);
+                  }
+                  return (
+                    <Fragment key={index}>
                       <UsersShown
                         name={user.name}
                         id={user.id}
                         handleUserCall={(id) => handleUserCall(id)}
                         notification={notification}
                       />
-                    )}
-                  </Fragment>
-                );
+                    </Fragment>
+                  );
+                }
               })
             ) : (
               <Typography textAlign="center" variant="h5">

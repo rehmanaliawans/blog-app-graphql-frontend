@@ -83,9 +83,7 @@ const CommentBox = ({
 
   const [createPostCommentMutation] = useCreatePostCommentMutation({
     onCompleted: (data) => {
-      console.log("call emit");
       socket?.emit("message", data.createPostComment.comment.commentBody);
-      console.log("after clal");
       toast.success(data.createPostComment.message);
       refetchPost();
       dispatch({

@@ -31,7 +31,6 @@ const UsersShown = ({
   handleUserCall: (id: string) => void;
   notification?: Notification;
 }) => {
-  console.log("notifaciton get", notification);
   return (
     <Grid
       container

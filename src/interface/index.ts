@@ -14,6 +14,11 @@ export interface User {
   clientId: string;
   room?: string[];
 }
+export interface Notification {
+  status: boolean;
+  user: User | null;
+  count: number;
+}
 export interface MessageList {
   room: string;
   author: string;
@@ -123,6 +128,7 @@ export type ChatAppState = {
   chatMessage: string;
   newRoomCreate: string;
   messageList: MessageList[];
+  notifications: Notification[];
 };
 export type ChatAppAction =
   | {
@@ -156,4 +162,9 @@ export type ChatAppAction =
   | {
       type: "SET_MESSAGE_LIST";
       value: MessageList[];
+    }
+  | {
+      type: "SET_NOTIFICATION";
+      value: Notification[];
     };
+

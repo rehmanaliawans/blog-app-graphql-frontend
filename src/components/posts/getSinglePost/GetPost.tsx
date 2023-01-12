@@ -1,19 +1,16 @@
-import { Box, Button, Typography } from "@mui/material";
-import { styled } from "@mui/system";
-import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
-import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
-import {
-  FetchPostByIdQuery,
-  Post,
-  useDeletePostMutation
-} from "../../../generated/graphql";
-import CommentBox from "../../CommentBox";
-import { useGlobalContext } from "../../../context";
-import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useState } from "react";
-import DialogBox from "../../DialogBox";
-import { ApolloQueryResult } from "@apollo/client";
+import { ApolloQueryResult } from '@apollo/client';
+import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
+import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
+import { Box, Button, Typography } from '@mui/material';
+import { styled } from '@mui/system';
+import { useState } from 'react';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { useGlobalContext } from '../../../context';
+import { FetchPostByIdQuery, useDeletePostMutation } from '../../../generated/graphql';
+import CommentBox from '../../CommentBox';
+import DialogBox from '../../DialogBox';
 
 const MainBox = styled(Box)(() => ({
   width: "100%",

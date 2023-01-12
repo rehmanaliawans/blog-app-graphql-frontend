@@ -17,8 +17,6 @@ import {
 import { CommentBoxAction, CommentBoxSate } from '../interface';
 import CommentDiv from './SingleCommentShow';
 
-// console.log("REACT_APP_BACKEND_URL", process.env.REACT_APP_BACKEND_URL);
-// const socket = io(process.env.REACT_APP_BACKEND_URL!);
 const MainCommentBox = styled(Paper)(({ theme }) => ({
   width: "100%",
   height: "30rem",
@@ -78,7 +76,6 @@ const CommentBox = ({
   showComments: PostComment[];
   refetchPost: () => Promise<ApolloQueryResult<FetchPostByIdQuery>>;
 }) => {
-  // console.log("socket", socket);
   const { id } = useParams();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [socket, setSocket] = useState<Socket>();

@@ -22,11 +22,6 @@ const MainStyle = styled("div")(({ theme }) => ({
   }
 }));
 
-const ChatBoxStyle = styled("div")(({ theme }) => ({
-  position: "absolute",
-  bottom: 0,
-  right: "10px"
-}));
 
 const PageLayout = () => {
   return (
@@ -35,9 +30,7 @@ const PageLayout = () => {
       <MainStyle>
         <Outlet />
       </MainStyle>
-      <ChatBoxStyle>
-        <ChatPopup />
-      </ChatBoxStyle>
+      <ChatPopup />
     </RootStyle>
   );
 };

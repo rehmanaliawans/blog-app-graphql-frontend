@@ -1,8 +1,9 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CircleIcon from "@mui/icons-material/Circle";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Button, Paper, styled, TextField, Typography } from '@mui/material';
-import React, { Fragment, useEffect, useReducer, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useReducer } from "react";
 import { io } from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,7 +11,6 @@ import { useGlobalContext } from '../../context';
 import { ChatAppAction, ChatAppState, MessageList, User } from '../../interface';
 import MessageBox from './MessageBox';
 import UsersShown from './UsersShown';
-
 
 const ChatBoxPaper = styled(Paper)(({ theme }) => ({
   width: "22rem",
@@ -23,6 +23,13 @@ const ChatBoxPaper = styled(Paper)(({ theme }) => ({
   borderBottomLeftRadius: "0px",
   borderBottomRightRadius: "0px"
 }));
+const ChatBox = styled(Box)(() => ({
+  position: "fixed",
+  bottom: "0",
+  right: "10px",
+  margin: "0",
+  padding: "0"
+}));
 
 const initialState = {
   onlineUsers: [],
@@ -32,7 +39,8 @@ const initialState = {
   user: null,
   chatMessage: "",
   newRoomCreate: "",
-  messageList: []
+  messageList: [],
+  notifications: []
 };
 const reducer = (state: ChatAppState, action: ChatAppAction) => {
   switch (action.type) {
@@ -76,21 +84,27 @@ const reducer = (state: ChatAppState, action: ChatAppAction) => {
         ...state,
         messageList: action.value
       };
+    case "SET_NOTIFICATION":
+      return {
+        ...state,
+        notifications: action.value
+      };
   }
 };
 const ChatPopup = () => {
   const { userId, userName } = useGlobalContext();
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { onlineUsers, chatOpen, usersOpen, user, socket, chatMessage, newRoomCreate, messageList } = state;
-
-  // // const [onlineUsers, setOnlineUsers] = useState<Users[]>([]);
-  // const [chatOpen, setChatOpen] = useState(false);
-  // const [usersOpen, setUsersOpen] = useState(false);
-  // const [socket, setSocket] = useState<Socket>();
-  // const [user, setUser] = useState<Users>();
-  // const [chatMessage, setChatMessage] = useState<string>("");
-  // const [newRoomCreate, setNewRoomCreate] = useState<string>("");
-  // const [messageList, setMessageList] = useState<MessageList[]>([]);
+  const {
+    onlineUsers,
+    notifications,
+    chatOpen,
+    usersOpen,
+    user,
+    socket,
+    chatMessage,
+    newRoomCreate,
+    messageList
+  } = state;
 
   useEffect(() => {
     if (userId) {
@@ -132,62 +146,75 @@ const ChatPopup = () => {
         type: "SET_CHAT_MESSAGE",
         value: ""
       });
-      // setMessageList((list) => [...list, messageData]);
-      // setChatMessage("");
     }
   };
 
   useEffect(() => {
+    console.log();
+    socket?.on("join_room_check", (sendUser, newRoom) => {
+      if (!!onlineUsers.length) {
+        let currentUser = onlineUsers?.find((user) => user.id === userId);
+
+        socket?.emit("join_room", { room: newRoom, user: currentUser });
+        dispatch({
+          type: "SET_NEW_ROOM_CREATE",
+          value: newRoom
+        });
+        dispatch({
+          type: "SET_USER",
+          value: sendUser
+        });
+      }
+    });
+
     socket?.on("online_users", (data) => {
       dispatch({
         type: "SET_ONLINE_USERS",
         value: data
       });
-      // setOnlineUsers(data);
       return;
     });
 
     socket?.on("receive_message", (data) => {
-      // setMessageList([...messageList, data]);
       dispatch({
         type: "SET_MESSAGE_LIST",
         value: [...messageList, data]
       });
-      return;
-    });
-  }, [messageList, socket, userId]);
 
-  useEffect(() => {
-    socket?.on("join_room_check", (sendUser, newRoom) => {
-      if (!!onlineUsers.length) {
-        let currentUser = onlineUsers?.find((user) => user.id === userId);
-        // setNewRoomCreate(newRoom);
-        dispatch({
-          type: "SET_NEW_ROOM_CREATE",
-          value: newRoom
+      if (notifications.some((e) => e?.user?.id === data.author) && !chatOpen) {
+        const notification = notifications.map((notification) => {
+          if (notification.user?.id === data.author)
+            return (notification = {
+              ...notification,
+              count: notification.count + 1
+            });
+          else return notification;
         });
 
-        socket?.emit("join_room", { room: newRoom, user: currentUser });
         dispatch({
-          type: "SET_USER",
-          value: sendUser
+          type: "SET_NOTIFICATION",
+          value: notification
         });
+      } else if (!notifications.some((e) => e?.user?.id === data.author) && !chatOpen) {
+        const notification = {
+          status: true,
+          user: user,
+          count: 1
+        };
+
         dispatch({
-          type: "SET_CHAT_OPEN",
-          value: true
+          type: "SET_NOTIFICATION",
+          value: [...notifications, notification]
         });
-        dispatch({
-          type: "SET_USERS_OPEN",
-          value: false
-        });
-        // // setUser(sendUser);
-        // // setChatOpen(true);
-        // setUsersOpen(false);
-        // setChatOpen(true);
       }
-      return;
     });
-  }, [onlineUsers, socket, userId]);
+
+    return () => {
+      socket?.off("receive_message");
+      socket?.off("join_room_check");
+      socket?.off("online_users");
+    };
+  }, [chatOpen, messageList, notifications, onlineUsers, socket, user, userId, usersOpen]);
 
   const handleUserCall = (id: string) => {
     let currentUser = onlineUsers?.find((user) => user.id === userId);
@@ -212,60 +239,39 @@ const ChatPopup = () => {
         sendUser: currentUser,
         newRoom: newRoom
       });
-      dispatch({
-        type: "SET_USER",
-        value: user
-      });
-      dispatch({
-        type: "SET_CHAT_OPEN",
-        value: true
-      });
-      dispatch({
-        type: "SET_USERS_OPEN",
-        value: false
-      });
-      // setUser(user);
-      // setUsersOpen(false);
-      // setChatOpen(true);
-    } else {
-      dispatch({
-        type: "SET_USER",
-        value: user
-      });
-      dispatch({
-        type: "SET_CHAT_OPEN",
-        value: true
-      });
-      dispatch({
-        type: "SET_USERS_OPEN",
-        value: false
-      });
-      // setUser(user);
-      // setUsersOpen(false);
-      // setChatOpen(true);
     }
+    if (!!notifications.length) {
+      const notification = notifications.filter((notification) => notification.user?.id !== id);
+
+      dispatch({
+        type: "SET_NOTIFICATION",
+        value: notification
+      });
+    }
+    dispatch({
+      type: "SET_USER",
+      value: user
+    });
+    dispatch({
+      type: "SET_CHAT_OPEN",
+      value: true
+    });
+    dispatch({
+      type: "SET_USERS_OPEN",
+      value: false
+    });
   };
 
   return (
-    <Box>
+    <ChatBox>
       <ChatBoxPaper
         onClick={() => {
-          if (user && !usersOpen && !chatOpen) {
-            dispatch({
-              type: "SET_CHAT_OPEN",
-              value: true
-            });
-            // setChatOpen(true);
-          } else if (!chatOpen && !usersOpen) {
-            // setUsersOpen(true);
-
+          if (!chatOpen && !usersOpen) {
             dispatch({
               type: "SET_USERS_OPEN",
               value: true
             });
           } else if (usersOpen && !chatOpen) {
-            // setUsersOpen(false);
-
             dispatch({
               type: "SET_USERS_OPEN",
               value: false
@@ -275,7 +281,6 @@ const ChatPopup = () => {
               type: "SET_CHAT_OPEN",
               value: false
             });
-            // setChatOpen(false);
           }
         }}
       >
@@ -290,10 +295,6 @@ const ChatPopup = () => {
               sx={{ color: "whitesmoke" }}
               onClick={() => {
                 dispatch({
-                  type: "SET_USER",
-                  value: null
-                });
-                dispatch({
                   type: "SET_CHAT_OPEN",
                   value: false
                 });
@@ -301,24 +302,27 @@ const ChatPopup = () => {
                   type: "SET_USERS_OPEN",
                   value: true
                 });
-
-                // setUser(undefined);
-                // setChatOpen(false);
-                // setUsersOpen(true);
               }}
             />
           )}
-          <Typography color="white" variant="body1">
-            {user?.name}
-          </Typography>
+          {chatOpen && (
+            <Typography color="white" variant="body1">
+              {user?.name}
+            </Typography>
+          )}
         </Box>
         <Box sx={{ width: "100%", textAlign: "right" }}>
+          {!!notifications.length && !chatOpen && !usersOpen && (
+            <CircleIcon
+              sx={{ color: "red", position: "absolute", fontSize: "20px", left: "-5px", top: "-10px" }}
+            />
+          )}
           <Typography color="white" sx={{ marginRight: "1rem" }} variant="h6">
             Chat
           </Typography>
         </Box>
       </ChatBoxPaper>
-
+      
       {chatOpen && (
         <Paper
           sx={{
@@ -330,17 +334,17 @@ const ChatPopup = () => {
         >
           <Box sx={{ height: "27rem", width: "100%", overflowY: "scroll", overflowX: "hidden" }}>
             {messageList.map((message, index) => {
-              if (user?.room?.includes(message.room)) {
-                return (
-                  <Fragment key={index}>
+              return (
+                <Fragment key={index}>
+                  {user?.room?.includes(message.room) && (
                     <MessageBox
                       text={message.message}
                       side={message.author === userId ? "right" : "left"}
                       time={message.time}
                     />
-                  </Fragment>
-                );
-              }
+                  )}
+                </Fragment>
+              );
             })}
           </Box>
           <Box
@@ -361,7 +365,6 @@ const ChatPopup = () => {
                   type: "SET_CHAT_MESSAGE",
                   value: e.target.value
                 });
-                // setChatMessage(e.target.value);
               }}
               size="small"
               placeholder="Enter Message"
@@ -383,7 +386,6 @@ const ChatPopup = () => {
           </Box>
         </Paper>
       )}
-
       {usersOpen && (
         <Paper
           sx={{
@@ -396,12 +398,24 @@ const ChatPopup = () => {
           <Box sx={{ height: "100%", width: "100%", overflowY: "scroll", overflowX: "hidden" }}>
             {onlineUsers.length >= 2 ? (
               onlineUsers.map((user, index) => {
-                if (user.id !== userId)
-                  return (
-                    <Fragment key={index}>
-                      <UsersShown name={user.name} id={user.id} handleUserCall={(id) => handleUserCall(id)} />
-                    </Fragment>
+                let notification = undefined;
+                if (!!notifications.length) {
+                  notification = notifications.find(
+                    (notification) => notification?.user?.id === user.id && notification?.user?.id !== userId
                   );
+                }
+                return (
+                  <Fragment key={index}>
+                    {user.id !== userId && (
+                      <UsersShown
+                        name={user.name}
+                        id={user.id}
+                        handleUserCall={(id) => handleUserCall(id)}
+                        notification={notification}
+                      />
+                    )}
+                  </Fragment>
+                );
               })
             ) : (
               <Typography textAlign="center" variant="h5">
@@ -411,7 +425,7 @@ const ChatPopup = () => {
           </Box>
         </Paper>
       )}
-    </Box>
+    </ChatBox>
   );
 };
 

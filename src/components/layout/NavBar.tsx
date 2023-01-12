@@ -1,6 +1,6 @@
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AppBar, Box, Button, Stack, styled, Toolbar } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 
 import { useGlobalContext } from '../../context';

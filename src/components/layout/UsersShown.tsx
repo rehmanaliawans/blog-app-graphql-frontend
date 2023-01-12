@@ -1,6 +1,8 @@
 import { Avatar, Box, Grid, styled, Typography } from '@mui/material';
 import React from 'react';
 
+import { Notification } from '../../interface';
+
 const AvatarIcon = styled(Avatar)(({ index }: { index: number }) => ({
   backgroundColor: index % 2 === 0 ? "#5c7c8b" : "#029489",
   width: "35px",
@@ -11,15 +13,25 @@ const DateTypography = styled(Typography)(({ theme }) => ({
   color: theme.palette.success.dark,
   position: "relative"
 }));
+const NotificationDiv = styled(Typography)(({ theme }) => ({
+  color: "#fff",
+  position: "relative",
+  backgroundColor: theme.palette.success.dark,
+  borderRadius: "50%",
+  padding: "0px 6px"
+}));
 const UsersShown = ({
   name,
   id,
-  handleUserCall
+  handleUserCall,
+  notification
 }: {
   name: string;
   id: string;
   handleUserCall: (id: string) => void;
+  notification?: Notification;
 }) => {
+  console.log("notifaciton get", notification);
   return (
     <Grid
       container
@@ -32,7 +44,7 @@ const UsersShown = ({
       onClick={() => handleUserCall(id)}
     >
       <Grid item>
-        <AvatarIcon index={1}>Y</AvatarIcon>
+        <AvatarIcon index={1}>{name.slice(0, 1).toUpperCase()}</AvatarIcon>
       </Grid>
 
       <Grid justifyContent="left" item xs zeroMinWidth>
@@ -53,7 +65,12 @@ const UsersShown = ({
           >
             {name}
           </Typography>
-          <DateTypography variant="body1">online</DateTypography>
+          <Box display="flex" flexDirection="column" alignItems="center">
+            {!!notification?.status && (
+              <NotificationDiv variant="caption">{notification?.count}</NotificationDiv>
+            )}
+            <DateTypography variant="body1">online</DateTypography>
+          </Box>
         </Box>
       </Grid>
     </Grid>

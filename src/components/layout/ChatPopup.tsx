@@ -108,7 +108,7 @@ const ChatPopup = () => {
 
   useEffect(() => {
     if (userId) {
-      const socketCon = io(`http://localhost:8002/chat-app`, {
+      const socketCon = io(`${process.env.REACT_APP_BACKEND_URL_SOCKET}/chat-app`, {
         query: {
           userId: userId,
           name: userName

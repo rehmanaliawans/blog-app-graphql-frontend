@@ -1,16 +1,16 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CircleIcon from "@mui/icons-material/Circle";
+import CircleIcon from '@mui/icons-material/Circle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Button, Paper, styled, TextField, Typography } from '@mui/material';
-import React, { Fragment, useEffect, useReducer, useState } from "react";
-import { io } from "socket.io-client";
-import { v4 as uuidv4 } from "uuid";
+import React, { Fragment, useEffect, useReducer, useState } from 'react';
+import { io } from 'socket.io-client';
+import { v4 as uuidv4 } from 'uuid';
 
-import { useGlobalContext } from "../../context";
-import { ChatAppAction, ChatAppState, MessageList, User } from "../../interface";
-import MessageBox from "./MessageBox";
-import UsersShown from "./UsersShown";
+import { useGlobalContext } from '../../context';
+import { ChatAppAction, ChatAppState, MessageList, User } from '../../interface';
+import MessageBox from './MessageBox';
+import UsersShown from './UsersShown';
 
 const ChatBoxPaper = styled(Paper)(({ theme }) => ({
   width: "22rem",
@@ -159,10 +159,10 @@ const ChatPopup = () => {
           type: "SET_NEW_ROOM_CREATE",
           value: newRoom
         });
-        dispatch({
-          type: "SET_USER",
-          value: sendUser
-        });
+        // dispatch({
+        //   type: "SET_USER",
+        //   value: sendUser
+        // });
       }
     });
 
@@ -180,10 +180,10 @@ const ChatPopup = () => {
         value: [...messageList, data]
       });
       let updateUser = onlineUsers?.find((user) => user.id === data.author);
-      dispatch({
-        type: "SET_USER",
-        value: updateUser!
-      });
+      // dispatch({
+      //   type: "SET_USER",
+      //   value: updateUser!
+      // });
       if (notifications?.some((e) => e?.user?.id === data.author) && !chatOpen) {
         const notification = notifications.map((notification) => {
           if (notification.user?.id === data.author)
@@ -203,7 +203,6 @@ const ChatPopup = () => {
           user: updateUser!,
           count: 1
         };
-
         dispatch({
           type: "SET_NOTIFICATION",
           value: [...notifications, notification]

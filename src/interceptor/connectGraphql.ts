@@ -8,7 +8,6 @@ const authMiddleware = new ApolloLink((operation, forward) => {
   const token = getToken("token");
   operation.setContext({
     headers: {
-      "Content-Type": "application/x-ndjson",
       authorization: `Bearer ${token}`
     }
   });

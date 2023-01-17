@@ -159,10 +159,6 @@ const ChatPopup = () => {
           type: "SET_NEW_ROOM_CREATE",
           value: newRoom
         });
-        // dispatch({
-        //   type: "SET_USER",
-        //   value: sendUser
-        // });
       }
     });
 
@@ -180,10 +176,7 @@ const ChatPopup = () => {
         value: [...messageList, data]
       });
       let updateUser = onlineUsers?.find((user) => user.id === data.author);
-      // dispatch({
-      //   type: "SET_USER",
-      //   value: updateUser!
-      // });
+
       if (notifications?.some((e) => e?.user?.id === data.author) && !chatOpen) {
         const notification = notifications.map((notification) => {
           if (notification.user?.id === data.author)
@@ -197,7 +190,7 @@ const ChatPopup = () => {
           type: "SET_NOTIFICATION",
           value: notification
         });
-      } else if (!notifications?.some((e) => e?.user?.id === data.author) || !chatOpen) {
+      } else if (notifications?.some((e) => e?.user?.id !== data.author) || !chatOpen) {
         const notification = {
           status: true,
           user: updateUser!,

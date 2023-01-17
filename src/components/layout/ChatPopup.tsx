@@ -93,6 +93,7 @@ const reducer = (state: ChatAppState, action: ChatAppAction) => {
 };
 const ChatPopup = () => {
   const { userId, userName } = useGlobalContext();
+  const [selectedRoom, setSelectedRoom] = useState("");
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     onlineUsers,
@@ -176,8 +177,7 @@ const ChatPopup = () => {
         value: [...messageList, data]
       });
       let updateUser = onlineUsers?.find((user) => user.id === data.author);
-
-      if (notifications?.some((e) => e?.user?.id === data.author) && !chatOpen) {
+      if (notifications?.some((e) => e?.user?.id === data.author)) {
         const notification = notifications.map((notification) => {
           if (notification.user?.id === data.author)
             return (notification = {
@@ -190,7 +190,7 @@ const ChatPopup = () => {
           type: "SET_NOTIFICATION",
           value: notification
         });
-      } else if (notifications?.some((e) => e?.user?.id !== data.author) || !chatOpen) {
+      } else if (notifications?.some((e) => e?.user?.id !== data.author) || user?.id !== data.author) {
         const notification = {
           status: true,
           user: updateUser!,
@@ -213,9 +213,18 @@ const ChatPopup = () => {
   const handleUserCall = (id: string) => {
     let currentUser = onlineUsers?.find((user) => user.id === userId);
     let user = onlineUsers?.find((user) => user.id === id.toString());
-
-    if (!user?.room?.includes(newRoomCreate!) || !currentUser?.room?.includes(newRoomCreate!)) {
+    let getRoom = "";
+    currentUser?.room?.find((room) => {
+      user?.room?.find((userRoom) => {
+        if (room === userRoom) {
+          getRoom = room;
+          return room;
+        }
+      });
+    });
+    if (!getRoom) {
       const newRoom = uuidv4();
+      setSelectedRoom(newRoom!);
       currentUser = {
         ...currentUser!,
         room: currentUser?.room?.length! > 0 ? [...currentUser?.room!, newRoom!] : [newRoom]
@@ -233,6 +242,8 @@ const ChatPopup = () => {
         sendUser: currentUser,
         newRoom: newRoom
       });
+    } else {
+      setSelectedRoom(getRoom);
     }
     if (!!notifications.length) {
       const notification = notifications.filter((notification) => notification.user?.id !== id);
@@ -241,9 +252,10 @@ const ChatPopup = () => {
         value: notification
       });
     }
+
     dispatch({
       type: "SET_USER",
-      value: user
+      value: user!
     });
     dispatch({
       type: "SET_CHAT_OPEN",
@@ -363,14 +375,14 @@ const ChatPopup = () => {
               fullWidth
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  sendMessage(newRoomCreate);
+                  sendMessage(selectedRoom);
                 }
               }}
             />
             <Button
               variant="contained"
               onClick={() => {
-                sendMessage(newRoomCreate);
+                sendMessage(selectedRoom);
               }}
             >
               Send

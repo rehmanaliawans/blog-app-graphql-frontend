@@ -2,98 +2,29 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Button, Paper, styled, TextField, Typography } from '@mui/material';
-import React, { Fragment, useEffect, useReducer, useState } from 'react';
+import { Box, Button, TextField, Typography } from "@mui/material";
+import React, { Fragment, useEffect, useReducer } from "react";
 import { io } from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
 import { useGlobalContext } from '../../context';
-import { ChatAppAction, ChatAppState, MessageList, User } from '../../interface';
+import { MessageList, User } from "../../interface";
+import { chatInitialState, chatReducer } from "../../reducers";
+import {
+  ChatBox,
+  ChatBoxPaper,
+  ChatOpenBox,
+  ChatOpenTextBox,
+  ChatPaper,
+  UserOpenBox
+} from "../../styledComponent";
 import MessageBox from './MessageBox';
 import UsersShown from './UsersShown';
 
-const ChatBoxPaper = styled(Paper)(({ theme }) => ({
-  width: "22rem",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: theme.spacing(1),
-  cursor: "pointer",
-  backgroundColor: theme.palette.primary.main,
-  borderBottomLeftRadius: "0px",
-  borderBottomRightRadius: "0px"
-}));
-const ChatBox = styled(Box)(() => ({
-  position: "fixed",
-  bottom: "0",
-  right: "10px",
-  margin: "0",
-  padding: "0"
-}));
 
-const initialState = {
-  onlineUsers: [],
-  chatOpen: false,
-  usersOpen: false,
-  socket: null,
-  user: null,
-  chatMessage: "",
-  newRoomCreate: "",
-  messageList: [],
-  notifications: []
-};
-const reducer = (state: ChatAppState, action: ChatAppAction) => {
-  switch (action.type) {
-    case "SET_ONLINE_USERS":
-      return {
-        ...state,
-        onlineUsers: action.value
-      };
-    case "SET_CHAT_OPEN":
-      return {
-        ...state,
-        chatOpen: action.value
-      };
-    case "SET_USERS_OPEN":
-      return {
-        ...state,
-        usersOpen: action.value
-      };
-    case "SET_USER":
-      return {
-        ...state,
-        user: action.value
-      };
-    case "SET_SOCKET":
-      return {
-        ...state,
-        socket: action.value
-      };
-    case "SET_CHAT_MESSAGE":
-      return {
-        ...state,
-        chatMessage: action.value
-      };
-    case "SET_NEW_ROOM_CREATE":
-      return {
-        ...state,
-        newRoomCreate: action.value
-      };
-    case "SET_MESSAGE_LIST":
-      return {
-        ...state,
-        messageList: action.value
-      };
-    case "SET_NOTIFICATION":
-      return {
-        ...state,
-        notifications: action.value
-      };
-  }
-};
 const ChatPopup = () => {
   const { userId, userName } = useGlobalContext();
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(chatReducer, chatInitialState);
   const {
     onlineUsers,
     notifications,
@@ -120,30 +51,6 @@ const ChatPopup = () => {
       });
     }
   }, [userId, userName]);
-
-  const joinRoom = (room: string, user: User) => {
-    socket?.emit("join_room", { room: room, user: user });
-  };
-
-  const sendMessage = async (room: string) => {
-    if (chatMessage !== "") {
-      const messageData: MessageList = {
-        room: room,
-        author: userId,
-        message: chatMessage,
-        time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
-      };
-      socket?.emit("send_message", messageData);
-      dispatch({
-        type: "SET_MESSAGE_LIST",
-        value: [...messageList, messageData]
-      });
-      dispatch({
-        type: "SET_CHAT_MESSAGE",
-        value: ""
-      });
-    }
-  };
 
   useEffect(() => {
     socket?.on("join_room_check", (sendUser, newRoom) => {
@@ -200,6 +107,30 @@ const ChatPopup = () => {
       socket?.off("online_users");
     };
   }, [chatOpen, messageList, notifications, onlineUsers, socket, user, userId, usersOpen]);
+
+  const joinRoom = (room: string, user: User) => {
+    socket?.emit("join_room", { room: room, user: user });
+  };
+
+  const sendMessage = async (room: string) => {
+    if (chatMessage !== "") {
+      const messageData: MessageList = {
+        room: room,
+        author: userId,
+        message: chatMessage,
+        time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
+      };
+      socket?.emit("send_message", messageData);
+      dispatch({
+        type: "SET_MESSAGE_LIST",
+        value: [...messageList, messageData]
+      });
+      dispatch({
+        type: "SET_CHAT_MESSAGE",
+        value: ""
+      });
+    }
+  };
 
   const handleUserCall = (id: string) => {
     let currentUser = onlineUsers?.find((user) => user.id === userId);
@@ -263,29 +194,28 @@ const ChatPopup = () => {
       value: false
     });
   };
+  const handleChatBoxClick = () => {
+    if (!chatOpen && !usersOpen) {
+      dispatch({
+        type: "SET_USERS_OPEN",
+        value: true
+      });
+    } else if (usersOpen && !chatOpen) {
+      dispatch({
+        type: "SET_USERS_OPEN",
+        value: false
+      });
+    } else if (!usersOpen && chatOpen) {
+      dispatch({
+        type: "SET_CHAT_OPEN",
+        value: false
+      });
+    }
+  };
 
   return (
     <ChatBox>
-      <ChatBoxPaper
-        onClick={() => {
-          if (!chatOpen && !usersOpen) {
-            dispatch({
-              type: "SET_USERS_OPEN",
-              value: true
-            });
-          } else if (usersOpen && !chatOpen) {
-            dispatch({
-              type: "SET_USERS_OPEN",
-              value: false
-            });
-          } else if (!usersOpen && chatOpen) {
-            dispatch({
-              type: "SET_CHAT_OPEN",
-              value: false
-            });
-          }
-        }}
-      >
+      <ChatBoxPaper onClick={() => handleChatBoxClick()}>
         <Box sx={{ display: "flex", width: "30rem" }}>
           {!usersOpen && !chatOpen ? (
             <KeyboardArrowUpIcon sx={{ color: "whitesmoke" }} />
@@ -325,15 +255,8 @@ const ChatPopup = () => {
         </Box>
       </ChatBoxPaper>
       {chatOpen && (
-        <Paper
-          sx={{
-            height: "30rem",
-            borderTopLeftRadius: "0px",
-            borderTopRightRadius: "0px",
-            position: "relative"
-          }}
-        >
-          <Box sx={{ height: "27rem", width: "100%", overflowY: "scroll", overflowX: "hidden" }}>
+        <ChatPaper>
+          <ChatOpenBox>
             {messageList.map((message, index) => {
               return (
                 <Fragment key={index}>
@@ -348,17 +271,8 @@ const ChatPopup = () => {
                 </Fragment>
               );
             })}
-          </Box>
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              position: "absolute",
-              bottom: "5px"
-            }}
-          >
+          </ChatOpenBox>
+          <ChatOpenTextBox>
             <TextField
               type="text"
               value={chatMessage}
@@ -385,19 +299,12 @@ const ChatPopup = () => {
             >
               Send
             </Button>
-          </Box>
-        </Paper>
+          </ChatOpenTextBox>
+        </ChatPaper>
       )}
       {usersOpen && (
-        <Paper
-          sx={{
-            height: "30rem",
-            borderTopLeftRadius: "0px",
-            borderTopRightRadius: "0px",
-            position: "relative"
-          }}
-        >
-          <Box sx={{ height: "100%", width: "100%", overflowY: "scroll", overflowX: "hidden" }}>
+        <ChatPaper>
+          <UserOpenBox>
             {onlineUsers.length >= 2 ? (
               onlineUsers.map((user, index) => {
                 if (user.id !== userId) {
@@ -422,8 +329,8 @@ const ChatPopup = () => {
                 No one online
               </Typography>
             )}
-          </Box>
-        </Paper>
+          </UserOpenBox>
+        </ChatPaper>
       )}
     </ChatBox>
   );

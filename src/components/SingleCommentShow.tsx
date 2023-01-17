@@ -6,7 +6,8 @@ import moment from 'moment';
 import { Fragment, useReducer } from 'react';
 
 import { useGlobalContext } from '../context';
-import { CommentProps, SingleCommentAction, SingleCommentSate } from '../interface';
+import { CommentProps } from "../interface";
+import { singleCommentInitialState, singleCommentReducer } from "../reducers";
 import DialogBox from './DialogBox';
 
 const ReplyDiv = styled(Box)(({ theme }) => ({
@@ -34,45 +35,6 @@ const ReplyShowButton = styled(Button)(() => ({
   marginLeft: "1.5rem"
 }));
 
-const initialState = {
-  deleteDialogOpen: false,
-  reply: {
-    id: "",
-    message: ""
-  },
-  showReplies: {
-    status: false,
-    id: ""
-  },
-  editReply: {
-    message: "",
-    id: ""
-  }
-};
-const reducer = (state: SingleCommentSate, action: SingleCommentAction) => {
-  switch (action.type) {
-    case "SET_DELETE_DIALOG_OPEN":
-      return {
-        ...state,
-        deleteDialogOpen: action.value
-      };
-    case "SET_SHOW_REPLIES":
-      return {
-        ...state,
-        showReplies: action.value
-      };
-    case "SET_EDIT_REPLY":
-      return {
-        ...state,
-        editReply: action.value
-      };
-    case "SET_REPLY":
-      return {
-        ...state,
-        reply: action.value
-      };
-  }
-};
 
 const CommentDiv: React.FC<CommentProps> = ({
   comment,
@@ -86,7 +48,7 @@ const CommentDiv: React.FC<CommentProps> = ({
 }) => {
   const { id, user, commentBody, createdAt, reply: commentReply } = comment;
   const { userId } = useGlobalContext();
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(singleCommentReducer, singleCommentInitialState);
   const { deleteDialogOpen, showReplies, editReply, reply } = state;
 
   const checkEditComment = () => {

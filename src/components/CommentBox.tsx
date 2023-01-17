@@ -14,7 +14,7 @@ import {
   useDeleteCommentMutation,
   useUpdateCommentMutation,
 } from '../generated/graphql';
-import { CommentBoxAction, CommentBoxSate } from '../interface';
+import { commentInitialState, commentReducer } from "../reducers";
 import CommentDiv from './SingleCommentShow';
 
 const MainCommentBox = styled(Paper)(({ theme }) => ({
@@ -25,49 +25,6 @@ const MainCommentBox = styled(Paper)(({ theme }) => ({
   position: "relative"
 }));
 
-const initialState = {
-  comment: "",
-  comments: [],
-  replyDelete: false,
-  editDialogOpen: {
-    isEdit: false,
-    id: ""
-  },
-  replyInputId: {
-    isReply: false,
-    id: ""
-  }
-};
-
-const reducer = (state: CommentBoxSate, action: CommentBoxAction) => {
-  switch (action.type) {
-    case "SET_COMMENTS":
-      return {
-        ...state,
-        comments: action.value
-      };
-    case "SET_COMMENT":
-      return {
-        ...state,
-        comment: action.value
-      };
-    case "REPLY_DELETE":
-      return {
-        ...state,
-        replyDelete: action.value
-      };
-    case "EDIT_DIALOG_OPEN":
-      return {
-        ...state,
-        editDialogOpen: action.value
-      };
-    case "REPLY_INPUT_ID":
-      return {
-        ...state,
-        replyInputId: action.value
-      };
-  }
-};
 
 const CommentBox = ({
   showComments,
@@ -77,7 +34,7 @@ const CommentBox = ({
   refetchPost: () => Promise<ApolloQueryResult<FetchPostByIdQuery>>;
 }) => {
   const { id } = useParams();
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(commentReducer, commentInitialState);
   const [socket, setSocket] = useState<Socket>();
   const { comment, comments, replyDelete, editDialogOpen, replyInputId } = state;
 

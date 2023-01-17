@@ -1,6 +1,8 @@
 import { Avatar, Box, Grid, styled, Typography } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 
+import { User } from "../../interface";
+
 const AvatarIcon = styled(Avatar)(({ index }: { index: number }) => ({
   backgroundColor: index % 2 === 0 ? "#5c7c8b" : "#029489",
   width: "35px",
@@ -13,7 +15,7 @@ const DateTypography = styled(Typography)(({ theme }) => ({
   color: theme.palette.grey[500],
   position: "relative"
 }));
-const MessageBox = ({ side, text, time }: { side: string; text: string; time: string }) => {
+const MessageBox = ({ side, text, time, user }: { user: User; side: string; text: string; time: string }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -28,7 +30,7 @@ const MessageBox = ({ side, text, time }: { side: string; text: string; time: st
     <Grid container wrap="nowrap" spacing={1} pl={1} pr={1} ref={messagesEndRef}>
       {side === "left" && (
         <Grid item>
-          <AvatarIcon index={1}>Y</AvatarIcon>
+          <AvatarIcon index={1}>{user.name[0]?.toUpperCase()}</AvatarIcon>
         </Grid>
       )}
       <Grid justifyContent="left" item xs zeroMinWidth>

@@ -93,7 +93,6 @@ const reducer = (state: ChatAppState, action: ChatAppAction) => {
 };
 const ChatPopup = () => {
   const { userId, userName } = useGlobalContext();
-  const [selectedRoom, setSelectedRoom] = useState("");
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     onlineUsers,
@@ -123,10 +122,6 @@ const ChatPopup = () => {
   }, [userId, userName]);
 
   const joinRoom = (room: string, user: User) => {
-    dispatch({
-      type: "SET_NEW_ROOM_CREATE",
-      value: room
-    });
     socket?.emit("join_room", { room: room, user: user });
   };
 
@@ -156,10 +151,6 @@ const ChatPopup = () => {
         let currentUser = onlineUsers?.find((user) => user.id === userId);
 
         socket?.emit("join_room", { room: newRoom, user: currentUser });
-        dispatch({
-          type: "SET_NEW_ROOM_CREATE",
-          value: newRoom
-        });
       }
     });
 
@@ -224,7 +215,10 @@ const ChatPopup = () => {
     });
     if (!getRoom) {
       const newRoom = uuidv4();
-      setSelectedRoom(newRoom!);
+      dispatch({
+        type: "SET_NEW_ROOM_CREATE",
+        value: newRoom!
+      });
       currentUser = {
         ...currentUser!,
         room: currentUser?.room?.length! > 0 ? [...currentUser?.room!, newRoom!] : [newRoom]
@@ -243,7 +237,10 @@ const ChatPopup = () => {
         newRoom: newRoom
       });
     } else {
-      setSelectedRoom(getRoom);
+      dispatch({
+        type: "SET_NEW_ROOM_CREATE",
+        value: getRoom!
+      });
     }
     if (!!notifications.length) {
       const notification = notifications.filter((notification) => notification.user?.id !== id);
@@ -342,6 +339,7 @@ const ChatPopup = () => {
                 <Fragment key={index}>
                   {user?.room?.includes(message.room) && (
                     <MessageBox
+                      user={user}
                       text={message.message}
                       side={message.author === userId ? "right" : "left"}
                       time={message.time}
@@ -375,14 +373,14 @@ const ChatPopup = () => {
               fullWidth
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  sendMessage(selectedRoom);
+                  sendMessage(newRoomCreate);
                 }
               }}
             />
             <Button
               variant="contained"
               onClick={() => {
-                sendMessage(selectedRoom);
+                sendMessage(newRoomCreate);
               }}
             >
               Send

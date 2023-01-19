@@ -2,11 +2,11 @@ import { ApolloQueryResult } from '@apollo/client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Stack, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import * as Yup from 'yup';
 
 import { GetCurrentUserQuery, UpdateUserInput, useUpdateUserMutation } from '../../generated/graphql';
+import { ProfileSchema } from '../../utils/hookForm';
 
 const ProfileForm = ({
   profileData,
@@ -18,7 +18,7 @@ const ProfileForm = ({
   const { firstName: pFirstName, lastName: pLastName, email, id } = profileData.getCurrentUser;
   const [updateUserMutation] = useUpdateUserMutation({
     onCompleted: (data) => {
-      toast.success("Profile updated successfully!");
+      toast.success('Profile updated successfully!');
 
       setBtnDisabled(true);
       refetchUser();
@@ -27,11 +27,6 @@ const ProfileForm = ({
   });
   const [btnDisabled, setBtnDisabled] = useState(true);
 
-  const RegisterSchema = Yup.object().shape({
-    firstName: Yup.string().required("First name required").min(3, "Minimum 3 characters"),
-    lastName: Yup.string().required("Last name required").min(3, "Minimum 3 characters"),
-    email: Yup.string().email("Email must be a valid email address").required("Email is required")
-  });
   const defaultValues = {
     email: email,
     firstName: pFirstName,
@@ -42,13 +37,14 @@ const ProfileForm = ({
     register,
     handleSubmit,
     watch,
-    formState: { errors }
+    formState: { errors },
+    control
   } = useForm({
-    resolver: yupResolver(RegisterSchema),
+    resolver: yupResolver(ProfileSchema),
     defaultValues
   });
 
-  const [firstName, lastName] = watch(["firstName", "lastName"]);
+  const [firstName, lastName] = watch(['firstName', 'lastName']);
 
   useEffect(() => {
     if (firstName.trim() !== pFirstName || lastName.trim() !== pLastName) {
@@ -74,40 +70,56 @@ const ProfileForm = ({
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-          <TextField
-            label="First name"
-            placeholder="Enter first name"
-            {...register("firstName")}
-            error={!!errors.firstName}
-            helperText={errors.firstName && errors.firstName.message}
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          <Controller
+            render={({ field }) => (
+              <TextField
+                label="First name"
+                placeholder="Enter first name"
+                {...field}
+                error={!!errors.firstName}
+                helperText={errors.firstName && errors.firstName.message}
+              />
+            )}
+            name="firstName"
+            control={control}
           />
-          <TextField
-            label="Last name"
-            placeholder="Enter last name"
-            {...register("lastName")}
-            error={!!errors.lastName}
-            helperText={errors.lastName && errors.lastName.message}
+          <Controller
+            render={({ field }) => (
+              <TextField
+                label="Last name"
+                placeholder="Enter last name"
+                {...field}
+                error={!!errors.lastName}
+                helperText={errors.lastName && errors.lastName.message}
+              />
+            )}
+            name="lastName"
+            control={control}
           />
         </Stack>
-
-        <TextField
-          label="email"
-          placeholder="enter email address"
-          {...register("email")}
-          error={!!errors.email}
-          helperText={errors.email && errors.email.message}
-          disabled={true}
+        <Controller
+          render={({ field }) => (
+            <TextField
+              label="email"
+              placeholder="enter email address"
+              {...field}
+              error={!!errors.email}
+              helperText={errors.email && errors.email.message}
+              disabled={true}
+            />
+          )}
+          name="email"
+          control={control}
         />
 
-        <Stack direction={{ xs: "column", sm: "row" }} sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             size="medium"
             type="submit"
-            sx={{ width: "7rem" }}
+            sx={{ width: '7rem' }}
             variant="contained"
-            disabled={btnDisabled}
-          >
+            disabled={btnDisabled}>
             Update
           </Button>
         </Stack>

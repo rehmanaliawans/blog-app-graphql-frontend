@@ -210,6 +210,10 @@ const ChatPopup = () => {
         type: "SET_CHAT_OPEN",
         value: false
       });
+      dispatch({
+        type: "SET_USER",
+        value: null
+      });
     }
   };
 

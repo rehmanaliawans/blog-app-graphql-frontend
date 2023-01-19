@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
 import { Box, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 import { ForgotPasswordMutationVariables, useForgotPasswordMutation } from '../../../generated/graphql';
 import { ForgotSchema } from '../../../utils/hookForm';
@@ -15,13 +15,14 @@ const ForgotPasswordForm = ({ setUserKey }: { setUserKey: (value: string) => voi
   });
 
   const defaultValues = {
-    email: ""
+    email: ''
   };
 
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    control
   } = useForm({
     resolver: yupResolver(ForgotSchema),
     defaultValues
@@ -37,13 +38,20 @@ const ForgotPasswordForm = ({ setUserKey }: { setUserKey: (value: string) => voi
   return (
     <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        <TextField
-          label="Email address"
-          placeholder="Enter email address"
-          {...register("email")}
-          error={!!errors.email}
-          helperText={errors.email && errors.email.message}
+        <Controller
+          render={({ field }) => (
+            <TextField
+              label="Email Address"
+              placeholder="Enter email address"
+              {...field}
+              error={!!errors.email}
+              helperText={errors.email && errors.email.message}
+            />
+          )}
+          name="email"
+          control={control}
         />
+
         <LoadingButton fullWidth size="medium" type="submit" variant="contained" loading={loading}>
           Send Request
         </LoadingButton>

@@ -32,3 +32,11 @@ export const RegisterSchema = Yup.object().shape({
       "Must contain 8 characters, one small letter,one capital letter, one number and one special case Character"
     )
 });
+
+
+
+export const ProfileSchema = Yup.object().shape({
+  firstName: Yup.string().required('First name required').min(3, 'Minimum 3 characters'),
+  lastName: Yup.string().required('Last name required').min(3, 'Minimum 3 characters'),
+  email: Yup.string().email('Email must be a valid email address').required('Email is required')
+});

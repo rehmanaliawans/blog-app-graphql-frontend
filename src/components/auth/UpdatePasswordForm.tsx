@@ -3,7 +3,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Box, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -16,21 +16,22 @@ const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
 
   const [updatePasswordMutation, { loading, error }] = useUpdatePasswordMutation({
     onCompleted(data) {
-      toast.success("Password updated successfully");
-      navigate("/login", { replace: true });
+      toast.success('Password updated successfully');
+      navigate('/login', { replace: true });
     },
     onError: (err) => toast.error(err.message)
   });
 
   const defaultValues = {
-    password: "",
-    confirmPassword: ""
+    password: '',
+    confirmPassword: ''
   };
 
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    control
   } = useForm({
     resolver: yupResolver(updateSPasswordSchema),
     defaultValues
@@ -51,30 +52,43 @@ const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
   return (
     <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        <TextField
-          label="New password"
-          placeholder="Enter new password"
-          {...register("password")}
-          error={!!errors.password}
-          helperText={errors.password && errors.password.message}
-          type={showPassword ? "text" : "password"}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  {showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            )
-          }}
+        <Controller
+          render={({ field }) => (
+            <TextField
+              placeholder="Enter Password"
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              error={!!errors.password}
+              {...field}
+              helperText={errors.password && errors.password.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+          )}
+          name="password"
+          control={control}
         />
-        <TextField
-          label="confirm password"
-          placeholder="Enter confirm password"
-          {...register("confirmPassword")}
-          error={!!errors.confirmPassword}
-          helperText={errors.confirmPassword && errors.confirmPassword.message}
-          type={showPassword ? "text" : "password"}
+
+        <Controller
+          render={({ field }) => (
+            <TextField
+              label="confirm password"
+              placeholder="Enter confirm password"
+              {...field}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword && errors.confirmPassword.message}
+              type={showPassword ? 'text' : 'password'}
+            />
+          )}
+          name="confirmPassword"
+          control={control}
         />
 
         <LoadingButton fullWidth size="medium" type="submit" variant="contained" loading={loading}>

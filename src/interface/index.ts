@@ -13,6 +13,7 @@ export interface User {
   name: string;
   clientId: string;
   room?: string[];
+  status: boolean;
 }
 export interface Notification {
   status: boolean;

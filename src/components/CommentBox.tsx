@@ -1,8 +1,9 @@
 import { ApolloQueryResult } from '@apollo/client';
-import SendIcon from '@mui/icons-material/Send';
-import { InputAdornment, Paper, TextField, Typography } from '@mui/material';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import { Fragment, useCallback, useEffect, useReducer, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { io, Socket } from 'socket.io-client';
@@ -14,17 +15,18 @@ import {
   useDeleteCommentMutation,
   useUpdateCommentMutation,
 } from '../generated/graphql';
-import { commentInitialState, commentReducer } from "../reducers";
+import { commentInitialState, commentReducer } from '../reducers';
+import { CommentSchema } from '../utils/hookForm';
+import CustomController from './CustomControllerTextField';
 import CommentDiv from './SingleCommentShow';
 
-const MainCommentBox = styled(Paper)(({ theme }) => ({
-  width: "100%",
-  height: "30rem",
-  overflowY: "auto",
+const MainCommentBox = styled(Box)(({ theme }) => ({
+  width: '100%',
+  height: '30rem',
+  overflowY: 'auto',
   padding: theme.spacing(2),
-  position: "relative"
+  position: 'relative'
 }));
-
 
 const CommentBox = ({
   showComments,
@@ -40,13 +42,10 @@ const CommentBox = ({
 
   const [createPostCommentMutation] = useCreatePostCommentMutation({
     onCompleted: (data) => {
-      socket?.emit("message", data.createPostComment.comment.commentBody);
+      socket?.emit('message', data.createPostComment.comment.commentBody);
       toast.success(data.createPostComment.message);
       refetchPost();
-      dispatch({
-        type: "SET_COMMENT",
-        value: ""
-      });
+      setValue('comment', '');
     },
     onError: (err) => toast.error(err.message)
   });
@@ -61,17 +60,17 @@ const CommentBox = ({
   }, [refetchPost]);
 
   useEffect(() => {
-    socket?.on("message", messageListener);
+    socket?.on('message', messageListener);
     return () => {
-      socket?.off("message", messageListener);
+      socket?.off('message', messageListener);
     };
   }, [messageListener, socket]);
 
   const [deleteCommentMutation] = useDeleteCommentMutation({
     onCompleted: (data) => {
-      socket?.emit("message", data.deleteComment.message);
+      socket?.emit('message', data.deleteComment.message);
       dispatch({
-        type: "REPLY_DELETE",
+        type: 'REPLY_DELETE',
         value: !replyDelete
       });
       toast.success(data.deleteComment.message);
@@ -81,16 +80,16 @@ const CommentBox = ({
 
   const [updateCommentMutation] = useUpdateCommentMutation({
     onCompleted: (data) => {
-      socket?.emit("message", data.updateComment.message);
+      socket?.emit('message', data.updateComment.message);
       dispatch({
-        type: "REPLY_DELETE",
+        type: 'REPLY_DELETE',
         value: !replyDelete
       });
       dispatch({
-        type: "EDIT_DIALOG_OPEN",
+        type: 'EDIT_DIALOG_OPEN',
         value: {
           isEdit: false,
-          id: ""
+          id: ''
         }
       });
       toast.success(data.updateComment.message);
@@ -100,9 +99,9 @@ const CommentBox = ({
 
   useEffect(() => {
     if (showComments.length > 0) {
-      dispatch({ type: "SET_COMMENTS", value: showComments });
+      dispatch({ type: 'SET_COMMENTS', value: showComments });
     } else {
-      dispatch({ type: "SET_COMMENTS", value: [] });
+      dispatch({ type: 'SET_COMMENTS', value: [] });
     }
   }, [showComments, replyDelete]);
 
@@ -126,24 +125,18 @@ const CommentBox = ({
         }
       });
     } else {
-      toast.error("Comment required");
+      toast.error('Comment required');
     }
   };
+  const defaultValues = {
+    comment: ''
+  };
+  const method = useForm({
+    resolver: yupResolver(CommentSchema),
+    defaultValues
+  });
 
-  const handleCommentCall = () => {
-    if (!!comment && id) {
-      createPostCommentMutation({
-        variables: {
-          createCommentInput: {
-            commentBody: comment,
-            postId: id!
-          }
-        }
-      });
-    } else {
-      toast.error("Comment required");
-    }
-  };
+  const { handleSubmit, setValue } = method;
 
   const handleCommentDelete = (id: string) => {
     deleteCommentMutation({
@@ -151,6 +144,18 @@ const CommentBox = ({
         commentId: id
       }
     });
+  };
+
+  const onSubmit = async (data: { comment: string }) => {
+    if (!!data.comment && !!id)
+      createPostCommentMutation({
+        variables: {
+          createCommentInput: {
+            commentBody: data.comment,
+            postId: id!
+          }
+        }
+      });
   };
 
   const handleEditComment = (reply: { id: string; message: string }) => {
@@ -164,56 +169,45 @@ const CommentBox = ({
         }
       });
     } else {
-      toast.error("Comment required");
+      toast.error('Comment required');
     }
   };
   return (
-    <MainCommentBox>
-      <TextField
-        fullWidth
-        placeholder="Enter new comment..."
-        variant="outlined"
-        label="New comment"
-        size="small"
-        sx={{
-          padding: "0px",
-          marginTop: "10px"
-        }}
-        value={comment}
-        onChange={(e) => dispatch({ type: "SET_COMMENT", value: e.target.value })}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end" onClick={() => handleCommentCall()}>
-              <SendIcon sx={{ cursor: "pointer" }} />
-            </InputAdornment>
-          )
-        }}
-        onKeyDown={(e) => e.key === "Enter" && handleCommentCall()}
-      />
+    <FormProvider {...method}>
+      <MainCommentBox component="form" onSubmit={handleSubmit(onSubmit)}>
+        <CustomController
+          label="Comment"
+          variant="outlined"
+          name="comment"
+          placeholder="Enter new comment"
+          type="text"
+          size="small"
+        />
 
-      {!!comments?.length ? (
-        comments?.map((comment, index) => {
-          return (
-            <Fragment key={index}>
-              <CommentDiv
-                comment={comment}
-                index={index}
-                handleCommentDelete={(id) => handleCommentDelete(id)}
-                handleEditComment={(reply) => handleEditComment(reply)}
-                handleReplyComment={(reply) => handleReplyComment(reply)}
-                editDialogOpen={editDialogOpen}
-                onDispatch={dispatch}
-                replyInputId={replyInputId}
-              />
-            </Fragment>
-          );
-        })
-      ) : (
-        <Typography color="primary" variant="h4" sx={{ textAlign: "center" }}>
-          No comments
-        </Typography>
-      )}
-    </MainCommentBox>
+        {!!comments?.length ? (
+          comments?.map((comment, index) => {
+            return (
+              <Fragment key={index}>
+                <CommentDiv
+                  comment={comment}
+                  index={index}
+                  handleCommentDelete={(id) => handleCommentDelete(id)}
+                  handleEditComment={(reply) => handleEditComment(reply)}
+                  handleReplyComment={(reply) => handleReplyComment(reply)}
+                  editDialogOpen={editDialogOpen}
+                  onDispatch={dispatch}
+                  replyInputId={replyInputId}
+                />
+              </Fragment>
+            );
+          })
+        ) : (
+          <Typography color="primary" variant="h4" sx={{ textAlign: 'center' }}>
+            No comments
+          </Typography>
+        )}
+      </MainCommentBox>
+    </FormProvider>
   );
 };
 

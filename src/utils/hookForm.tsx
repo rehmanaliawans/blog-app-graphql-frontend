@@ -18,7 +18,13 @@ export const updateSPasswordSchema = Yup.object().shape({
 });
 
 export const ForgotSchema = Yup.object().shape({
-  email: Yup.string().email("Email must be a valid email address").required("Email is required")
+  email: Yup.string().email('Email must be a valid email address').required('Email is required')
+});
+export const CommentSchema = Yup.object().shape({
+  comment: Yup.string().required('Comment is required')
+});
+export const ChatSchema = Yup.object().shape({
+  chat: Yup.string().required('Message is required')
 });
 
 export const RegisterSchema = Yup.object().shape({

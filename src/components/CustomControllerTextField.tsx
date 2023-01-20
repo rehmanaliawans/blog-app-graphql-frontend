@@ -15,6 +15,8 @@ export interface IControllerInterface {
   defaultValue?: string | number;
   shrink?: boolean;
   rows?: number | string;
+  size?: 'small' | 'medium' | undefined;
+  fullWidth?: boolean;
 }
 const CustomController = (props: IControllerInterface) => {
   const {
@@ -29,6 +31,8 @@ const CustomController = (props: IControllerInterface) => {
     disable,
     shrink,
     rows,
+    size,
+    fullWidth,
     ...other
   } = props;
   const { control } = useFormContext();
@@ -42,6 +46,7 @@ const CustomController = (props: IControllerInterface) => {
         defaultValue={defaultValue}
         render={({ field, fieldState: { error: { message } = {} } }) => (
           <TextField
+            size={size}
             type={type === 'password' ? (showPassword ? 'text' : type) : type}
             variant={variant ? variant : 'outlined'}
             margin="normal"

@@ -1,9 +1,11 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import React, { Fragment, useEffect, useReducer } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { io } from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -11,24 +13,15 @@ import { useGlobalContext } from '../../context';
 import { MessageList, User } from '../../interface';
 import { chatInitialState, chatReducer } from '../../reducers';
 import { ChatBox, ChatBoxPaper, ChatOpenBox, ChatOpenTextBox, ChatPaper, UserOpenBox } from '../../styledComponent';
+import { ChatSchema } from '../../utils/hookForm';
+import CustomController from '../CustomControllerTextField';
 import MessageBox from './MessageBox';
 import UsersShown from './UsersShown';
 
 const ChatPopup = () => {
   const { userId, userName } = useGlobalContext();
   const [state, dispatch] = useReducer(chatReducer, chatInitialState);
-  const {
-    onlineUsers,
-    notifications,
-    chatOpen,
-    usersOpen,
-    user,
-    socket,
-    chatMessage,
-    newRoomCreate,
-    messageList
-  } = state;
-
+  const { onlineUsers, notifications, chatOpen, usersOpen, user, socket, newRoomCreate, messageList } = state;
 
   useEffect(() => {
     if (localStorage) {
@@ -126,26 +119,25 @@ const ChatPopup = () => {
     socket?.emit('join_room', { room: room, user: user });
   };
 
-  const sendMessage = async (room: string) => {
-    if (chatMessage !== '') {
-      const messageData: MessageList = {
-        room: room,
-        author: userId,
-        message: chatMessage,
-        time: new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes()
-      };
-      localStorage.setItem('message', JSON.stringify([...messageList, messageData]));
+  const sendMessage = async (room: string, chat: string) => {
+    const messageData: MessageList = {
+      room: room,
+      author: userId,
+      message: chat,
+      time: new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes()
+    };
+    localStorage.setItem('message', JSON.stringify([...messageList, messageData]));
 
-      socket?.emit('send_message', { messageData, clientId: user?.clientId });
-      dispatch({
-        type: 'SET_MESSAGE_LIST',
-        value: [...messageList, messageData]
-      });
-      dispatch({
-        type: 'SET_CHAT_MESSAGE',
-        value: ''
-      });
-    }
+    socket?.emit('send_message', { messageData, clientId: user?.clientId });
+    dispatch({
+      type: 'SET_MESSAGE_LIST',
+      value: [...messageList, messageData]
+    });
+    setValue('chat', '');
+  };
+
+  const onSubmit = async (data: { chat: string }) => {
+    if (!!data.chat) sendMessage(newRoomCreate, data.chat);
   };
 
   const handleUserCall = (id: string) => {
@@ -233,6 +225,16 @@ const ChatPopup = () => {
     }
   };
 
+  const defaultValues = {
+    chat: ''
+  };
+  const method = useForm({
+    resolver: yupResolver(ChatSchema),
+    defaultValues
+  });
+
+  const { handleSubmit, setValue } = method;
+
   return (
     <ChatBox>
       <ChatBoxPaper onClick={() => handleChatBoxClick()}>
@@ -292,33 +294,21 @@ const ChatPopup = () => {
               );
             })}
           </ChatOpenBox>
-          <ChatOpenTextBox>
-            <TextField
-              type="text"
-              value={chatMessage}
-              onChange={(e) => {
-                dispatch({
-                  type: 'SET_CHAT_MESSAGE',
-                  value: e.target.value
-                });
-              }}
-              size="small"
-              placeholder="Enter Message"
-              fullWidth
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  sendMessage(newRoomCreate);
-                }
-              }}
-            />
-            <Button
-              variant="contained"
-              onClick={() => {
-                sendMessage(newRoomCreate);
-              }}>
-              Send
-            </Button>
-          </ChatOpenTextBox>
+          <FormProvider {...method}>
+            <ChatOpenTextBox component="form" onSubmit={handleSubmit(onSubmit)}>
+              <CustomController
+                label="Message"
+                name="chat"
+                placeholder="Enter message"
+                type="text"
+                size="small"
+              />
+
+              <Button variant="contained" type="submit">
+                Send
+              </Button>
+            </ChatOpenTextBox>
+          </FormProvider>
         </ChatPaper>
       )}
       {usersOpen && (

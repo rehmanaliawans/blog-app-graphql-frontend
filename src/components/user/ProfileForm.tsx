@@ -1,12 +1,13 @@
 import { ApolloQueryResult } from '@apollo/client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, Stack, TextField } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { GetCurrentUserQuery, UpdateUserInput, useUpdateUserMutation } from '../../generated/graphql';
 import { ProfileSchema } from '../../utils/hookForm';
+import CustomController from '../CustomControllerTextField';
 
 const ProfileForm = ({
   profileData,
@@ -33,17 +34,12 @@ const ProfileForm = ({
     lastName: pLastName,
     id: id
   };
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-    control
-  } = useForm({
+  const method = useForm({
     resolver: yupResolver(ProfileSchema),
     defaultValues
   });
 
+  const { handleSubmit, watch } = method;
   const [firstName, lastName] = watch(['firstName', 'lastName']);
 
   useEffect(() => {
@@ -68,63 +64,39 @@ const ProfileForm = ({
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={3}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <Controller
-            render={({ field }) => (
-              <TextField
-                label="First name"
-                placeholder="Enter first name"
-                {...field}
-                error={!!errors.firstName}
-                helperText={errors.firstName && errors.firstName.message}
-              />
-            )}
-            name="firstName"
-            control={control}
-          />
-          <Controller
-            render={({ field }) => (
-              <TextField
-                label="Last name"
-                placeholder="Enter last name"
-                {...field}
-                error={!!errors.lastName}
-                helperText={errors.lastName && errors.lastName.message}
-              />
-            )}
-            name="lastName"
-            control={control}
-          />
-        </Stack>
-        <Controller
-          render={({ field }) => (
-            <TextField
-              label="email"
-              placeholder="enter email address"
-              {...field}
-              error={!!errors.email}
-              helperText={errors.email && errors.email.message}
-              disabled={true}
+    <FormProvider {...method}>
+      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={3}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <CustomController
+              label="First Name"
+              name="firstName"
+              placeholder="Enter first name"
+              type="text"
             />
-          )}
-          name="email"
-          control={control}
-        />
+            <CustomController label="Last Name" name="lastName" placeholder="Enter last name" type="text" />
+          </Stack>
+          <CustomController
+            label="Email"
+            name="email"
+            placeholder="Enter email address"
+            type="text"
+            disable={true}
+          />
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            size="medium"
-            type="submit"
-            sx={{ width: '7rem' }}
-            variant="contained"
-            disabled={btnDisabled}>
-            Update
-          </Button>
+          <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              size="medium"
+              type="submit"
+              sx={{ width: '7rem' }}
+              variant="contained"
+              disabled={btnDisabled}>
+              Update
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
-    </Box>
+      </Box>
+    </FormProvider>
   );
 };
 

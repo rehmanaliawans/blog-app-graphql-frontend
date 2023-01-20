@@ -1,8 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, Stack, styled, TextField } from '@mui/material';
+import { Box, Button, Stack, styled } from '@mui/material';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
@@ -14,35 +14,36 @@ import {
   useCreateUserPostMutation,
   useUpdateUserPostMutation,
 } from '../../../generated/graphql';
+import CustomController from '../../CustomControllerTextField';
 
 const MainBox = styled(Box)(() => ({
-  width: "100%",
-  height: "100%",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  justifyContent: "flex-start"
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  justifyContent: 'flex-start'
 }));
 
-const FileLabel = styled("label")(({ theme }) => ({
-  cursor: "pointer",
+const FileLabel = styled('label')(({ theme }) => ({
+  cursor: 'pointer',
   color: theme.palette.primary.main,
   border: `1px solid ${theme.palette.primary.light}`,
   borderRadius: theme.shape.borderRadius,
   padding: theme.spacing(1),
-  width: "8rem",
-  textAlign: "center"
+  width: '8rem',
+  textAlign: 'center'
 }));
 
 const uploadImage = (image: (string | Blob)[]) => {
   const promise = new Promise((resolve, reject) => {
     const fileData = new FormData();
-    fileData.append("file", image[0]);
-    fileData.append("upload_preset", "Blog_post");
-    fileData.append("cloud_name", "dxxv034dh");
+    fileData.append('file', image[0]);
+    fileData.append('upload_preset', 'Blog_post');
+    fileData.append('cloud_name', 'dxxv034dh');
 
-    fetch("https://api.cloudinary.com/v1_1/dxxv034dh/image/upload", {
-      method: "POST",
+    fetch('https://api.cloudinary.com/v1_1/dxxv034dh/image/upload', {
+      method: 'POST',
       body: fileData
     })
       .then((res) => res.json())
@@ -74,11 +75,11 @@ const CreatePostForm = ({
       if (data.createUserPost.status === 200) {
         toast.success(data.createUserPost.message);
         setFileLoading(false);
-        setValue("title", "");
-        setValue("description", "");
-        setValue("file", []);
+        setValue('title', '');
+        setValue('description', '');
+        setValue('file', []);
         setPreviewImage(null);
-        navigate("/");
+        navigate('/');
         setTimeout(() => {
           reset();
         }, 3000);
@@ -94,12 +95,12 @@ const CreatePostForm = ({
       if (data.updateUserPost.status === 200) {
         toast.success(data.updateUserPost.message);
         setFileLoading(false);
-        setValue("title", "");
-        setValue("description", "");
-        setValue("file", []);
+        setValue('title', '');
+        setValue('description', '');
+        setValue('file', []);
         setPreviewImage(null);
         setIsEdit(false);
-        navigate(`/get-post/${id.get("id")}`);
+        navigate(`/get-post/${id.get('id')}`);
       }
     },
     onError: (err) => {
@@ -108,31 +109,31 @@ const CreatePostForm = ({
   });
 
   const LoginSchema = Yup.object().shape({
-    title: Yup.string().required("Title is required").min(3, "Minimum 3 characters required"),
-    description: Yup.string().required("Description is required").min(3, "Minimum 3 characters required"),
+    title: Yup.string().required('Title is required').min(3, 'Minimum 3 characters required'),
+    description: Yup.string().required('Description is required').min(3, 'Minimum 3 characters required'),
     file: Yup.mixed()
   });
 
   const defaultValues = {
-    title: "",
-    description: "",
+    title: '',
+    description: '',
     file: []
   };
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors }
-  } = useForm({
+  const method = useForm({
     resolver: yupResolver(LoginSchema),
     defaultValues
   });
 
+  const {
+    handleSubmit,
+    setValue,
+  } = method;
+
   useEffect(() => {
     if (isEdit) {
-      setValue("title", post?.fetchPost?.title!);
-      setValue("description", post?.fetchPost?.description!);
+      setValue('title', post?.fetchPost?.title!);
+      setValue('description', post?.fetchPost?.description!);
       setPreviewImage(post?.fetchPost?.attachmentUrl);
     }
   }, [
@@ -143,7 +144,6 @@ const CreatePostForm = ({
     setValue
   ]);
 
-  
   const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
 
@@ -169,7 +169,7 @@ const CreatePostForm = ({
     let UpdatePostData: UpdatePostInput = {
       title: postData.title,
       description: postData.description,
-      postId: ""
+      postId: ''
     };
 
     if (!!image.length) {
@@ -178,7 +178,7 @@ const CreatePostForm = ({
       if (imgUrl && isEdit) {
         UpdatePostData = {
           ...UpdatePostData,
-          postId: id.get("id") as string,
+          postId: id.get('id') as string,
           attachmentUrl: imgUrl as string
         };
         updateUserPostMutation({
@@ -201,7 +201,7 @@ const CreatePostForm = ({
       if (isEdit) {
         UpdatePostData = {
           ...UpdatePostData,
-          postId: id.get("id") as string
+          postId: id.get('id') as string
         };
 
         updateUserPostMutation({
@@ -219,80 +219,69 @@ const CreatePostForm = ({
     }
   };
   return (
-    <MainBox component="form" onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={3} sx={{ width: "100%" }}>
-        <TextField
-          label="Title"
-          placeholder="Enter email address"
-          size="medium"
-          {...register("title")}
-          error={!!errors.title}
-          helperText={errors.title && errors.title.message}
-          InputLabelProps={{ shrink: true }}
-        />
+    <FormProvider {...method}>
+      <MainBox component="form" onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={3} sx={{ width: '100%' }}>
+          <CustomController label="Title" name="title" placeholder="Enter title" type="text" shrink={true} />
+          <CustomController
+            label="Description"
+            name="description"
+            placeholder="Enter description"
+            type="text"
+            shrink={true}
+            multiline={true}
+            rows={10}
+          />
 
-        <TextField
-          placeholder="Enter description"
-          label="Description"
-          fullWidth
-          multiline
-          rows={10}
-          error={!!errors.description}
-          helperText={errors.description && errors.description.message}
-          {...register("description")}
-          InputLabelProps={{ shrink: true }}
-        />
+          <Stack display="flex" flexDirection="row">
+            <FileLabel htmlFor="fileupload">Attached file</FileLabel>
+            {image.length > 0 && (
+              <Button
+                onClick={() => {
+                  setImage([]);
+                  setPreviewImage('');
+                }}
+                variant="contained"
+                color="error"
+                sx={{ marginLeft: '10px', textTransform: 'capitalize' }}>
+                Remove
+              </Button>
+            )}
+          </Stack>
 
-        <Stack display="flex" flexDirection="row">
-          <FileLabel htmlFor="fileupload">Attached file</FileLabel>
-          {image.length > 0 && (
-            <Button
-              onClick={() => {
-                setImage([]);
-                setPreviewImage("");
-              }}
-              variant="contained"
-              color="error"
-              sx={{ marginLeft: "10px", textTransform: "capitalize" }}
-            >
-              Remove
-            </Button>
+          <input
+            type="file"
+            id="fileupload"
+            onChange={(e) => handleChangeImage(e)}
+            style={{ display: 'none' }}
+            accept="image/*"
+          />
+          {previewImage && (
+            <Box>
+              <img
+                src={previewImage as string}
+                alt="blog-post-images"
+                style={{
+                  width: '300px',
+                  height: '300px',
+                  objectFit: 'cover',
+                  maxWidth: '100%'
+                }}
+              />
+            </Box>
           )}
+
+          <LoadingButton
+            size="large"
+            type="submit"
+            variant="contained"
+            loading={fileLoading}
+            sx={{ width: { sm: '100%', md: '20%' } }}>
+            {`${isEdit ? 'Update' : 'Create'}`}
+          </LoadingButton>
         </Stack>
-
-        <input
-          type="file"
-          id="fileupload"
-          onChange={(e) => handleChangeImage(e)}
-          style={{ display: "none" }}
-          accept="image/*"
-        />
-        {previewImage && (
-          <Box>
-            <img
-              src={previewImage as string}
-              alt="blog-post-images"
-              style={{
-                width: "300px",
-                height: "300px",
-                objectFit: "cover",
-                maxWidth: "100%"
-              }}
-            />
-          </Box>
-        )}
-
-        <LoadingButton
-          size="large"
-          type="submit"
-          variant="contained"
-          loading={fileLoading}
-          sx={{ width: { sm: "100%", md: "20%" } }}
-        >
-          {`${isEdit ? "Update" : "Create"}`}
-        </LoadingButton>
-      </Stack>
-    </MainBox>
+      </MainBox>
+    </FormProvider>
   );
 };
 

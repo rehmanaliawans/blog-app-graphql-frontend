@@ -1,18 +1,16 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Box, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Box, Stack, Typography } from '@mui/material';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { useUpdatePasswordMutation } from '../../generated/graphql';
 import { updateSPasswordSchema } from '../../utils/hookForm';
+import CustomController from '../CustomControllerTextField';
 
 const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
 
   const [updatePasswordMutation, { loading, error }] = useUpdatePasswordMutation({
     onCompleted(data) {
@@ -26,17 +24,12 @@ const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
     password: '',
     confirmPassword: ''
   };
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    control
-  } = useForm({
+  const method = useForm({
     resolver: yupResolver(updateSPasswordSchema),
     defaultValues
   });
 
+  const { handleSubmit } = method;
   const onSubmit = async (data: { password: string }) => {
     if (!!userKey) {
       updatePasswordMutation({
@@ -50,58 +43,29 @@ const UpdatePasswordForm = ({ userKey }: { userKey: string }) => {
     }
   };
   return (
-    <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={3}>
-        <Controller
-          render={({ field }) => (
-            <TextField
-              placeholder="Enter Password"
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              error={!!errors.password}
-              {...field}
-              helperText={errors.password && errors.password.message}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
+    <FormProvider {...method}>
+      <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={1}>
+          <CustomController label="Password" name="password" placeholder="Enter password" type="password" />
+          <CustomController
+            label="confirm Password"
+            name="confirmPassword"
+            placeholder="Enter confirm password"
+            type="password"
+          />
+
+          <LoadingButton fullWidth size="medium" type="submit" variant="contained" loading={loading}>
+            Update
+          </LoadingButton>
+
+          {error && (
+            <Typography variant="caption" color="error">
+              {error.message}
+            </Typography>
           )}
-          name="password"
-          control={control}
-        />
-
-        <Controller
-          render={({ field }) => (
-            <TextField
-              label="confirm password"
-              placeholder="Enter confirm password"
-              {...field}
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword && errors.confirmPassword.message}
-              type={showPassword ? 'text' : 'password'}
-            />
-          )}
-          name="confirmPassword"
-          control={control}
-        />
-
-        <LoadingButton fullWidth size="medium" type="submit" variant="contained" loading={loading}>
-          Update
-        </LoadingButton>
-
-        {error && (
-          <Typography variant="caption" color="error">
-            {error.message}
-          </Typography>
-        )}
-      </Stack>
-    </Box>
+        </Stack>
+      </Box>
+    </FormProvider>
   );
 };
 

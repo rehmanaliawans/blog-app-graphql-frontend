@@ -16,6 +16,8 @@ export interface IControllerInterface {
   shrink?: boolean;
   rows?: number | string;
   size?: 'small' | 'medium' | undefined;
+  sx?: {};
+  id?: string;
   fullWidth?: boolean;
 }
 const CustomController = (props: IControllerInterface) => {
@@ -33,6 +35,8 @@ const CustomController = (props: IControllerInterface) => {
     rows,
     size,
     fullWidth,
+    sx,
+    id,
     ...other
   } = props;
   const { control } = useFormContext();
@@ -54,6 +58,8 @@ const CustomController = (props: IControllerInterface) => {
             rows={rows}
             error={!!message}
             label={label}
+            sx={sx}
+            id={id}
             placeholder={placeholder || ''}
             fullWidth
             {...field}

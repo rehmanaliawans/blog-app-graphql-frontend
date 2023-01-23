@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Stack, styled } from '@mui/material';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -14,6 +14,7 @@ import {
   useCreateUserPostMutation,
   useUpdateUserPostMutation,
 } from '../../../generated/graphql';
+import CustomImageController from '../../CustomControllerImage';
 import CustomController from '../../CustomControllerTextField';
 
 const MainBox = styled(Box)(() => ({
@@ -125,10 +126,8 @@ const CreatePostForm = ({
     defaultValues
   });
 
-  const {
-    handleSubmit,
-    setValue,
-  } = method;
+  const { handleSubmit, setValue, watch } = method;
+  const [file] = watch(['file']);
 
   useEffect(() => {
     if (isEdit) {
@@ -144,11 +143,17 @@ const CreatePostForm = ({
     setValue
   ]);
 
-  const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
+  useEffect(() => {
+    if (!!file.length) {
+      handleChangeImage(file);
+    }
+  }, [file]);
+
+  const handleChangeImage = (e: File[]) => {
+    const file = e ? e[0] : null;
 
     if (file) {
-      setImage(e.target.files as unknown as []);
+      setImage(e as unknown as []);
       const reader = new FileReader();
       reader.onload = () => {
         if (reader.readyState === 2) {
@@ -161,7 +166,7 @@ const CreatePostForm = ({
     }
   };
 
-  const onSubmit = async (data: { title: string; description: string }) => {
+  const onSubmit = async (data: { title: string; description: string; file: File[] }) => {
     let postData: CreatePostInput = {
       title: data.title,
       description: data.description
@@ -171,10 +176,9 @@ const CreatePostForm = ({
       description: postData.description,
       postId: ''
     };
-
-    if (!!image.length) {
+    if (!!data.file.length) {
       setFileLoading(true);
-      const imgUrl = await uploadImage(image);
+      const imgUrl = await uploadImage(data.file);
       if (imgUrl && isEdit) {
         UpdatePostData = {
           ...UpdatePostData,
@@ -203,7 +207,6 @@ const CreatePostForm = ({
           ...UpdatePostData,
           postId: id.get('id') as string
         };
-
         updateUserPostMutation({
           variables: {
             updatePostInput: UpdatePostData
@@ -218,6 +221,7 @@ const CreatePostForm = ({
       }
     }
   };
+
   return (
     <FormProvider {...method}>
       <MainBox component="form" onSubmit={handleSubmit(onSubmit)}>
@@ -248,14 +252,7 @@ const CreatePostForm = ({
               </Button>
             )}
           </Stack>
-
-          <input
-            type="file"
-            id="fileupload"
-            onChange={(e) => handleChangeImage(e)}
-            style={{ display: 'none' }}
-            accept="image/*"
-          />
+          <CustomImageController id="fileupload" name="file" sx={{ display: 'none' }} accept="image/*" />
           {previewImage && (
             <Box>
               <img

@@ -1,8 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import SendIcon from '@mui/icons-material/Send';
-import { Avatar, Box, Button, Divider, Grid, InputAdornment, styled, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Divider, Grid, styled, Typography } from '@mui/material';
 import moment from 'moment';
 import { Fragment, useReducer } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -10,7 +9,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useGlobalContext } from '../context';
 import { CommentProps } from '../interface';
 import { singleCommentInitialState, singleCommentReducer } from '../reducers';
-import { EditReplySchema } from '../utils/hookForm';
+import { EditReplySchema, ReplyMessageSchema } from '../utils/hookForm';
 import CustomController from './CustomControllerTextField';
 import DialogBox from './DialogBox';
 
@@ -64,7 +63,16 @@ const CommentDiv: React.FC<CommentProps> = ({
     defaultValues
   });
 
-  const { handleSubmit } = method;
+  const { handleSubmit, setValue } = method;
+  const defaultReplyValues = {
+    replyMessage: ''
+  };
+  const method2 = useForm({
+    resolver: yupResolver(ReplyMessageSchema),
+    defaultValues: defaultReplyValues
+  });
+
+  const { handleSubmit: handleReplySubmit, setValue: setReplyValue } = method2;
 
   const onSubmit = async (data: { editMessage: string }) => {
     const edit = {
@@ -73,6 +81,30 @@ const CommentDiv: React.FC<CommentProps> = ({
     };
     console.log('submit tclall', edit);
     handleEditComment(edit);
+  };
+  const onSubmitReply = async (data: { replyMessage: string }) => {
+    const replyData = {
+      message: data.replyMessage,
+      id: id
+    };
+    console.log('submit tclall', replyData);
+    // handleEditComment(edit);
+    handleReplyComment(replyData);
+
+    dispatch({
+      type: 'SET_REPLY',
+      value: {
+        message: '',
+        id: ''
+      }
+    });
+    onDispatch({
+      type: 'REPLY_INPUT_ID',
+      value: {
+        isReply: false,
+        id: ''
+      }
+    });
   };
 
   const checkEditComment = () => {
@@ -99,6 +131,7 @@ const CommentDiv: React.FC<CommentProps> = ({
         }
       });
     } else {
+      setValue('editMessage', editReply.id === id ? editReply.message : commentBody);
       onDispatch({
         type: 'EDIT_DIALOG_OPEN',
         value: {
@@ -129,6 +162,7 @@ const CommentDiv: React.FC<CommentProps> = ({
   };
 
   const handleEditSetComment = () => {
+    setReplyValue('replyMessage', reply.id === id ? reply.message : '');
     onDispatch({
       type: 'EDIT_DIALOG_OPEN',
       value: {
@@ -237,51 +271,21 @@ const CommentDiv: React.FC<CommentProps> = ({
             <Typography sx={{ lineBreak: 'anywhere' }}>{commentBody}</Typography>
           )}
           {replyInputId.id === id && replyInputId.isReply === true && (
-            <TextField
-              placeholder="Enter reply..."
-              variant="outlined"
-              label="reply"
-              size="small"
-              fullWidth
-              autoFocus
-              InputLabelProps={{ shrink: true }}
-              value={reply.id === id ? reply.message : ''}
-              onChange={(e) =>
-                dispatch({
-                  type: 'SET_REPLY',
-                  value: {
-                    message: e.target.value,
-                    id: id
-                  }
-                })
-              }
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end" onClick={() => handleReplySetComment()}>
-                    <SendIcon sx={{ cursor: 'pointer' }} />
-                  </InputAdornment>
-                )
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleReplyComment(reply);
-                  dispatch({
-                    type: 'SET_REPLY',
-                    value: {
-                      message: '',
-                      id: ''
-                    }
-                  });
-                  onDispatch({
-                    type: 'REPLY_INPUT_ID',
-                    value: {
-                      isReply: false,
-                      id: ''
-                    }
-                  });
-                }
-              }}
-            />
+            <>
+              <FormProvider {...method2}>
+                <Box component="form" noValidate onSubmit={handleReplySubmit(onSubmitReply)}>
+                  <CustomController
+                    label="Reply"
+                    name="replyMessage"
+                    variant="outlined"
+                    placeholder="Enter reply..."
+                    type="text"
+                    size="small"
+                    defaultValue={reply.id === id ? reply.message : ''}
+                  />
+                </Box>
+              </FormProvider>
+            </>
           )}
         </Grid>
 

@@ -10,7 +10,7 @@ export interface IControllerInterface {
   accept?: string;
 }
 const CustomImageController = (props: IControllerInterface) => {
-  const { sx, id, name, accept } = props;
+  const { sx, id, name } = props;
   const { control } = useFormContext();
 
   return (

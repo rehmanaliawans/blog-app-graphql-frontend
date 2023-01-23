@@ -26,6 +26,9 @@ export const CommentSchema = Yup.object().shape({
 export const EditReplySchema = Yup.object().shape({
   editMessage: Yup.string().required('Comment is required')
 });
+export const ReplyMessageSchema = Yup.object().shape({
+  replyMessage: Yup.string().required('Comment is required')
+});
 export const ChatSchema = Yup.object().shape({
   chat: Yup.string().required('Message is required')
 });

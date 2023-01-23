@@ -173,41 +173,42 @@ const CommentBox = ({
     }
   };
   return (
-    <FormProvider {...method}>
-      <MainCommentBox component="form" onSubmit={handleSubmit(onSubmit)}>
-        <CustomController
-          label="Comment"
-          variant="outlined"
-          name="comment"
-          placeholder="Enter new comment"
-          type="text"
-          size="small"
-        />
-
-        {!!comments?.length ? (
-          comments?.map((comment, index) => {
-            return (
-              <Fragment key={index}>
-                <CommentDiv
-                  comment={comment}
-                  index={index}
-                  handleCommentDelete={(id) => handleCommentDelete(id)}
-                  handleEditComment={(reply) => handleEditComment(reply)}
-                  handleReplyComment={(reply) => handleReplyComment(reply)}
-                  editDialogOpen={editDialogOpen}
-                  onDispatch={dispatch}
-                  replyInputId={replyInputId}
-                />
-              </Fragment>
-            );
-          })
-        ) : (
-          <Typography color="primary" variant="h4" sx={{ textAlign: 'center' }}>
-            No comments
-          </Typography>
-        )}
-      </MainCommentBox>
-    </FormProvider>
+    <MainCommentBox>
+      <FormProvider {...method}>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+          <CustomController
+            label="Comment"
+            variant="outlined"
+            name="comment"
+            placeholder="Enter new comment"
+            type="text"
+            size="small"
+          />
+        </Box>
+      </FormProvider>
+      {!!comments?.length ? (
+        comments?.map((comment, index) => {
+          return (
+            <Fragment key={index}>
+              <CommentDiv
+                comment={comment}
+                index={index}
+                handleCommentDelete={(id) => handleCommentDelete(id)}
+                handleEditComment={(reply) => handleEditComment(reply)}
+                handleReplyComment={(reply) => handleReplyComment(reply)}
+                editDialogOpen={editDialogOpen}
+                onDispatch={dispatch}
+                replyInputId={replyInputId}
+              />
+            </Fragment>
+          );
+        })
+      ) : (
+        <Typography color="primary" variant="h4" sx={{ textAlign: 'center' }}>
+          No comments
+        </Typography>
+      )}
+    </MainCommentBox>
   );
 };
 

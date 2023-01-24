@@ -4,22 +4,29 @@ import CircleIcon from '@mui/icons-material/Circle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Button, Typography } from '@mui/material';
-import React, { Fragment, useEffect, useReducer } from 'react';
+import React, { Fragment, useContext, useEffect, useReducer } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { io } from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useGlobalContext } from '../../context';
+import { GlobalContext } from '../../context';
 import { MessageList, User } from '../../interface';
 import { chatInitialState, chatReducer } from '../../reducers';
-import { ChatBox, ChatBoxPaper, ChatOpenBox, ChatOpenTextBox, ChatPaper, UserOpenBox } from '../../styledComponent';
+import {
+  ChatBox,
+  ChatBoxPaper,
+  ChatOpenBox,
+  ChatOpenTextBox,
+  ChatPaper,
+  UserOpenBox
+} from '../../styledComponent';
 import { ChatSchema } from '../../utils/hookForm';
 import CustomController from '../CustomControllerTextField';
 import MessageBox from './MessageBox';
 import UsersShown from './UsersShown';
 
 const ChatPopup = () => {
-  const { userId, userName } = useGlobalContext();
+  const { user: userContext } = useContext(GlobalContext);
   const [state, dispatch] = useReducer(chatReducer, chatInitialState);
   const { onlineUsers, notifications, chatOpen, usersOpen, user, socket, newRoomCreate, messageList } = state;
 
@@ -36,11 +43,11 @@ const ChatPopup = () => {
     }
   }, []);
   useEffect(() => {
-    if (userId) {
+    if (userContext?.id) {
       const socketCon = io(`${process.env.REACT_APP_BACKEND_URL_SOCKET}/chat-app`, {
         query: {
-          userId: userId,
-          name: userName
+          userId: userContext?.id,
+          name: userContext?.firstName + ' ' + userContext?.lastName
         }
       });
       dispatch({
@@ -48,12 +55,12 @@ const ChatPopup = () => {
         value: socketCon
       });
     }
-  }, [userId, userName]);
+  }, [userContext?.firstName, userContext?.id, userContext?.lastName]);
 
   useEffect(() => {
     socket?.on('join_room_check', (sendUser, newRoom) => {
       if (!!onlineUsers.length) {
-        let currentUser = onlineUsers?.find((user) => user.id === userId);
+        let currentUser = onlineUsers?.find((user) => user.id === userContext?.id);
 
         socket?.emit('join_room', { room: newRoom, user: currentUser });
       }
@@ -113,7 +120,7 @@ const ChatPopup = () => {
       socket?.off('join_room_check');
       socket?.off('online_users');
     };
-  }, [chatOpen, messageList, notifications, onlineUsers, socket, user, userId, usersOpen]);
+  }, [chatOpen, messageList, notifications, onlineUsers, socket, user, userContext?.id, usersOpen]);
 
   const joinRoom = (room: string, user: User) => {
     socket?.emit('join_room', { room: room, user: user });
@@ -122,7 +129,7 @@ const ChatPopup = () => {
   const sendMessage = async (room: string, chat: string) => {
     const messageData: MessageList = {
       room: room,
-      author: userId,
+      author: userContext?.id!,
       message: chat,
       time: new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes()
     };
@@ -141,7 +148,7 @@ const ChatPopup = () => {
   };
 
   const handleUserCall = (id: string) => {
-    let currentUser = onlineUsers?.find((user) => user.id === userId);
+    let currentUser = onlineUsers?.find((user) => user.id === userContext?.id);
     let user = onlineUsers?.find((user) => user.id === id.toString());
     let getRoom = '';
     currentUser?.room?.find((room) => {
@@ -286,7 +293,7 @@ const ChatPopup = () => {
                     <MessageBox
                       user={user}
                       text={message.message}
-                      side={message.author === userId ? 'right' : 'left'}
+                      side={message.author === userContext?.id ? 'right' : 'left'}
                       time={message.time}
                     />
                   )}
@@ -316,7 +323,7 @@ const ChatPopup = () => {
           <UserOpenBox>
             {onlineUsers.length >= 2 ? (
               onlineUsers.map((user, index) => {
-                if (user.id !== userId && !!user.status) {
+                if (user.id !== userContext?.id && !!user.status) {
                   let notification = undefined;
                   if (!!notifications.length) {
                     notification = notifications.find((notification) => notification?.user?.id === user.id);

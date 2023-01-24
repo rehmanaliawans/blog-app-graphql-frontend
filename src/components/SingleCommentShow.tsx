@@ -3,10 +3,11 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Avatar, Box, Button, Divider, Grid, styled, Typography } from '@mui/material';
 import moment from 'moment';
-import { Fragment, useReducer } from 'react';
+import { Fragment, useContext, useReducer } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { useGlobalContext } from '../context';
+// import { useGlobalContext } from '../context';
+import { GlobalContext } from '../context';
 import { CommentProps } from '../interface';
 import { singleCommentInitialState, singleCommentReducer } from '../reducers';
 import { EditReplySchema, ReplyMessageSchema } from '../utils/hookForm';
@@ -50,7 +51,7 @@ const CommentDiv: React.FC<CommentProps> = ({
 }) => {
   const { id, user, commentBody, createdAt, reply: commentReply } = comment;
 
-  const { userId } = useGlobalContext();
+  const { user: userContext } = useContext(GlobalContext);
 
   const [state, dispatch] = useReducer(singleCommentReducer, singleCommentInitialState);
   const { deleteDialogOpen, showReplies, editReply, reply } = state;
@@ -79,7 +80,6 @@ const CommentDiv: React.FC<CommentProps> = ({
       message: data.editMessage,
       id: id
     };
-    console.log('submit tclall', edit);
     handleEditComment(edit);
   };
   const onSubmitReply = async (data: { replyMessage: string }) => {
@@ -87,8 +87,6 @@ const CommentDiv: React.FC<CommentProps> = ({
       message: data.replyMessage,
       id: id
     };
-    console.log('submit tclall', replyData);
-    // handleEditComment(edit);
     handleReplyComment(replyData);
 
     dispatch({
@@ -140,25 +138,6 @@ const CommentDiv: React.FC<CommentProps> = ({
         }
       });
     }
-  };
-
-  const handleReplySetComment = () => {
-    handleReplyComment(reply);
-
-    dispatch({
-      type: 'SET_REPLY',
-      value: {
-        message: '',
-        id: ''
-      }
-    });
-    onDispatch({
-      type: 'REPLY_INPUT_ID',
-      value: {
-        isReply: false,
-        id: ''
-      }
-    });
   };
 
   const handleEditSetComment = () => {
@@ -217,17 +196,19 @@ const CommentDiv: React.FC<CommentProps> = ({
     <Fragment key={id}>
       <Grid container wrap="nowrap" spacing={1} mt={1}>
         <Grid item>
-          <AvatarIcon index={index}>{user.id === userId ? 'Y' : user.firstName[0].toUpperCase()}</AvatarIcon>
+          <AvatarIcon index={index}>
+            {user.id === userContext?.id ? 'Y' : user.firstName[0].toUpperCase()}
+          </AvatarIcon>
         </Grid>
         <Grid justifyContent="left" item xs zeroMinWidth>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                {user?.id === userId ? 'You' : user?.firstName + ' ' + user?.lastName}
+                {user?.id === userContext?.id ? 'You' : user?.firstName + ' ' + user?.lastName}
               </Typography>
               <DateTypography variant="caption">posted {moment(createdAt).fromNow()}</DateTypography>
             </Box>
-            {user.id === userId && (
+            {user.id === userContext?.id && (
               <Box>
                 <Button
                   size="small"

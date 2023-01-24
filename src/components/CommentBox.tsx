@@ -6,7 +6,7 @@ import { Fragment, useCallback, useEffect, useReducer, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { io, Socket } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 
 import {
   FetchPostByIdQuery,
@@ -38,7 +38,7 @@ const CommentBox = ({
   const { id } = useParams();
   const [state, dispatch] = useReducer(commentReducer, commentInitialState);
   const [socket, setSocket] = useState<Socket>();
-  const { comment, comments, replyDelete, editDialogOpen, replyInputId } = state;
+  const { comments, replyDelete, editDialogOpen, replyInputId } = state;
 
   const [createPostCommentMutation] = useCreatePostCommentMutation({
     onCompleted: (data) => {

@@ -1,23 +1,27 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import React, { useMemo, createContext, useReducer, Reducer, ReactElement } from 'react';
+import { InitialState } from './interface';
+import appReducer, { Action, initialState } from './appReduced';
 
-const AppContext = createContext({
-  userId: "",
-  setUserId: (userId: string) => {},
-  userName: "",
-  setUserName: (userName: string) => {}
+export const GlobalContext = createContext<InitialState>({
+  ...initialState
 });
 
-const AppProvider = ({ children }: { children: ReactNode }) => {
-  //change context values
-  const [userId, setUserId] = useState("");
-  const [userName, setUserName] = useState("");
+interface Props {
+  children: ReactElement;
+}
 
-  return (
-    <AppContext.Provider value={{ userId, setUserId, userName, setUserName }}>{children}</AppContext.Provider>
+const GlobalProvider: React.FC<Props> = ({ children }) => {
+  const [state, dispatch] = useReducer<Reducer<InitialState, Action>>(appReducer, initialState);
+
+  const store = useMemo(
+    () => ({
+      user: state.user,
+      dispatch
+    }),
+    [state]
   );
+
+  return <GlobalContext.Provider value={{ ...store }}>{children}</GlobalContext.Provider>;
 };
 
-//custom hook
-const useGlobalContext = () => useContext(AppContext);
-
-export { AppProvider, useGlobalContext };
+export default GlobalProvider;

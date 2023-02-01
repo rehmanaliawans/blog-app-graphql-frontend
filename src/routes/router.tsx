@@ -1,17 +1,7 @@
 import { useRoutes } from 'react-router-dom';
 
-import {
-  CreatePost,
-  ForgotPassword,
-  GetSinglePost,
-  HomePage,
-  Login,
-  MyPosts,
-  Page404,
-  Profile,
-  Register
-} from '../Pages';
 import PageLayout from '../components/layout';
+import { CreatePost, ForgotPassword, GetSinglePost, HomePage, Login, MyPosts, Page404, Profile, Register } from '../Pages';
 import LoggedInProtection from './LoggedInProtection';
 import LoggedOutProtection from './LoggedOutProtection';
 
@@ -41,7 +31,6 @@ export default function Router() {
         </LoggedOutProtection>
       )
     },
-
     {
       path: '/',
       element: <PageLayout />,

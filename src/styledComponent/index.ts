@@ -1,5 +1,5 @@
-import { Box, Card, Paper } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { Box, Card, Paper } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 export const RootStyle = styled("div")(({ theme }) => ({
   [theme.breakpoints.up("md")]: {
